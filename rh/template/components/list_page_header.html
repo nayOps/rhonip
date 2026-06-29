@@ -1,0 +1,26 @@
+{% load i18n %}
+{% load core %}
+
+<div class="onip-list-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="onip-page-title">{{ page_title|default:model|getattr:'_meta'|getattr:'verbose_name_plural'|title }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {% trans 'Liste des' %} {{ model|getattr:'_meta'|getattr:'verbose_name_plural'|lower }}
+                    </li>
+                </ol>
+            </nav>
+        </div>
+        {% if show_create_button|default:False %}
+        <div class="col-md-4 onip-list-header-actions">
+            <a href="{% url 'core:create' app model|getattr:'_meta'|getattr:'model_name' %}" class="btn onip-btn-new">
+                <i class="bi bi-plus-lg me-1"></i>
+                {% blocktrans with name=model|getattr:'_meta'|getattr:'verbose_name' %}Nouveau {{ name }}{% endblocktrans %}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>

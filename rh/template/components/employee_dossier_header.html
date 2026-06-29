@@ -1,0 +1,41 @@
+{% load i18n %}
+
+<div class="epd-hero">
+    <div class="epd-hero-inner">
+        <div class="epd-hero-left">
+            <div class="epd-avatar-wrap">
+                {% if employee.photo %}
+                <img class="epd-avatar" src="{{ employee.photo.url }}" alt="{{ employee.full_name }}">
+                {% else %}
+                <span class="epd-avatar-placeholder">{{ employee.first_name|default:'?'|slice:":1" }}{{ employee.last_name|default:''|slice:":1" }}</span>
+                {% endif %}
+                <span class="epd-status-dot" title="{% trans 'Actif' %}"></span>
+            </div>
+            <div>
+                <h2 class="epd-hero-name">{{ employee.full_name }}</h2>
+                <p class="epd-hero-subtitle">{{ dossier.subtitle }}</p>
+                <div class="epd-badges">
+                    <span class="epd-badge epd-badge--primary">{{ dossier.status_badge }}</span>
+                    {% if dossier.grade_badge %}
+                    <span class="epd-badge epd-badge--muted">{{ dossier.grade_badge }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="epd-hero-actions">
+            <button type="button" class="epd-btn-outline" onclick="window.print()">
+                <i class="bi bi-file-earmark-pdf"></i> {% trans 'Exporter le dossier (PDF)' %}
+            </button>
+            {% if profile_mode == 'edit' %}
+            {% elif can_edit and edit_url %}
+            <a href="{{ edit_url }}" class="epd-btn-primary">
+                <i class="bi bi-pencil"></i> {% trans 'Modifier le profil' %}
+            </a>
+            {% else %}
+            <a href="{% url 'core:password-change' %}" class="epd-btn-primary">
+                <i class="bi bi-key"></i> {% trans 'Modifier le mot de passe' %}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>

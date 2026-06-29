@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Annuaire des agents ONIP</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 1.2cm 1cm 1.4cm 1cm;
+        }
+
+        body {
+            color: #0f2744;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 9pt;
+            margin: 0;
+        }
+
+        .tricolor {
+            background: #0f2744;
+            height: 6px;
+            margin-bottom: 14px;
+            width: 100%;
+        }
+
+        .tricolor span {
+            display: inline-block;
+            height: 6px;
+            width: 33.33%;
+        }
+
+        .tricolor .yellow { background: #fff24b; }
+        .tricolor .red { background: #db3832; }
+
+        .header {
+            border-bottom: 2px solid #0f2744;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            width: 100%;
+        }
+
+        .header-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .header-table td {
+            vertical-align: top;
+        }
+
+        .org-name {
+            color: #0f2744;
+            font-size: 16pt;
+            font-weight: bold;
+            margin: 0 0 4px 0;
+        }
+
+        .org-subtitle {
+            color: #475569;
+            font-size: 9pt;
+            margin: 0;
+        }
+
+        .doc-title {
+            color: #0f2744;
+            font-size: 13pt;
+            font-weight: bold;
+            margin: 0 0 4px 0;
+            text-align: right;
+        }
+
+        .doc-meta {
+            color: #64748b;
+            font-size: 8pt;
+            margin: 0;
+            text-align: right;
+        }
+
+        .summary {
+            background: #f8fafc;
+            border: 1px solid #dbe3ee;
+            border-radius: 6px;
+            color: #334155;
+            font-size: 8.5pt;
+            margin-bottom: 14px;
+            padding: 8px 10px;
+        }
+
+        table.agents {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table.agents thead {
+            display: table-header-group;
+        }
+
+        table.agents th {
+            background: #0f2744;
+            border: 1px solid #0a1e36;
+            color: #ffffff;
+            font-size: 8.5pt;
+            font-weight: bold;
+            padding: 7px 6px;
+            text-align: left;
+        }
+
+        table.agents td {
+            border: 1px solid #dbe3ee;
+            padding: 6px;
+            vertical-align: top;
+        }
+
+        table.agents tbody tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        .col-index {
+            text-align: center;
+            width: 28px;
+        }
+
+        .col-first-name {
+            width: 80px;
+        }
+
+        .col-last-name {
+            width: 136px;
+            word-break: break-word;
+        }
+
+        .col-password {
+            width: 88px;
+        }
+
+        .col-email {
+            width: 240px;
+            word-break: break-word;
+        }
+
+        .footer {
+            border-top: 1px solid #dbe3ee;
+            color: #64748b;
+            font-size: 7.5pt;
+            margin-top: 12px;
+            padding-top: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <table width="100%" style="border-collapse: collapse; margin-bottom: 14px;">
+        <tr>
+            <td width="33%" style="background: #0f2744; height: 6px; padding: 0;"></td>
+            <td width="34%" style="background: #fff24b; height: 6px; padding: 0;"></td>
+            <td width="33%" style="background: #db3832; height: 6px; padding: 0;"></td>
+        </tr>
+    </table>
+
+    <div class="header">
+        <table class="header-table">
+            <tr>
+                <td>
+                    <p class="org-name">{{ organization.name|default:"ONIP" }}</p>
+                    <p class="org-subtitle">Office National des Infrastructures et des Ports</p>
+                    <p class="org-subtitle">Direction des Ressources Humaines</p>
+                </td>
+                <td>
+                    <p class="doc-title">Annuaire des agents</p>
+                    <p class="doc-meta">Généré le {{ generated_at|date:"d/m/Y à H:i" }}</p>
+                    <p class="doc-meta">{{ total_count }} agent{{ total_count|pluralize }}</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="summary">
+        Liste des agents actifs (hors Directeur Général et Directeurs Généraux Adjoints).
+    </div>
+
+    <table class="agents">
+        <thead>
+            <tr>
+                <th class="col-index">#</th>
+                <th class="col-first-name">Prénom</th>
+                <th class="col-last-name">Nom</th>
+                <th class="col-password">Mot de passe</th>
+                <th class="col-email">E-mail professionnel</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in employees %}
+            <tr>
+                <td class="col-index">{{ forloop.counter }}</td>
+                <td class="col-first-name">{{ employee.first_name|default:"—" }}</td>
+                <td class="col-last-name">{{ employee.last_name|default:"—" }}</td>
+                <td class="col-password">{{ employee.registration_number|default:"—" }}</td>
+                <td class="col-email">{{ employee.email_professional|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">Aucun agent trouvé.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Document interne ONIP — {{ organization.name|default:"ONIP" }} — {{ generated_at|date:"Y" }}
+    </div>
+</body>
+</html>

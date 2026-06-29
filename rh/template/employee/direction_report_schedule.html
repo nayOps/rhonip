@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/employee-detail.css' %}">
+
+<div class="employee-detail-page">
+    <div class="page-heading">
+        <div class="card">
+            <div class="card-body">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'employee:direction_report_hub' %}?year={{ report.year }}&month={{ report.month }}">{% trans 'Rapports par direction' %}</a></li>
+                    <li class="breadcrumb-item active">{{ direction.name }}</li>
+                </ol>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h3 class="m-0">{% trans 'Programmer le rapport' %}</h3>
+                        <p class="text-muted mb-0">{{ direction.name }} · {{ report.period_label }}</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'employee:direction_report_hub' %}?year={{ report.year }}&month={{ report.month }}" class="btn btn-light">{% trans 'Retour' %}</a>
+                        <a href="{% url 'employee:direction_attendance_report' direction.pk %}?year={{ report.year }}&month={{ report.month }}" class="btn btn-outline-primary">{% trans 'Aperçu du rapport' %}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card employee-tabs-card">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3">{% trans 'Paramètres de génération automatique' %}</h5>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">{% trans 'Direction' %}</label>
+                                    <input type="text" class="form-control" value="{{ direction.name }}" disabled>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{% trans 'Périodicité' %}</label>
+                                    <select name="frequency" class="form-select">
+                                        {% for value, label in frequencies %}
+                                        <option value="{{ value }}"{% if form_data.frequency == value %} selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{% trans 'Format' %}</label>
+                                    <select name="format" class="form-select">
+                                        {% for value, label in formats %}
+                                        <option value="{{ value }}"{% if form_data.format == value %} selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{% trans "Jour d'envoi" %}</label>
+                                    <select name="send_day" class="form-select">
+                                        <option value="1"{% if form_data.send_day == '1' %} selected{% endif %}>1</option>
+                                        <option value="5"{% if form_data.send_day == '5' %} selected{% endif %}>5</option>
+                                        <option value="last"{% if form_data.send_day == 'last' %} selected{% endif %}>{% trans 'Dernier jour du mois' %}</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">{% trans 'Destinataire email' %}</label>
+                                    <input type="email" name="recipient" class="form-control" value="{{ form_data.recipient }}">
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="active" id="direction-schedule-active"{% if form_data.active %} checked{% endif %}>
+                                        <label class="form-check-label" for="direction-schedule-active">{% trans 'Activer la programmation' %}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-4">
+                                <i class="bi bi-save"></i> {% trans 'Enregistrer la programmation' %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card employee-summary-card">
+                    <div class="card-body">
+                        <h6 class="text-uppercase text-muted mb-3">{% trans 'Aperçu direction' %}</h6>
+                        <ul class="attendance-summary-list">
+                            <li><span>{% trans 'Agents' %}</span><strong>{{ report.agent_count }}</strong></li>
+                            <li><span>{% trans 'Total retards' %}</span><strong>{{ report.total_lates }}</strong></li>
+                            <li><span>{% trans 'Moyenne / agent' %}</span><strong>{{ report.avg_per_agent }} min</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

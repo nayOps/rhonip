@@ -1,0 +1,54 @@
+version: '2'
+
+services:
+    redis:
+        restart: unless-stopped
+        image: redis:latest
+        expose:
+            - 6379
+    payday-db:
+        image: postgres:15
+        restart: unless-stopped
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+        environment:
+            - POSTGRES_PASSWORD=payday
+            - POSTGRES_USER=payday
+            - POSTGRES_DB=payday
+        ports:
+            - 5433:5432
+    server:
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: ./docker/backend/Dockerfile
+        entrypoint: /app/docker/backend/server-entrypoint.sh
+        volumes:
+            - static_volume:/app/backend/static
+            - media_volume:/app/backend/media
+        ports:
+            - 8000:8000    
+        env_file:
+            - ./docker/.env
+        depends_on:
+            - payday-db
+            - redis
+    
+    worker:
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: ./docker/backend/Dockerfile
+        entrypoint: /app/docker/backend/worker-entrypoint.sh
+        volumes:
+            - static_volume:/app/backend/static
+            - media_volume:/app/backend/media
+        env_file:
+            - ./docker/.env
+        depends_on:
+            - server
+    
+volumes:
+    static_volume: {}
+    postgres_data: {}
+    media_volume: {}

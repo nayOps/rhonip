@@ -1,0 +1,61 @@
+{% load i18n %}
+{% load static %}
+{% get_current_language as LANGUAGE_CODE %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+    <head>
+        <title>ONIP-RH — {% trans 'Portail RH Administratif' %}</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{% static 'assets/css/main/app.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/onip-brand.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/pages/auth.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/extensions/bootstrap-icons/font/bootstrap-icons.css' %}">
+        <link rel="shortcut icon" href="{% static 'assets/images/logo/logo-onip.png' %}" type="image/png">
+    </head>
+
+    <body>
+        {% include 'includes/onip_tricolor_bar.html' %}
+        <div id="auth">
+            <div class="auth-page">
+                <div class="auth-card">
+                    <div class="auth-card-brand">
+                        <div class="auth-brand-inner">
+                            <img src="{% static 'assets/images/logo/logo-onip-white.svg' %}" alt="ONIP" class="auth-brand-logo">
+                            <h1 class="auth-brand-title">{% trans 'Portail RH Administratif' %}</h1>
+                            <p class="auth-brand-desc">
+                                {% trans "Bienvenue sur l'outil de gestion centralisé de l'Office National d'Identification de la Population. Gérez vos effectifs avec précision et sécurité." %}
+                            </p>
+                            <span class="auth-ssl-badge">
+                                <i class="bi bi-shield-check"></i>
+                                {% trans 'Connexion sécurisée SSL 256 bits' %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="auth-card-form">
+                        <div class="auth-form-wrap">
+                            <div class="auth-mobile-logo">
+                                <img src="{% static 'assets/images/logo/logo-onip.png' %}" alt="ONIP-RH">
+                            </div>
+                            {% block auth_content %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                </div>
+
+                <footer class="auth-page-footer">
+                    <div>
+                        <strong>{% trans "Office National d'Identification de la Population (ONIP)" %}</strong>
+                        <span>&copy; {% now 'Y' %} {% trans 'République Démocratique du Congo. Tous droits réservés.' %}</span>
+                    </div>
+                    <div class="auth-page-footer-links">
+                        <a href="#">{% trans 'Politique de confidentialité' %}</a>
+                        <a href="#">{% trans "Conditions d'utilisation" %}</a>
+                        <span class="auth-lang"><i class="bi bi-globe2"></i> {{ LANGUAGE_CODE|upper }}</span>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </body>
+</html>

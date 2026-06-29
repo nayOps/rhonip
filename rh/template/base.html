@@ -1,0 +1,168 @@
+{% load i18n %}
+{% load static %}
+{% get_current_language as LANGUAGE_CODE %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <title>{{ organization.name|default:'ONIP-RH' }}</title>
+      <link rel="stylesheet" href="{% static 'assets/css/main/app.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/css/main/app-dark.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/css/onip-brand.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/css/onip-sidebar.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/css/app-data-table.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/css/onip-forms.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/css/onip-responsive.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/extensions/bootstrap-icons/font/bootstrap-icons.css' %}">
+      {% comment %}<link rel="shortcut icon" href="{% static 'assets/images/logo/favicon.svg' %}" type="image/x-icon">{% endcomment %}
+      {% static 'assets/images/logo/favicon.png' as favicon %}
+      <link rel="shortcut icon" href="{{ organization.logo.url|default:favicon }}" type="image/png">
+      <link rel="stylesheet" href="{% static 'assets/css/shared/iconly.css' %}">
+      <link rel="stylesheet" href="{% static 'autocomplete_light/select2.css' %}">
+      <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+      <style>
+         html{
+            font-size: 13px;
+         }
+      </style>
+   </head>
+   <body>
+      {% include 'includes/onip_tricolor_bar.html' %}
+      <div id="app">
+         <div class="onip-sidebar-backdrop" id="onip-sidebar-backdrop" aria-hidden="true"></div>
+         {% include 'includes/sidebar.html' %}
+         <div id="main">
+            <header class='mb-0'>
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-light-{{ message.tags }} fw-bold mb-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                <nav class="navbar navbar-expand navbar-light navbar-top p-0">
+                    <div class="container-fluid">
+                        <a href="#" class="burger-btn d-block">
+                            <i class="bi bi-justify fs-3"></i>
+                        </a>
+
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                           <ul class="navbar-nav ms-auto mb-lg-0">
+                              <li class="nav-item dropdown me-3">
+                                  <a class="nav-link nav-icon icon-class active dropdown-toggle text-gray-600" href="#" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+                                      {{ LANGUAGE_CODE|upper }}
+                                  </a>
+                              </li>
+                           </ul>
+                        </div>
+                    </div>
+                </nav>
+            </header>
+            
+            {% block content %}
+            {% endblock %}
+            <footer>
+               <div class="footer clearfix mb-0 text-muted">
+                  <div class="float-start">
+                     <p>{% now 'Y' %} &copy; ONIP-RH</p>
+                  </div>
+                  <div class="float-end">
+                     <p style="font-size: 9px">{% trans 'Crafted with' %} <span class="text-danger"><i class="bi bi-heart"></i></span></p>
+                  </div>
+               </div>
+            </footer>
+         </div>
+      </div>
+      <script src="{% static 'assets/js/bootstrap.js' %}"></script>
+      <script src="{% static 'assets/js/app.js' %}"></script>
+      <script src="{% static 'autocomplete_light/autocomplete_light.js' %}"></script>
+      <script src="{% static 'autocomplete_light/select2.js' %}"></script>
+      <script src="{% static 'assets/js/onip-geo-cascade.js' %}"></script>
+      <input class="d-none" type="checkbox" id="toggle-dark" aria-hidden="true">
+      <script>
+         (function () {
+            var sidebar = document.getElementById('sidebar');
+            var backdrop = document.getElementById('onip-sidebar-backdrop');
+            var burger = document.querySelector('.burger-btn');
+            var closeBtn = document.querySelector('.onip-sidebar-close');
+            var XL_BREAKPOINT = 1200;
+
+            function isDesktop() {
+               return window.innerWidth >= XL_BREAKPOINT;
+            }
+
+            function setBackdrop(visible) {
+               if (!backdrop) return;
+               backdrop.classList.toggle('show', visible);
+               backdrop.setAttribute('aria-hidden', visible ? 'false' : 'true');
+               document.body.classList.toggle('onip-sidebar-open', visible);
+            }
+
+            function openSidebar() {
+               if (!sidebar) return;
+               sidebar.classList.add('active');
+               if (!isDesktop()) setBackdrop(true);
+            }
+
+            function closeSidebar() {
+               if (!sidebar || isDesktop()) return;
+               sidebar.classList.remove('active');
+               setBackdrop(false);
+            }
+
+            function syncSidebarLayout() {
+               if (!sidebar) return;
+               if (isDesktop()) {
+                  sidebar.classList.add('active');
+                  setBackdrop(false);
+               } else if (!document.body.classList.contains('onip-sidebar-open')) {
+                  sidebar.classList.remove('active');
+               }
+            }
+
+            document.querySelectorAll('#sidebar .sidebar-item.has-sub > .sidebar-link').forEach(function (link) {
+               link.addEventListener('click', function (event) {
+                  var href = link.getAttribute('href') || '';
+                  if (!href || href.charAt(0) === '#') {
+                     event.preventDefault();
+                     link.parentElement.classList.toggle('active');
+                  }
+               });
+            });
+
+            if (burger) {
+               burger.addEventListener('click', function (event) {
+                  event.preventDefault();
+                  if (sidebar && sidebar.classList.contains('active') && !isDesktop()) {
+                     closeSidebar();
+                  } else {
+                     openSidebar();
+                  }
+               });
+            }
+
+            if (closeBtn) {
+               closeBtn.addEventListener('click', function (event) {
+                  event.preventDefault();
+                  closeSidebar();
+               });
+            }
+
+            if (backdrop) {
+               backdrop.addEventListener('click', closeSidebar);
+            }
+
+            document.addEventListener('DOMContentLoaded', syncSidebarLayout);
+            window.addEventListener('resize', syncSidebarLayout);
+         })();
+      </script>
+   </body>
+</html>

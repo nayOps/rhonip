@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% load core %}
+{% load i18n %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+<div class="onip-list-page">
+    <div class="onip-list-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h1 class="onip-page-title">{% trans 'Notifications' %}</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
+                        <li class="breadcrumb-item active">{% trans 'Notifications' %}</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="onip-data-card">
+            <div class="onip-data-card-header">
+                <h2 class="onip-data-card-title">{% trans 'Liste des notifications' %}</h2>
+                <form method="get" class="onip-search-form input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" class="form-control" placeholder="{% trans 'Rechercher…' %}" value="{{ request.GET.q }}">
+                </form>
+            </div>
+            <div class="onip-data-card-body">
+                <div class="table-responsive">
+                    <table class="table onip-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                {% for field in list_display %}
+                                <th>{{ field.verbose_name|upper }}</th>
+                                {% endfor %}
+                                <th class="onip-col-actions">{% trans 'Actions' %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for obj in qs %}
+                            <tr data-id="{{ obj.id }}" {% if obj.unread %}class="table-warning"{% endif %}>
+                                <td><span class="onip-cell-id">{{ forloop.counter }}</span></td>
+                                {% for field in list_display %}
+                                <td>{{ obj|getattr:field.name|default:'—' }}</td>
+                                {% endfor %}
+                                <td class="onip-row-actions">
+                                    <div class="onip-action-group">
+                                        <a href="{% url 'core:notification' obj.pk %}" class="onip-action-btn onip-action-view">
+                                            <i class="bi bi-eye"></i><span>{% trans 'Voir' %}</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr class="onip-empty-row"><td colspan="{{ list_display|length|add:3 }}">{% trans 'Aucun résultat.' %}</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% with page_obj=qs %}
+            {% include 'components/data_table_pagination.html' %}
+            {% endwith %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% load core %}
+{% load i18n %}
+{% load static %}
+{% load mathfilters %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+<div class="onip-form-page">
+    <div class="onip-form-header">
+        <div class="row">
+            <div class="col-lg-7 text-start">
+                <h1 class="onip-form-title">{{ model|getattr:'_meta'|getattr:'verbose_name'|title }} #{{ obj.id }}</h1>
+                {% include 'components/breadcrumb.html' %}
+            </div>
+            {% with approbations=self.approbations %}
+            <div class="col-lg-5 onip-form-header-actions">
+                {% if approbations.is_fully_approved %}
+                <a target="_blank" href="{% url 'core:print' app model|getattr:'_meta'|getattr:'model_name' obj.pk %}" class="onip-btn-cancel">
+                    <i class="bi bi-printer-fill"></i>
+                </a>
+                {% endif %}
+                {% if request.user.id in approbations.pending.users %}
+                <a href="{% url 'core:approbation' 'approved' app model|getattr:'_meta'|getattr:'model_name' obj.pk %}" class="onip-btn-save">{% trans 'Approuver' %}</a>
+                <a href="{% url 'core:approbation' 'rejected' app model|getattr:'_meta'|getattr:'model_name' obj.pk %}" class="onip-btn-danger">{% trans 'Désapprouver' %}</a>
+                {% endif %}
+                <a href="{% url 'core:delete' app model|getattr:'_meta'|getattr:'model_name' obj.pk %}" class="onip-btn-danger">{% trans 'Supprimer' %}</a>
+                <button type="submit" form="form-{{ model|getattr:'_meta'|getattr:'model_name' }}" class="onip-btn-save">
+                    <i class="bi bi-floppy me-1"></i>{% trans 'Sauvegarder' %}
+                </button>
+            </div>
+            {% endwith %}
+        </div>
+    </div>
+
+    <div class="page-content">
+        <section>
+            <div class="onip-form-card mb-3">
+                <div class="onip-form-tab-content py-3">
+                    {% include 'components/timeline.html' %}
+                </div>
+            </div>
+
+            {% include 'components/change_form.html' %}
+        </section>
+    </div>
+
+    <div class="onip-form-footer">
+        <div class="onip-form-footer-inner">
+            <a href="{% url 'core:list' app model|getattr:'_meta'|getattr:'model_name' %}" class="onip-btn-cancel">{% trans 'Annuler les modifications' %}</a>
+            <button type="submit" form="form-{{ model|getattr:'_meta'|getattr:'model_name' }}" class="onip-btn-save">
+                <i class="bi bi-floppy me-1"></i>{% trans 'Sauvegarder le dossier' %}
+            </button>
+        </div>
+    </div>
+
+    {% if self.activities %}
+    <div class="onip-form-card mt-3">
+        <div class="onip-form-tab-content">
+            <h4 class="onip-form-title" style="font-size:1.1rem;">{% trans 'Activités' %}</h4>
+            <ul class="mb-0">
+                {% for activity in self.activities %}
+                <li>{{ activity }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

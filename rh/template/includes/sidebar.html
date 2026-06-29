@@ -1,0 +1,214 @@
+{% load i18n %}
+
+{% load static %}
+
+
+
+<div id="sidebar">
+
+    <div class="sidebar-wrapper active">
+
+        <div class="sidebar-header">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <a href="{% url 'core:home' %}" class="onip-sidebar-brand">
+
+                    <img
+
+                        class="onip-sidebar-logo"
+
+                        src="{% if organization.logo %}{{ organization.logo.url }}{% else %}{% static 'assets/images/logo/logo-onip.png' %}{% endif %}"
+
+                        alt="ONIP"
+
+                    >
+
+                </a>
+
+                <a href="#" class="onip-sidebar-close sidebar-hide d-xl-none" aria-label="{% trans 'Fermer' %}">
+
+                    <i class="bi bi-x-lg"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="sidebar-menu">
+
+            <ul class="menu">
+
+                {% for el in menus %}
+
+                    {% if el.children or el.forced %}
+
+                    <li class="sidebar-item {% if el.children %}has-sub{% endif %}{% if el.active %} active{% endif %}">
+
+                        <a href="{{ el.href }}" class="sidebar-link">
+
+                            <i class="bi {{ el.icon }}"></i>
+
+                            <span>{{ el.title|title }}</span>
+
+                            {% if el.badge %}
+
+                                {% if el.badge > 0 %}
+
+                                <span class="badge bg-danger">{{ el.badge }}</span>
+
+                                {% endif %}
+
+                            {% endif %}
+
+                            {% if el.children %}
+
+                            <i class="bi bi-chevron-down sidebar-chevron"></i>
+
+                            {% endif %}
+
+                        </a>
+
+                        {% if el.children %}
+
+                        <ul class="submenu">
+
+                            {% for child in el.children %}
+
+                            <li class="submenu-item{% if child.active %} active{% endif %}">
+
+                                <a href="{{ child.href }}">{{ child.title|title }}</a>
+
+                            </li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                        {% endif %}
+
+                    </li>
+
+                    {% endif %}
+
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+
+
+        <div class="sidebar-user-footer">
+
+            <div class="dropup w-100">
+
+                <button type="button" class="sidebar-user-card" data-bs-toggle="dropdown" aria-expanded="false">
+
+                    <div class="sidebar-user-avatar">
+
+                        {% if request.user.employee and request.user.employee.photo %}
+
+                        <img src="{{ request.user.employee.photo.url }}" alt="">
+
+                        {% else %}
+
+                        <img src="{% static 'assets/images/faces/1.jpg' %}" alt="">
+
+                        {% endif %}
+
+                        <span class="sidebar-user-status" aria-hidden="true"></span>
+
+                    </div>
+
+                    <div class="sidebar-user-info">
+
+                        <strong>
+
+                            {% if request.user.employee %}
+
+                                {{ request.user.employee.full_name }}
+
+                            {% else %}
+
+                                {{ request.user.get_full_name|default:request.user.email }}
+
+                            {% endif %}
+
+                        </strong>
+
+                        <span>
+
+                            {% if request.user.employee and request.user.employee.designation %}
+
+                                {{ request.user.employee.designation }}
+
+                            {% else %}
+
+                                {% trans 'Utilisateur' %}
+
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+                    <i class="bi bi-chevron-up sidebar-user-chevron" aria-hidden="true"></i>
+
+                </button>
+
+                <ul class="dropdown-menu sidebar-user-dropdown">
+
+                    <li>
+
+                        <h6 class="dropdown-header">
+
+                            {% if request.user.employee %}
+
+                                {{ request.user.employee.full_name }}
+
+                            {% else %}
+
+                                {{ request.user.get_full_name|default:request.user.email }}
+
+                            {% endif %}
+
+                        </h6>
+
+                    </li>
+
+                    <li><hr class="dropdown-divider"></li>
+
+                    <li>
+
+                        <a class="dropdown-item" href="{% url 'core:password-change' %}">
+
+                            <i class="bi bi-key me-2"></i>{% trans 'Modifier le mot de passe' %}
+
+                        </a>
+
+                    </li>
+
+                    <li>
+
+                        <a class="dropdown-item sidebar-logout-link" href="{% url 'logout' %}">
+
+                            <i class="bi bi-box-arrow-left me-2"></i>{% trans 'Déconnexion' %}
+
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+

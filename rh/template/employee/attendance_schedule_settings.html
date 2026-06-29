@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/employee-detail.css' %}">
+
+<div class="employee-detail-page">
+    <div class="page-heading">
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="m-0">{% trans 'Plages de présence' %}</h3>
+                        <p class="text-muted mb-0">{% trans 'Configuration globale des pointages — appliquée sur toute l\'application.' %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card employee-tabs-card">
+                    <div class="card-body p-4">
+                        <form method="post" id="attendance-schedule-form">
+                            {% csrf_token %}
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">{% trans 'Modèle de plages' %}</label>
+                                <select name="slot_preset" id="slot_preset" class="form-select">
+                                    {% for value, label in preset_choices %}
+                                    <option value="{{ value }}"{% if preset == value %} selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">{% trans 'Choisissez 2 plages (entrée / sortie) ou 4 plages (matin, pause déjeuner, après-midi).' %}</div>
+                            </div>
+
+                            <div id="slots-container">
+                                {% for slot in slots %}
+                                <div class="border rounded p-3 mb-3 slot-block" data-slot-index="{{ forloop.counter0 }}">
+                                    <h6 class="mb-3">{{ slot.ui_header|default:slot.label }}</h6>
+                                    <input type="hidden" name="slot_{{ forloop.counter0 }}_code" value="{{ slot.code }}">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">{% trans 'Libellé' %}</label>
+                                            <input type="text" name="slot_{{ forloop.counter0 }}_label" class="form-control" value="{{ slot.label }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">{% trans 'En-tête tableau' %}</label>
+                                            <input type="text" name="slot_{{ forloop.counter0 }}_ui_header" class="form-control" value="{{ slot.ui_header }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">{% trans 'Heure cible' %}</label>
+                                            <input type="time" name="slot_{{ forloop.counter0 }}_target" class="form-control" value="{{ slot.target }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">{% trans 'Accepté dès' %}</label>
+                                            <input type="time" name="slot_{{ forloop.counter0 }}_accept_from" class="form-control" value="{{ slot.accept_from }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">{% trans 'Accepté jusqu\'à' %}</label>
+                                            <input type="time" name="slot_{{ forloop.counter0 }}_accept_until" class="form-control" value="{{ slot.accept_until }}">
+                                        </div>
+                                        <div class="col-md-3{% if preset == '2_slots' and slot.code == 'EVENING_OUT' %} d-none{% endif %}">
+                                            <label class="form-label">{% trans 'Référence retard' %}</label>
+                                            <input type="time" name="slot_{{ forloop.counter0 }}_reference" class="form-control" value="{{ slot.reference|default:'' }}">
+                                        </div>
+                                        {% if preset == '2_slots' and slot.code == 'EVENING_OUT' %}
+                                        <div class="col-md-3">
+                                            <label class="form-label">{% trans 'Référence retard' %}</label>
+                                            <input type="text" class="form-control" value="00:00" readonly disabled>
+                                            <div class="form-text">{% trans 'Non applicable à la sortie (mode 2 plages).' %}</div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3">
+                                    <label class="form-label">{% trans 'Début de journée' %}</label>
+                                    <input type="time" name="work_start" class="form-control" value="{{ work_start }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">{% trans 'Fin de journée' %}</label>
+                                    <input type="time" name="work_end" class="form-control" value="{{ work_end }}">
+                                </div>
+                                <div class="col-md-3 lunch-fields">
+                                    <label class="form-label">{% trans 'Pause min (min)' %}</label>
+                                    <input type="number" name="lunch_break_min_minutes" class="form-control" value="{{ lunch_break_min_minutes }}" min="0" max="180">
+                                </div>
+                                <div class="col-md-3 lunch-fields">
+                                    <label class="form-label">{% trans 'Pause max (min)' %}</label>
+                                    <input type="number" name="lunch_break_max_minutes" class="form-control" value="{{ lunch_break_max_minutes }}" min="0" max="180">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg"></i> {% trans 'Enregistrer' %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body p-4">
+                        <h6>{% trans 'À propos' %}</h6>
+                        <p class="text-muted small mb-2">{% trans 'Cette configuration détermine le nombre de plages de pointage journalières et leurs horaires.' %}</p>
+                        <ul class="text-muted small mb-0">
+                            <li>{% trans '2 plages : entrée le matin, sortie le soir.' %}</li>
+                            <li>{% trans '4 plages : entrée matin, sortie pause, retour pause, sortie soir.' %}</li>
+                            <li>{% trans 'Les présences, rapports et la tablette utilisent automatiquement ces paramètres.' %}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const presetSelect = document.getElementById('slot_preset');
+    const form = document.getElementById('attendance-schedule-form');
+    if (!presetSelect || !form) return;
+
+    presetSelect.addEventListener('change', function () {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'reload_preset';
+        input.value = '1';
+        form.appendChild(input);
+        form.submit();
+    });
+
+    function toggleLunchFields() {
+        const show = presetSelect.value === '4_slots';
+        document.querySelectorAll('.lunch-fields').forEach(function (el) {
+            el.style.display = show ? '' : 'none';
+        });
+    }
+    toggleLunchFields();
+})();
+</script>
+{% endblock %}

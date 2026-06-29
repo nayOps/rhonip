@@ -1,0 +1,201 @@
+{% load i18n %}
+
+{% with registry=dashboard.registry %}
+
+<div class="ca-sheet-card">
+    {% if registry.period_view == 'weekly' %}
+    <div class="ca-date-strip" role="navigation" aria-label="{% trans 'Jours de la semaine' %}">
+        {% for day in registry.weekly.calendar_days %}
+        <a href="?{{ day.day_url }}" class="ca-date-chip{% if day.is_selected %} active{% endif %}{% if day.is_weekend %} weekend{% endif %} status-{{ day.status }}">
+            <span class="ca-date-chip-day">{{ day.weekday_short }}</span>
+            <strong class="ca-date-chip-num">{{ day.day_number }}</strong>
+            {% if not day.is_weekend %}
+            <small>{{ day.present_count }}/{{ day.total }}</small>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+    {% elif registry.period_view == 'monthly' %}
+    <div class="ca-month-calendar" aria-label="{% trans 'Calendrier du mois' %}">
+        <div class="ca-month-calendar-head">
+            {% for label in registry.monthly.weekday_headers %}
+            <span>{{ label }}</span>
+            {% endfor %}
+        </div>
+        {% for week in registry.monthly.weeks %}
+        <div class="ca-month-calendar-row">
+            {% for cell in week %}
+            {% if cell.is_padding %}
+            <span class="ca-month-cell padding"></span>
+            {% else %}
+            <a href="?{{ cell.day_url }}" class="ca-month-cell{% if cell.is_selected %} active{% endif %}{% if cell.is_weekend %} weekend{% endif %} status-{{ cell.status }}">
+                <strong>{{ cell.day_number }}</strong>
+                {% if not cell.is_weekend %}
+                <small>{{ cell.present_count }}</small>
+                {% endif %}
+            </a>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if registry.period_view == 'daily' %}
+        {% with pagination=registry.daily.pagination rows=registry.daily.pagination.items %}
+        <div class="table-responsive">
+            <table class="ca-attendance-table onip-table" id="ca-attendance-table">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Agent & Département' %}</th>
+                        {% for header in registry.slot_headers %}
+                        <th>{{ header }}</th>
+                        {% endfor %}
+                        <th class="text-end">{% trans 'Actions' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr class="{% if row.status == 'absent' %}ca-row-absent{% endif %}" data-search="{{ row.search_text }}">
+                        <td>
+                            <div class="ca-agent-cell">
+                                {% if row.employee.photo %}
+                                <img src="{{ row.employee.photo.url }}" alt="{{ row.employee.full_name }}" class="ca-agent-avatar">
+                                {% else %}
+                                <span class="ca-agent-avatar ca-agent-avatar-initials">{{ row.initials }}</span>
+                                {% endif %}
+                                <div>
+                                    <a href="{{ row.detail_url }}" class="ca-agent-name">{{ row.employee.full_name }}</a>
+                                    <span class="ca-agent-matricule">{{ row.registration_number }}</span>
+                                    <span class="ca-agent-dept">{{ row.direction }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        {% for slot in row.slots %}
+                        <td>
+                            <div class="ca-slot-time">{{ slot.time }}</div>
+                            <span class="ca-slot-badge {{ slot.badge_class }}">{{ slot.badge }}</span>
+                        </td>
+                        {% endfor %}
+                        <td class="text-end">
+                            <div class="ca-row-actions">
+                                <a href="{{ row.detail_url }}" class="ca-action-btn" title="{% trans 'Modifier' %}"><i class="bi bi-pencil"></i></a>
+                                <button type="button" class="ca-action-btn" title="{% trans 'Options' %}"><i class="bi bi-three-dots-vertical"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="ca-empty-row">
+                            {% if dashboard.search_query %}
+                                {% trans 'Aucun agent ne correspond à cette recherche.' %}
+                            {% else %}
+                                {% trans 'Aucun pointage enregistré pour cette période.' %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include 'employee/includes/company_attendance_pagination.html' with pagination=pagination %}
+        {% endwith %}
+
+    {% elif registry.period_view == 'weekly' %}
+        {% with pagination=registry.weekly.pagination rows=registry.weekly.pagination.items %}
+        <div class="table-responsive">
+            <table class="ca-attendance-table onip-table" id="ca-attendance-table">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Agent & Département' %}</th>
+                        {% for day in registry.weekly.calendar_days %}
+                        <th class="text-center">{{ day.weekday_short }}<br><small>{{ day.day_number }}</small></th>
+                        {% endfor %}
+                        <th class="text-end">{% trans 'Actions' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr data-search="{{ row.search_text }}">
+                        <td>
+                            <div class="ca-agent-cell">
+                                <span class="ca-agent-avatar ca-agent-avatar-initials">{{ row.initials }}</span>
+                                <div>
+                                    <a href="{{ row.detail_url }}" class="ca-agent-name">{{ row.employee.full_name }}</a>
+                                    <span class="ca-agent-matricule">{{ row.registration_number }}</span>
+                                    <span class="ca-agent-dept">{{ row.direction }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        {% for day in row.days %}
+                        <td class="text-center">
+                            {% if day.is_weekend %}
+                            <span class="text-muted">—</span>
+                            {% else %}
+                            <span class="ca-slot-badge {% if day.status == 'present' %}ok{% elif day.status == 'late' %}late{% elif day.status == 'absent' %}absent{% else %}partial{% endif %}">
+                                {{ day.validated_slots }}/{{ dashboard.total_slots }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                        <td class="text-end">
+                            <a href="{{ row.detail_url }}" class="ca-action-btn"><i class="bi bi-pencil"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="9" class="ca-empty-row">{% if dashboard.search_query %}{% trans 'Aucun agent ne correspond à cette recherche.' %}{% else %}{% trans 'Aucun pointage enregistré pour cette période.' %}{% endif %}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include 'employee/includes/company_attendance_pagination.html' with pagination=pagination %}
+        {% endwith %}
+
+    {% else %}
+        {% with pagination=registry.monthly.pagination rows=registry.monthly.pagination.items %}
+        <div class="table-responsive">
+            <table class="ca-attendance-table onip-table" id="ca-attendance-table">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Agent & Département' %}</th>
+                        <th>{% trans 'Taux présence' %}</th>
+                        <th>{% trans 'Jours présents' %}</th>
+                        <th>{% trans 'Retards' %}</th>
+                        <th>{% trans 'Absences' %}</th>
+                        <th class="text-end">{% trans 'Actions' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr data-search="{{ row.search_text }}">
+                        <td>
+                            <div class="ca-agent-cell">
+                                <span class="ca-agent-avatar ca-agent-avatar-initials">{{ row.initials }}</span>
+                                <div>
+                                    <a href="{{ row.detail_url }}" class="ca-agent-name">{{ row.employee.full_name }}</a>
+                                    <span class="ca-agent-matricule">{{ row.registration_number }}</span>
+                                    <span class="ca-agent-dept">{{ row.direction }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><strong>{{ row.presence_rate }}%</strong></td>
+                        <td>{{ row.present_days }}</td>
+                        <td><span class="ca-slot-badge late">{{ row.late_count }}</span></td>
+                        <td><span class="ca-slot-badge absent">{{ row.absence_count }}</span></td>
+                        <td class="text-end">
+                            <a href="{{ row.detail_url }}" class="ca-action-btn"><i class="bi bi-pencil"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="ca-empty-row">{% if dashboard.search_query %}{% trans 'Aucun agent ne correspond à cette recherche.' %}{% else %}{% trans 'Aucun pointage enregistré pour cette période.' %}{% endif %}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include 'employee/includes/company_attendance_pagination.html' with pagination=pagination %}
+        {% endwith %}
+    {% endif %}
+</div>
+
+{% endwith %}

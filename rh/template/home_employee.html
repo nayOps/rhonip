@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load core %}
+{% load humanize %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/onip-employee-dashboard.css' %}">
+
+<div class="onip-agent-dash">
+    {# Barre supérieure #}
+    <div class="onip-agent-dash__topbar">
+        <div class="onip-agent-dash__search">
+            <i class="bi bi-search"></i>
+            <input type="search" placeholder="{% trans 'Rechercher des tâches, documents ou employés…' %}" aria-label="{% trans 'Recherche' %}">
+        </div>
+        <div class="onip-agent-dash__top-actions">
+            <a href="{% url 'core:notifications' %}" class="onip-agent-dash__icon-btn" title="{% trans 'Notifications' %}">
+                <i class="bi bi-bell"></i>
+                {% if unread_notifications_count %}<span class="badge-dot"></span>{% endif %}
+            </a>
+            <a href="{% url 'employee:my_profile' %}" class="onip-agent-dash__icon-btn" title="{% trans 'Aide' %}">
+                <i class="bi bi-question-circle"></i>
+            </a>
+            <div class="onip-agent-dash__user-chip">
+                <div>
+                    <strong>{{ employee.designation|default:_('Agent ONIP') }}</strong>
+                    <span>{{ employee.registration_number|default:employee.email_professional }}</span>
+                </div>
+                {% if employee.photo %}
+                <img src="{{ employee.photo.url }}" alt="" class="onip-agent-dash__avatar">
+                {% else %}
+                <img src="{% static 'assets/images/faces/1.jpg' %}" alt="" class="onip-agent-dash__avatar">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# En-tête #}
+    <div class="onip-agent-dash__header">
+        <div>
+            <h1>{{ greeting }}, {{ employee.first_name|default:employee.short_name }}</h1>
+            <p>{% trans "Voici un aperçu de vos activités et opérations aujourd'hui." %}</p>
+        </div>
+    </div>
+
+    {# Indicateurs #}
+    <div class="onip-agent-dash__stats">
+        <div class="onip-agent-dash__stat">
+            <div class="onip-agent-dash__stat-top">
+                <div class="onip-agent-dash__stat-icon onip-agent-dash__stat-icon--blue">
+                    <i class="bi bi-briefcase"></i>
+                </div>
+                <span class="onip-agent-dash__stat-badge onip-agent-dash__stat-badge--orange">
+                    {% if stats.missions_count %}{{ stats.missions_count }} {% trans "active(s)" %}{% else %}{% trans "Aucune" %}{% endif %}
+                </span>
+            </div>
+            <div class="onip-agent-dash__stat-label">{% trans "Missions" %}</div>
+            <div class="onip-agent-dash__stat-value">{{ stats.missions_count }}</div>
+        </div>
+
+        <div class="onip-agent-dash__stat">
+            <div class="onip-agent-dash__stat-top">
+                <div class="onip-agent-dash__stat-icon onip-agent-dash__stat-icon--green">
+                    <i class="bi bi-person-check"></i>
+                </div>
+                <span class="onip-agent-dash__stat-badge onip-agent-dash__stat-badge--green">{% trans "Stable" %}</span>
+            </div>
+            <div class="onip-agent-dash__stat-label">{% trans "Taux de présence" %}</div>
+            <div class="onip-agent-dash__stat-value">{{ stats.presence_rate }}%</div>
+        </div>
+
+        <div class="onip-agent-dash__stat">
+            <div class="onip-agent-dash__stat-top">
+                <div class="onip-agent-dash__stat-icon onip-agent-dash__stat-icon--blue">
+                    <i class="bi bi-people"></i>
+                </div>
+                <span class="onip-agent-dash__stat-badge onip-agent-dash__stat-badge--blue">{% trans "Disponible" %}</span>
+            </div>
+            <div class="onip-agent-dash__stat-label">{% trans "Congés restants" %}</div>
+            <div class="onip-agent-dash__stat-value">{{ stats.remaining_leave_days }}</div>
+        </div>
+
+        <div class="onip-agent-dash__stat">
+            <div class="onip-agent-dash__stat-top">
+                <div class="onip-agent-dash__stat-icon onip-agent-dash__stat-icon--red">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <span class="onip-agent-dash__stat-badge onip-agent-dash__stat-badge--red">
+                    {% if stats.open_requests %}{% trans "En cours" %}{% else %}{% trans "Aucune" %}{% endif %}
+                </span>
+            </div>
+            <div class="onip-agent-dash__stat-label">{% trans "Demandes ouvertes" %}</div>
+            <div class="onip-agent-dash__stat-value">{{ stats.open_requests|stringformat:"02d" }}</div>
+        </div>
+    </div>
+
+    <div class="onip-agent-dash__grid">
+        <div class="onip-agent-dash__main">
+            {# Communication officielle — toujours visible #}
+            <div class="onip-agent-dash__announce">
+                <i class="bi bi-megaphone onip-agent-dash__announce-megaphone"></i>
+                <span class="onip-agent-dash__announce-tag">{% trans "Communication officielle" %}</span>
+                <h2>{{ featured_announcement.title }}</h2>
+                <p>{{ featured_announcement.content|truncatewords:45 }}</p>
+                <div class="onip-agent-dash__announce-actions">
+                    {% if featured_announcement.is_default %}
+                    <a href="{% url 'core:list' app='core' model='announcement' %}" class="onip-agent-dash__btn-primary">
+                        {% trans "Lire le document complet" %}
+                    </a>
+                    {% else %}
+                    <button type="button" class="onip-agent-dash__btn-primary" data-bs-toggle="modal" data-bs-target="#announceModal">
+                        {% trans "Lire le document complet" %}
+                    </button>
+                    {% endif %}
+                    <a href="{% url 'core:notifications' %}" class="onip-agent-dash__link-all" style="margin:0;">
+                        <i class="bi bi-archive me-1"></i>{% trans "Archiver" %}
+                    </a>
+                </div>
+            </div>
+
+            <div class="onip-agent-dash__row2">
+                {# Formations #}
+                <div class="onip-agent-dash__panel">
+                    <h3>{% trans "État de la formation" %}</h3>
+                    {% for course in training_courses %}
+                    <div class="onip-agent-dash__progress-item">
+                        <div class="onip-agent-dash__progress-head">
+                            <span>{{ course.name }}</span>
+                            <span>{{ course.progress }}%</span>
+                        </div>
+                        <div class="onip-agent-dash__progress-bar">
+                            <div class="onip-agent-dash__progress-fill{% if course.tone == 'alt' %} onip-agent-dash__progress-fill--alt{% endif %}" style="width: {{ course.progress }}%"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <a href="{% url 'core:list' app='training' model='training' %}" class="onip-agent-dash__btn-primary w-100 text-center justify-content-center mt-2">
+                        {% trans "Continuer l'apprentissage" %}
+                    </a>
+                </div>
+
+                {# Documents récents #}
+                <div class="onip-agent-dash__panel">
+                    <h3>{% trans "Documents récents" %}</h3>
+                    {% if recent_documents %}
+                        {% for doc in recent_documents %}
+                        <a href="{{ doc.url }}" class="onip-agent-dash__doc-item text-decoration-none" target="_blank" rel="noopener">
+                            <div class="onip-agent-dash__doc-icon onip-agent-dash__doc-icon--{{ doc.type }}">
+                                <i class="bi bi-file-earmark-{% if doc.type == 'pdf' %}pdf{% else %}word{% endif %}"></i>
+                            </div>
+                            <div class="onip-agent-dash__doc-info">
+                                <strong>{{ doc.title }}</strong>
+                                <small>{% trans "Ajouté" %} {{ doc.updated_at|naturaltime }}</small>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                        <p class="onip-agent-dash__empty">{% trans "Aucun document pour le moment." %}</p>
+                    {% endif %}
+                    <a href="{% url 'employee:my_profile' %}" class="onip-agent-dash__link-all">
+                        {% trans "Voir tous les documents" %} <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {# Centre de notifications #}
+        <aside class="onip-agent-dash__notifications">
+            <div class="onip-agent-dash__notif-header">
+                <h3>{% trans "Centre de notifications" %}</h3>
+                <a href="{% url 'core:notifications' %}">{% trans "Tout marquer comme lu" %}</a>
+            </div>
+            {% if dashboard_notifications %}
+                {% for notif in dashboard_notifications %}
+                <a href="{% if notif.url %}{{ notif.url }}{% else %}{% url 'core:notifications' %}{% endif %}" class="onip-agent-dash__notif-item onip-agent-dash__notif-item--{{ notif.tone }}">
+                    <div class="onip-agent-dash__notif-icon onip-agent-dash__notif-icon--{{ notif.tone }}">
+                        <i class="bi {{ notif.icon }}"></i>
+                    </div>
+                    <div class="onip-agent-dash__notif-body">
+                        <strong>{{ notif.label }} : {{ notif.title }}</strong>
+                        <p>{{ notif.description|truncatewords:12 }}</p>
+                    </div>
+                    <span class="onip-agent-dash__notif-time">{{ notif.time }}</span>
+                </a>
+                {% endfor %}
+            {% else %}
+                <p class="onip-agent-dash__empty">{% trans "Aucune notification récente." %}</p>
+            {% endif %}
+            <div class="onip-agent-dash__notif-footer">
+                <a href="{% url 'core:notifications' %}">
+                    {% trans "Parcourir toutes les notifications" %} <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </aside>
+    </div>
+</div>
+
+{% if featured_announcement and not featured_announcement.is_default %}
+<div class="modal fade" id="announceModal" tabindex="-1" aria-labelledby="announceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="announceModalLabel">{{ featured_announcement.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% trans 'Fermer' %}"></button>
+            </div>
+            <div class="modal-body">
+                <span class="badge bg-primary mb-2">{{ featured_announcement.get_type_display }}</span>
+                <p class="mb-0">{{ featured_announcement.content|linebreaks }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

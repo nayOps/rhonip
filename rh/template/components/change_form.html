@@ -1,0 +1,62 @@
+{% load core %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% with model_name=model|getattr:'_meta'|getattr:'model_name' model_verbose_name=model|getattr:'_meta'|getattr:'verbose_name' %}
+
+<form method="post" enctype="multipart/form-data" class="onip-form" id="form-{{ model_name }}">
+    {% csrf_token %}
+
+    <div class="onip-form-card">
+        <ul class="nav nav-tabs onip-form-tabs" id="onip-form-tab-{{ model_name }}" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" data-bs-toggle="tab" href="#{{ model_name }}" role="tab">
+                    {{ model_verbose_name|title }}
+                </a>
+            </li>
+            {% for formset in formsets %}
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" data-bs-toggle="tab" href="#{{ formset.model|getattr:'_meta'|getattr:'model_name' }}" role="tab">
+                    {{ formset.model|getattr:'_meta'|getattr:'verbose_name_plural'|title }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <div class="tab-content onip-form-tab-content">
+            <div class="tab-pane fade active show" id="{{ model_name }}" role="tabpanel">
+                {% crispy form %}
+                {{ form.media }}
+            </div>
+
+            {% for formset in formsets %}
+            <div class="tab-pane fade" id="{{ formset.model|getattr:'_meta'|getattr:'model_name' }}" role="tabpanel">
+                <div id="formset-{{ forloop.counter }}">
+                    {{ formset.non_form_errors }}
+                    {% crispy formset inline_formset_helper %}
+                </div>
+                {% if not formset.fk.unique %}
+                <script>$(function(){$('#formset-{{ forloop.counter }} tbody tr').formset({prefix: '{{ formset.prefix }}'});})</script>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.formset/1.2.2/jquery.formset.js" integrity="sha512-Tsdobfrx6IMRPi8d5z3AtjWNSbZxGm58IZFnblaRaepw562ZITlRhUM2Zu87vbvZjQxGmmto+31zEBLZ4wjs+w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        const inputs = document.querySelectorAll('input[id*="DELETE"]');
+        inputs.forEach(input => input.type = 'checkbox');
+
+        $('a[data-bs-toggle="tab"]').on('show.bs.tab', function(e) {
+            localStorage.setItem('payday-last-active-tab', $(e.target).attr('href'));
+        });
+        var activeTab = localStorage.getItem('payday-last-active-tab');
+        if (activeTab == null || activeTab == undefined) return;
+        var tabLink = document.querySelector('a[href="' + activeTab + '"]');
+        if (tabLink) $(tabLink).tab('show');
+    });
+</script>
+{% endwith %}

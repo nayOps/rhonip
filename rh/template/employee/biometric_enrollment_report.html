@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/company-attendance.css' %}">
+
+<div class="company-attendance-page">
+    <div class="page-heading no-print">
+        <div class="card">
+            <div class="card-body">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employee:reports_hub' %}">{% trans 'Rapports' %}</a></li>
+                    <li class="breadcrumb-item active">{% trans 'Enregistrement biométrique' %}</li>
+                </ol>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h3 class="page-title m-0">{{ report.title }}</h3>
+                        <p class="text-muted mb-0">{% trans 'Généré le' %} {{ report.generated_at_label }}</p>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{% url 'employee:reports_hub' %}" class="btn btn-light">{% trans 'Retour' %}</a>
+                        <a href="{% url 'employee:biometric_enrollment_report_schedule' %}?filter={{ report.filter_status }}" class="btn btn-outline-primary">
+                            <i class="bi bi-calendar-check"></i> {% trans 'Programmer' %}
+                        </a>
+                        <a href="{% url 'employee:biometric_enrollment_report_export' %}?filter={{ report.filter_status }}" class="btn btn-primary">
+                            <i class="bi bi-file-earmark-pdf"></i> {% trans 'Exporter PDF' %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="company-attendance-filters mb-3 no-print">
+            {% for code, label in report.filter_choices %}
+            <a class="company-attendance-filter{% if report.filter_status == code %} active{% endif %}" href="?filter={{ code }}">{{ label }}</a>
+            {% endfor %}
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="company-attendance-card text-center">
+                    <div class="text-muted small">{% trans 'Agents affichés' %}</div>
+                    <div class="fs-3 fw-bold">{{ report.total_count }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="company-attendance-card text-center">
+                    <div class="text-muted small">{% trans 'Enrôlement complet' %}</div>
+                    <div class="fs-3 fw-bold text-success">{{ report.complete_count }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="company-attendance-card text-center">
+                    <div class="text-muted small">{% trans 'Enrôlement partiel' %}</div>
+                    <div class="fs-3 fw-bold text-warning">{{ report.partial_count }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="company-attendance-card text-center">
+                    <div class="text-muted small">{% trans 'Sans empreinte' %}</div>
+                    <div class="fs-3 fw-bold text-danger">{{ report.none_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="company-attendance-card">
+            <div class="table-responsive">
+                <table class="table onip-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>{% trans 'Photo' %}</th>
+                            <th>{% trans 'Matricule' %}</th>
+                            <th>{% trans 'Agent' %}</th>
+                            <th>{% trans 'Direction' %}</th>
+                            <th>{% trans 'Statut' %}</th>
+                            <th>{% trans 'Empreintes' %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in report.rows %}
+                        <tr>
+                            <td>
+                                {% if row.photo_url %}
+                                <img src="{{ row.photo_url }}" alt="" class="rounded" style="width:48px;height:48px;object-fit:cover;">
+                                {% else %}
+                                <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td><code>{{ row.employee.registration_number|default:"—" }}</code></td>
+                            <td><strong>{{ row.employee.full_name }}</strong></td>
+                            <td>{{ row.employee.direction.name|default:"—" }}</td>
+                            <td>
+                                {% if row.is_complete %}
+                                <span class="badge bg-success">{{ row.status_label }}</span>
+                                {% elif row.has_any %}
+                                <span class="badge bg-warning text-dark">{{ row.status_label }}</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ row.status_label }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="fw-semibold">{{ row.enrolled_count }}/{{ row.total_fingers }}</span>
+                                <div class="d-flex flex-wrap gap-1 mt-1" style="max-width:320px;">
+                                    {% for finger in row.fingers %}
+                                    <span class="badge {% if finger.captured %}bg-success{% else %}bg-light text-muted border{% endif %}" title="{{ finger.label }}">
+                                        {% if finger.captured %}<i class="bi bi-check2"></i>{% else %}<i class="bi bi-dash"></i>{% endif %}
+                                        {{ finger.label }}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-muted">{% trans 'Aucun agent pour ce filtre.' %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

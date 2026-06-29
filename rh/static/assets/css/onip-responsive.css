@@ -1,0 +1,303 @@
+/* ——— ONIP — Responsive global (mobile & tablette) ——— */
+
+.onip-sidebar-backdrop {
+    background: rgba(15, 23, 42, 0.45);
+    display: none;
+    inset: 0;
+    position: fixed;
+    top: var(--onip-tricolor-height, 6px);
+    z-index: 1025;
+}
+
+.onip-sidebar-backdrop.show {
+    display: block;
+}
+
+body.onip-sidebar-open {
+    overflow: hidden;
+}
+
+/* ——— Layout principal ——— */
+@media (max-width: 1199.98px) {
+    #main header .navbar-top .container-fluid {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    #main .page-content,
+    #main .page-heading {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    #main footer .footer {
+        padding: 0.75rem 1rem;
+        text-align: center;
+    }
+
+    #main footer .float-end,
+    #main footer .float-start {
+        float: none !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    #main {
+        overflow-x: hidden;
+    }
+
+    #main header .burger-btn {
+        margin-right: 0.25rem;
+    }
+
+    #main .page-content,
+    #main .page-heading {
+        padding-left: 0.65rem;
+        padding-right: 0.65rem;
+    }
+}
+
+/* ——— Listes & tableaux ——— */
+@media (max-width: 991.98px) {
+    .onip-list-header {
+        padding: 1rem 0.75rem 0.5rem;
+    }
+
+    .onip-list-header .row {
+        row-gap: 0.75rem;
+    }
+
+    .onip-list-header-actions {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .onip-list-page .row.g-3 > [class*="col-lg-3"] {
+        order: 2;
+    }
+
+    .onip-list-page .row.g-3 > [class*="col-lg-9"],
+    .onip-list-page .row.g-3 > [class*="col-lg-12"] {
+        order: 1;
+    }
+
+    .onip-filters-card {
+        position: static;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .onip-list-header .onip-page-title {
+        font-size: 1.35rem;
+    }
+
+    .onip-data-card-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .onip-data-card-toolbar {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .onip-search-form {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .onip-data-card-toolbar .onip-btn-filter,
+    .onip-data-card-toolbar .onip-btn-outline {
+        width: 100%;
+    }
+
+    .onip-table-footer {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .onip-pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .onip-col-actions,
+    .onip-row-actions {
+        min-width: 7.5rem;
+    }
+
+    .onip-action-group {
+        align-items: stretch;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .onip-action-btn {
+        justify-content: center;
+        width: 100%;
+    }
+
+    table.onip-table thead th,
+    table.onip-table tbody td {
+        padding-left: 0.65rem;
+        padding-right: 0.65rem;
+    }
+}
+
+/* ——— Formulaires ——— */
+@media (max-width: 991.98px) {
+    .onip-form-header .row > [class*="col-lg-"] {
+        margin-bottom: 0.25rem;
+    }
+
+    .onip-form-header-actions {
+        justify-content: flex-start;
+        margin-top: 0.75rem;
+        width: 100%;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .onip-form-page {
+        padding-bottom: 1.5rem;
+    }
+
+    .onip-form-header {
+        margin-left: 0;
+        margin-right: 0;
+        padding: 1rem;
+    }
+
+    .onip-form-title {
+        font-size: 1.3rem;
+    }
+
+    .onip-form-header-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .onip-form-header-actions .onip-btn-cancel,
+    .onip-form-header-actions .onip-btn-save,
+    .onip-form-header-actions .onip-btn-danger {
+        justify-content: center;
+        text-align: center;
+        width: 100%;
+    }
+
+    .onip-form-card {
+        border-left: none;
+        border-radius: 10px;
+        border-right: none;
+    }
+
+    .onip-form-tab-content {
+        padding: 1rem 0.85rem 1.15rem;
+    }
+
+    .onip-form-tabs {
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding: 0 0.35rem;
+        scrollbar-width: thin;
+    }
+
+    .onip-form-tabs .nav-link {
+        font-size: 0.82rem;
+        padding: 0.75rem 0.85rem;
+    }
+
+    .onip-form .onip-form-section > legend {
+        font-size: 0.92rem;
+    }
+
+    .onip-form-footer {
+        margin-left: 0;
+        margin-right: 0;
+        padding: 0.85rem 1rem;
+    }
+
+    .onip-form-footer-inner {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .onip-form-footer .onip-btn-cancel,
+    .onip-form-footer .onip-btn-save {
+        justify-content: center;
+        text-align: center;
+        width: 100%;
+    }
+
+    .employee-dossier-profile {
+        margin-left: 0;
+        margin-right: 0;
+        padding: 1rem;
+    }
+
+    .employee-dossier-profile-inner {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .employee-dossier-meta {
+        flex-direction: column;
+        gap: 0.45rem;
+    }
+
+    .employee-dossier-name {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .onip-list-header .onip-page-title,
+    .onip-form-title {
+        font-size: 1.15rem;
+    }
+
+    .onip-form .form-label {
+        font-size: 0.76rem;
+    }
+
+    .onip-sidebar-logo {
+        max-height: 5rem;
+        min-height: 3.75rem;
+    }
+}
+
+/* ——— Pages héritées (change/create legacy cards) ——— */
+@media (max-width: 767.98px) {
+    .page-heading .card .row > [class*="col"] {
+        margin-bottom: 0.65rem;
+        text-align: start !important;
+    }
+
+    .page-heading .card .text-end {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .page-heading .card .text-end .btn {
+        margin: 0 !important;
+        width: 100%;
+    }
+}
+
+/* ——— Présences & rapports ——— */
+@media (max-width: 767.98px) {
+    .company-attendance-page .ca-header,
+    .attendance-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .attendance-schedule-btn,
+    .ca-fab {
+        bottom: 1rem;
+        right: 1rem;
+    }
+}

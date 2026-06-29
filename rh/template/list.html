@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% load core %}
+{% load i18n %}
+{% load static %}
+{% load humanize %}
+{% load mathfilters %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+<div class="onip-list-page">
+    {% include 'components/list_page_header.html' %}
+
+    <div class="page-content">
+        <div class="row g-3">
+            <div class="col-lg-{% if list_filter %}9{% else %}12{% endif %}">
+                <div class="onip-data-card">
+                    <div class="onip-data-card-header">
+                        <h2 class="onip-data-card-title">
+                            {% blocktrans with name=model|getattr:'_meta'|getattr:'verbose_name_plural' %}Liste des {{ name }}{% endblocktrans %}
+                        </h2>
+                        <div class="onip-data-card-toolbar">
+                            <form method="get" class="onip-search-form input-group">
+                                {% for key, value in request.GET.items %}
+                                    {% if key != 'q' and key != 'page' %}
+                                    <input type="hidden" name="{{ key }}" value="{{ value }}">
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" name="q" class="form-control" placeholder="{% if model|getattr:'_meta'|getattr:'model_name' == 'employee' %}{% trans 'Rechercher un employé…' %}{% else %}{% trans 'Rechercher…' %}{% endif %}" value="{{ request.GET.q }}">
+                            </form>
+                            {% if list_filter %}
+                            <a href="#onip-filters-panel" class="btn onip-btn-filter d-lg-none">
+                                <i class="bi bi-funnel me-1"></i>{% trans 'Filtrer' %}
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="onip-data-card-body">
+                        <div class="table-responsive">
+                            <table class="table onip-table mb-0">
+                                <thead>
+                                    {% if model|getattr:'_meta'|getattr:'model_name' == 'employee' %}
+                                    <tr>
+                                        <th>{% trans 'ID' %}</th>
+                                        <th>{% trans 'Employé' %}</th>
+                                        <th>{% trans 'Position / Service' %}</th>
+                                        <th>{% trans 'Date d\'embauche' %}</th>
+                                        <th class="onip-col-actions">{% trans 'Actions' %}</th>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        {% for field in list_display %}
+                                        <th>{{ field.verbose_name|upper }}</th>
+                                        {% empty %}
+                                        <th>{% trans 'ID' %}</th>
+                                        <th>{% trans 'Nom' %}</th>
+                                        {% endfor %}
+                                        <th class="onip-col-actions">{% trans 'Actions' %}</th>
+                                    </tr>
+                                    {% endif %}
+                                </thead>
+                                <tbody>
+                                    {% for obj in page_obj %}
+                                    {% if model|getattr:'_meta'|getattr:'model_name' == 'employee' %}
+                                    <tr data-id="{{ obj.id }}">
+                                        <td><a href="{{ obj.get_absolute_url }}" class="onip-cell-id">#{{ obj.pk }}</a></td>
+                                        <td>
+                                            <div class="onip-employee-cell">
+                                                <span class="onip-avatar">
+                                                    {% if obj.photo %}
+                                                    <img src="{{ obj.photo.url }}" alt="">
+                                                    {% else %}
+                                                    {{ obj|employee_initials }}
+                                                    {% endif %}
+                                                </span>
+                                                <div>
+                                                    <div class="onip-employee-name">{{ obj.full_name }}</div>
+                                                    <div class="onip-employee-sub">{{ obj|employee_email }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="onip-cell-stack">
+                                                <strong>{{ obj.designation|default:'—' }}</strong>
+                                                <span>{{ obj.direction|default:'—' }}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{ obj.date_of_join|date:'d/m/Y'|default:'—' }}</td>
+                                        <td class="onip-row-actions">
+                                            {% include 'components/onip_table_actions.html' with obj=obj show_edit=True employee_row=True %}
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr data-id="{{ obj.id }}">
+                                        {% for field in list_display %}
+                                        <td>
+                                            {% if field.get_internal_type == 'FloatField' %}
+                                                {{ obj|getattr:field.name|intcomma|default:'—' }}
+                                            {% else %}
+                                                {{ obj|getattr:field.name|default:'—' }}
+                                            {% endif %}
+                                        </td>
+                                        {% empty %}
+                                        <td><span class="onip-cell-id">#{{ obj.pk }}</span></td>
+                                        <td>{{ obj }}</td>
+                                        {% endfor %}
+                                        <td class="onip-row-actions">
+                                            {% include 'components/onip_table_actions.html' with obj=obj show_edit=False %}
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% empty %}
+                                    <tr class="onip-empty-row">
+                                        <td colspan="{% if model|getattr:'_meta'|getattr:'model_name' == 'employee' %}5{% else %}{{ list_display|length|default:2|add:1 }}{% endif %}">
+                                            {% trans 'Aucun résultat trouvé.' %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {% include 'components/data_table_pagination.html' %}
+                </div>
+            </div>
+
+            {% if list_filter %}
+            <div class="col-lg-3 d-none d-lg-block" id="onip-filters-panel">
+                {% include 'components/advanced_filters_panel.html' %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

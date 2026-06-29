@@ -1,0 +1,14 @@
+{% load i18n %}
+
+<div class="onip-action-group">
+    <a href="{{ obj.get_absolute_url }}" class="onip-action-btn onip-action-view">
+        <i class="bi bi-eye"></i>
+        <span>{% if employee_row %}{% trans 'Voir la fiche' %}{% else %}{% trans 'Voir' %}{% endif %}</span>
+    </a>
+    {% if show_edit %}
+    <a href="{{ obj.get_absolute_url }}" class="onip-action-btn onip-action-edit">
+        <i class="bi bi-pencil"></i>
+        <span>{% trans 'Modifier' %}</span>
+    </a>
+    {% endif %}
+</div>

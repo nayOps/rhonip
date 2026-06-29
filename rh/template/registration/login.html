@@ -1,0 +1,86 @@
+{% extends 'registration/base.html' %}
+
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block auth_content %}
+    <h1 class="auth-title">{% trans 'Se connecter.' %}</h1>
+    <p class="auth-subtitle">{% trans 'Connectez-vous avec votre e-mail professionnel ou votre matricule. Mot de passe initial : votre matricule.' %}</p>
+
+    <form method="post" id="login-form">
+        {% csrf_token %}
+
+        {% if form.errors %}
+          <div class="alert alert-light-danger fw-bold mb-3 py-2" role="alert">
+            {% trans 'Identifiant ou mot de passe incorrect.' %}
+          </div>
+        {% endif %}
+
+        {% for field in form.visible_fields %}
+            {% if field.name == 'username' %}
+            <label class="auth-field-label" for="{{ field.id_for_label }}">{% trans 'E-mail professionnel ou matricule' %}</label>
+            <div class="auth-input-wrap">
+                {% if form.is_bound and field.errors %}
+                  {% render_field field class="form-control is-invalid" placeholder="prenom.nom@onip.gouv.cd" %}
+                {% else %}
+                  {% render_field field class="form-control" placeholder="prenom.nom@onip.gouv.cd" %}
+                {% endif %}
+                <span class="auth-input-icon"><i class="bi bi-at"></i></span>
+                {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            {% elif field.name == 'password' %}
+            <div class="auth-field-header">
+                <label class="auth-field-label" for="{{ field.id_for_label }}">{% trans 'Mot de passe' %}</label>
+                <a href="{{ PASSWORD_RESET_REDIRECT_URL }}">{% trans 'Mot de passe oublié ?' %}</a>
+            </div>
+            <div class="auth-input-wrap">
+                {% if form.is_bound and field.errors %}
+                  {% render_field field class="form-control is-invalid" id="password-field" %}
+                {% else %}
+                  {% render_field field class="form-control" id="password-field" %}
+                {% endif %}
+                <span class="auth-input-icon"><i class="bi bi-lock"></i></span>
+                <button type="button" class="auth-toggle-password" id="toggle-password" aria-label="{% trans 'Afficher le mot de passe' %}">
+                    <i class="bi bi-eye"></i>
+                </button>
+                {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            {% else %}
+            <label class="auth-field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <div class="auth-input-wrap mb-3">
+                {% render_field field class="form-control" %}
+            </div>
+            {% endif %}
+        {% endfor %}
+
+        <div class="auth-remember">
+            <input class="form-check-input" type="checkbox" id="remember-me" name="remember">
+            <label class="form-check-label ms-2" for="remember-me">{% trans 'Rester connecté' %}</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary auth-btn-submit">
+            {% trans 'Se connecter' %}
+            <i class="bi bi-arrow-right"></i>
+        </button>
+    </form>
+
+    <div class="auth-form-footer">
+        <span>{% trans 'Pas encore de compte ?' %}</span>
+        <a href="#" class="auth-help-btn"><i class="bi bi-question-circle"></i> {% trans "Besoin d'aide ?" %}</a>
+    </div>
+
+    <script>
+        (function () {
+            var toggle = document.getElementById('toggle-password');
+            var field = document.getElementById('password-field');
+            if (!toggle || !field) return;
+            toggle.addEventListener('click', function () {
+                var isPassword = field.getAttribute('type') === 'password';
+                field.setAttribute('type', isPassword ? 'text' : 'password');
+                toggle.innerHTML = isPassword
+                    ? '<i class="bi bi-eye-slash"></i>'
+                    : '<i class="bi bi-eye"></i>';
+            });
+        })();
+    </script>
+{% endblock %}

@@ -1,0 +1,123 @@
+:root {
+    --onip-blue: #0f2744;
+    --onip-blue-mid: #132f52;
+    --onip-blue-dark: #0a1e36;
+    --onip-yellow: #fff24b;
+    --onip-red: #db3832;
+    --onip-tricolor-height: 6px;
+
+    --bs-primary: var(--onip-blue);
+    --bs-primary-rgb: 15, 39, 68;
+    --bs-blue: var(--onip-blue);
+}
+
+body.theme-dark {
+    --bs-primary: var(--onip-blue);
+    --bs-primary-rgb: 15, 39, 68;
+    --bs-blue: var(--onip-blue);
+}
+
+.onip-tricolor-bar {
+    width: 100%;
+    height: var(--onip-tricolor-height);
+    background: linear-gradient(
+        90deg,
+        var(--onip-blue) 0%,
+        var(--onip-yellow) 50%,
+        var(--onip-red) 100%
+    );
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2000;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--onip-blue);
+    --bs-btn-border-color: var(--onip-blue);
+    --bs-btn-hover-bg: var(--onip-blue-mid);
+    --bs-btn-hover-border-color: var(--onip-blue-mid);
+    --bs-btn-active-bg: var(--onip-blue-dark);
+    --bs-btn-active-border-color: var(--onip-blue-dark);
+}
+
+.text-primary {
+    color: var(--onip-blue) !important;
+}
+
+.bg-primary {
+    background-color: var(--onip-blue) !important;
+}
+
+.badge.bg-primary {
+    background-color: var(--onip-blue) !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--onip-blue);
+    border-color: var(--onip-blue);
+}
+
+a:not(.btn):not(.sidebar-link):not(.dropdown-item):not(.nav-link) {
+    color: var(--onip-blue);
+}
+
+a:not(.btn):not(.sidebar-link):not(.dropdown-item):not(.nav-link):hover {
+    color: var(--onip-blue-mid);
+}
+
+.page-item.active .page-link {
+    background-color: var(--onip-blue);
+    border-color: var(--onip-blue);
+}
+
+.sidebar-wrapper .sidebar-item.active > .sidebar-link {
+    /* surchargé par onip-sidebar.css */
+}
+
+.nav-pills .nav-link.active,
+.nav-tabs .nav-link.active {
+    background-color: var(--onip-blue);
+    border-color: var(--onip-blue);
+    color: #fff;
+}
+
+.progress-bar {
+    background-color: var(--onip-blue);
+}
+
+.chat-app .chat-app-body .the-contact.active {
+    background-color: var(--onip-blue) !important;
+}
+
+.email-application .email-app-list .email-list-item.active,
+.email-application .email-app-list .email-list-item:focus {
+    border-left-color: var(--onip-blue) !important;
+}
+
+.sidebar-brand-link {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    text-decoration: none;
+}
+
+.sidebar-logo {
+    max-height: 3.25rem;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+.sidebar-app-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--onip-blue);
+    letter-spacing: 0.04em;
+    line-height: 1;
+}
+
+body.theme-dark .sidebar-app-name {
+    color: #b8cfe8;
+}

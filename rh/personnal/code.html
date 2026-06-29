@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1258e2",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<title>Employee Dashboard - ARE RDC</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 flex-shrink-0 bg-slate-50 dark:bg-[#111722] border-r border-slate-200 dark:border-slate-800 flex flex-col">
+<div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+<div class="size-8 bg-primary rounded flex items-center justify-center text-white">
+<span class="material-symbols-outlined">shield</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight text-primary">ARE RDC</h2>
+</div>
+<nav class="flex-1 overflow-y-auto p-4 space-y-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary font-medium" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined">mail</span>
+<span>Mail Management</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined">work</span>
+<span>Projects</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span>Leave Requests</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined">school</span>
+<span>Training</span>
+</a>
+<div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
+<p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Internal Tools</p>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined">description</span>
+<span>Resources</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</div>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 p-2">
+<div class="size-10 rounded-full bg-slate-300 dark:bg-slate-700 bg-cover bg-center" data-alt="Portrait of Jean Mukendi in professional attire" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCk6is2Kb-D69-GDv67zblAlPdVkggkAJcY1L1U8rk7jfuRQzlrvGOg_6aukWf6A9hcwJ24P4E2nLD06KOpbDyQqChEvjjHzWLtuFE_5WKYxYU_g2G7FHFdu32WhpMqZ3at61dt9zo-hYNmzNyw-FzBG8BMN1x18OGLyaDwr8axOlQsVtUYCPxsILcg8jbQpwwsIFmVa6RhcQYuYSbFFg2Klwf-JyVeJP53fdfH3B-EqaI3czwUFg_nmCAhNEC_6UXG491E3LvEU-I')"></div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold truncate">Jean Mukendi</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 truncate">Senior Analyst</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark">
+<!-- Header -->
+<header class="sticky top-0 z-10 flex items-center justify-between px-8 py-4 bg-white/80 dark:bg-[#101622]/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-4">
+<h1 class="text-xl font-bold">Personal Dashboard</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary" placeholder="Search tasks, documents..." type="text"/>
+</div>
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark"></span>
+</button>
+</div>
+</header>
+<div class="p-8 max-w-7xl mx-auto space-y-8">
+<!-- Welcome Section -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div>
+<h2 class="text-3xl font-bold tracking-tight">Bonjour, Jean Mukendi</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-1">L'ARE est régulatrice d'opportunités. Voici votre aperçu pour aujourd'hui.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>New Request</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Left Column: Stats & Links -->
+<div class="lg:col-span-2 space-y-8">
+<!-- My Balance Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
+<span class="material-symbols-outlined">flight_takeoff</span>
+</div>
+<span class="text-xs font-semibold px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded">Accrued</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Remaining Leave</p>
+<div class="flex items-end gap-2 mt-1">
+<span class="text-3xl font-bold">14.5</span>
+<span class="text-slate-500 dark:text-slate-400 text-sm mb-1">Days</span>
+</div>
+</div>
+<div class="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-lg">
+<span class="material-symbols-outlined">auto_stories</span>
+</div>
+<span class="text-xs font-semibold px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded">In Progress</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Training Hours</p>
+<div class="flex items-end gap-2 mt-1">
+<span class="text-3xl font-bold">8.0</span>
+<span class="text-slate-500 dark:text-slate-400 text-sm mb-1">Hours Pending</span>
+</div>
+</div>
+</div>
+<!-- My Tasks / Workflow -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">assignment</span>
+                                My Workflow
+                            </h3>
+<button class="text-primary text-sm font-medium hover:underline">View All</button>
+</div>
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl divide-y dark:divide-slate-800">
+<!-- Task 1 -->
+<div class="p-4 flex items-center gap-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<div class="size-10 flex-shrink-0 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">forward_to_inbox</span>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-semibold text-sm truncate">Process Mail #ARE-2024-089</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 truncate">From: Legal Dept - Response required by 16:00</p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-[10px] font-bold rounded uppercase tracking-wider">Urgent</span>
+<span class="text-[11px] text-slate-400">Due in 2h</span>
+</div>
+</div>
+<!-- Task 2 -->
+<div class="p-4 flex items-center gap-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<div class="size-10 flex-shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">task_alt</span>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-semibold text-sm truncate">Quarterly Regulation Audit Report</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 truncate">Project: National Grid Modernization</p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-bold rounded uppercase tracking-wider">Project</span>
+<span class="text-[11px] text-slate-400">Due Tomorrow</span>
+</div>
+</div>
+<!-- Task 3 -->
+<div class="p-4 flex items-center gap-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<div class="size-10 flex-shrink-0 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">groups</span>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-semibold text-sm truncate">Weekly Sync: Regulation Team</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 truncate">Conference Room B • 14:00 - 15:30</p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-[10px] font-bold rounded uppercase tracking-wider">Meeting</span>
+<span class="text-[11px] text-slate-400">Starts in 4h</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Activity -->
+<section class="space-y-4">
+<h3 class="text-lg font-bold">Recent Documents</h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-red-500">picture_as_pdf</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium truncate">Directive_Tarification_2024.pdf</p>
+<p class="text-xs text-slate-500">Modified 3h ago</p>
+</div>
+</div>
+<div class="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-500">description</span>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium truncate">Rapport_Audit_Zone_Est.docx</p>
+<p class="text-xs text-slate-500">Modified yesterday</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Sidebar Widgets -->
+<div class="space-y-8">
+<!-- Quick Links Section -->
+<section class="space-y-4">
+<h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Quick Links</h3>
+<div class="flex flex-col gap-2">
+<button class="w-full flex items-center justify-between p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-primary dark:hover:border-primary transition-colors text-sm font-medium">
+<span class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">calendar_add_on</span>
+                                    Request Leave
+                                </span>
+<span class="material-symbols-outlined text-slate-400 text-sm">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-primary dark:hover:border-primary transition-colors text-sm font-medium">
+<span class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">rate_review</span>
+                                    Submit Report
+                                </span>
+<span class="material-symbols-outlined text-slate-400 text-sm">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-primary dark:hover:border-primary transition-colors text-sm font-medium">
+<span class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">meeting_room</span>
+                                    Book Meeting Room
+                                </span>
+<span class="material-symbols-outlined text-slate-400 text-sm">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- Internal Announcements -->
+<section class="p-6 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl space-y-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-500">campaign</span>
+<h3 class="text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Announcements</h3>
+</div>
+<div class="space-y-4">
+<div class="space-y-1">
+<span class="text-[10px] font-bold text-primary uppercase">Service Note #24-012</span>
+<h4 class="text-sm font-semibold leading-tight">Mise à jour du protocole de sécurité informatique</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400">Veuillez mettre à jour vos mots de passe avant vendredi.</p>
+</div>
+<div class="space-y-1 pt-3 border-t border-slate-200 dark:border-slate-800">
+<span class="text-[10px] font-bold text-primary uppercase">HR Update</span>
+<h4 class="text-sm font-semibold leading-tight">Nouveaux avantages d'assurance santé</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400">Le livret d'accueil mis à jour est disponible au téléchargement.</p>
+</div>
+</div>
+<button class="w-full mt-2 py-2 text-xs font-semibold text-primary bg-primary/5 hover:bg-primary/10 rounded transition-colors">
+                            All Service Notes
+                        </button>
+</section>
+<!-- Quote/Tip of the day -->
+<section class="relative p-6 rounded-xl bg-gradient-to-br from-primary to-blue-700 text-white overflow-hidden shadow-xl shadow-primary/20">
+<div class="relative z-10">
+<span class="material-symbols-outlined opacity-50 mb-2">lightbulb</span>
+<h4 class="font-bold text-sm mb-1">Tip of the day</h4>
+<p class="text-xs text-blue-100 italic leading-relaxed">"La régulation efficace est le moteur de l'investissement énergétique durable en RDC."</p>
+</div>
+<div class="absolute -right-4 -bottom-4 size-24 bg-white/10 rounded-full blur-2xl"></div>
+</section>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-12 p-8 border-t border-slate-200 dark:border-slate-800 text-center">
+<p class="text-xs text-slate-500">© 2024 ARE RDC - Autorité de Régulation du Secteur de l'Électricité. République Démocratique du Congo.</p>
+</footer>
+</main>
+</div>
+</body></html>

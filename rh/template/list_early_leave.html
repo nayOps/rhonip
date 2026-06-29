@@ -1,0 +1,45 @@
+{% extends 'list_agent_requests.html' %}
+{% load i18n %}
+
+{% block list_type_column_header %}{% trans 'Type de départ' %}{% endblock %}
+
+{% block content %}
+<div class="onip-early-leave-banner">
+    <div class="onip-early-leave-banner__icon"><i class="bi bi-box-arrow-right"></i></div>
+    <div>
+        <strong>{% trans 'Lien avec vos présences' %}</strong>
+        <p class="mb-0">{% trans 'Chaque départ anticipé validé apparaît sur votre onglet Présences (profil employé) avec le type de départ et la plage horaire.' %}</p>
+    </div>
+</div>
+{{ block.super }}
+<style>
+.onip-early-leave-banner {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin: 0 0 1rem;
+    padding: 1rem 1.15rem;
+    border-radius: 12px;
+    border: 1px solid #c5d8eb;
+    background: linear-gradient(135deg, #e8eef6 0%, #f4f8fc 100%);
+    color: #0f2744;
+}
+.onip-early-leave-banner__icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: #0f2744;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+.onip-early-leave-banner p {
+    font-size: 0.88rem;
+    color: #4b5f78;
+    margin-top: 0.25rem;
+}
+</style>
+{% endblock %}

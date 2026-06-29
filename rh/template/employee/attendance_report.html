@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/attendance-report.css' %}">
+
+<div class="attendance-report-page">
+    <div class="attendance-report-toolbar no-print">
+        <div>
+            <a href="{% url 'employee:change' obj.pk %}?year={{ report.year }}&month={{ report.month }}" class="btn btn-light">
+                <i class="bi bi-arrow-left"></i> {% trans 'Retour à la fiche' %}
+            </a>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'employee:attendance_report_schedule' obj.pk %}?year={{ report.year }}&month={{ report.month }}" class="btn btn-outline-primary">
+                <i class="bi bi-calendar-check"></i> {% trans 'Programmer' %}
+            </a>
+            <button type="button" class="btn btn-primary" onclick="window.print()">
+                <i class="bi bi-printer"></i> {% trans 'Imprimer le rapport' %}
+            </button>
+        </div>
+    </div>
+
+    <div class="attendance-report-sheet">
+        <div class="attendance-report-header">
+            <div>
+                <p class="attendance-report-kicker">{% trans 'RAPPORT DE PRÉSENCE' %}</p>
+                <h1>{{ obj.full_name }}</h1>
+                <p class="attendance-report-meta">
+                    {% trans 'ID Agent' %} : {{ report.agent_label }}
+                    {% if report.direction_label %}| {{ report.direction_label }}{% endif %}
+                </p>
+                <p class="attendance-report-meta">
+                    {{ report.period_label }} · {% trans 'Généré le' %} {{ report.generated_at_label }}
+                </p>
+            </div>
+            <div class="attendance-report-brand">
+                <i class="bi bi-building"></i>
+                <div>
+                    <strong>ONIP</strong>
+                    <span>{% trans 'Portail Administratif RH' %}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="attendance-report-kpis">
+            <div class="attendance-report-kpi">
+                <div>
+                    <span>{% trans 'Taux de présence' %}</span>
+                    <strong>{{ report.summary.presence_rate }}%</strong>
+                    <small>{{ report.rate_delta_label }}</small>
+                </div>
+                <i class="bi bi-check-circle-fill text-primary"></i>
+            </div>
+            <div class="attendance-report-kpi">
+                <div>
+                    <span>{% trans 'Retards' %}</span>
+                    <strong>{{ report.summary.late_count }}</strong>
+                    <small>{% trans 'Actions requises' %}</small>
+                </div>
+                <i class="bi bi-clock-fill text-warning"></i>
+            </div>
+            <div class="attendance-report-kpi">
+                <div>
+                    <span>{% trans 'Absence' %}</span>
+                    <strong>{{ report.summary.absence_count }}</strong>
+                    <small>{% trans 'Injustifiée' %}</small>
+                </div>
+                <i class="bi bi-x-circle-fill text-danger"></i>
+            </div>
+        </div>
+
+        <h2>{% trans 'Détails des pointages journaliers' %}</h2>
+        <div class="table-responsive">
+            <table class="attendance-report-table onip-table">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Date' %}</th>
+                        {% for header in report.slot_headers %}
+                        <th>{{ header }}</th>
+                        {% endfor %}
+                        <th>{% trans 'Durée' %}</th>
+                        <th>{% trans 'Statut' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report.visible_rows %}
+                    <tr>
+                        <td>{{ row.date_label }}</td>
+                        {% for value in row.slot_values %}
+                        <td class="{% if forloop.first and row.is_late_entry %}text-danger fw-semibold{% endif %}">{{ value }}</td>
+                        {% endfor %}
+                        <td>{{ row.duration_label }}</td>
+                        <td>
+                            <span class="attendance-report-badge {{ row.status }}">{{ row.status_label }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for row in report.rows|slice:"5:" %}
+                    <tr class="attendance-report-extra-row" hidden>
+                        <td>{{ row.date_label }}</td>
+                        {% for value in row.slot_values %}
+                        <td class="{% if forloop.first and row.is_late_entry %}text-danger fw-semibold{% endif %}">{{ value }}</td>
+                        {% endfor %}
+                        <td>{{ row.duration_label }}</td>
+                        <td>
+                            <span class="attendance-report-badge {{ row.status }}">{{ row.status_label }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if report.hidden_rows_count %}
+        <button type="button" class="btn btn-link attendance-report-expand no-print" id="attendance-report-expand">
+            {% blocktrans with count=report.hidden_rows_count %}Afficher les {{ count }} jours restants{% endblocktrans %}
+        </button>
+        {% endif %}
+
+        <div class="attendance-report-observations">
+            <h3>{% trans 'Observations RH' %}</h3>
+            <p>{{ report.observations|linebreaksbr }}</p>
+        </div>
+
+        <div class="attendance-report-signatures">
+            <div>
+                <span>{% trans 'Signature agent' %}</span>
+                <div class="attendance-report-sign-line"></div>
+            </div>
+            <div>
+                <span>{% trans 'Signature RH / Direction' %}</span>
+                <div class="attendance-report-sign-line"></div>
+            </div>
+        </div>
+
+        <div class="attendance-report-footer">
+            <span>{{ report.report_ref }}</span>
+            <span>{% trans 'PAGE' %} 1 / 1</span>
+            <span>{% trans 'STRICTEMENT CONFIDENTIEL' %}</span>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('attendance-report-expand')?.addEventListener('click', function () {
+    document.querySelectorAll('.attendance-report-extra-row').forEach(function (row) {
+        row.hidden = false;
+    });
+    this.remove();
+});
+</script>
+{% endblock %}

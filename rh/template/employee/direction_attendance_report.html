@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/direction-attendance-report.css' %}">
+
+<div class="direction-report-page">
+    <div class="direction-report-toolbar no-print">
+        <div>
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'employee:direction_report_hub' %}?year={{ report.year }}&month={{ report.month }}">{% trans 'Départements' %}</a></li>
+                <li class="breadcrumb-item active">{{ report.direction.name }}</li>
+            </ol>
+            <h2>{{ report.direction.name }}</h2>
+            <p class="text-muted mb-0">{% trans 'Analyse de la ponctualité' %} — {{ report.period_label }}</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'employee:direction_report_hub' %}?year={{ report.year }}&month={{ report.month }}" class="btn btn-light">{% trans 'Retour' %}</a>
+            <a href="{% url 'employee:direction_report_schedule' report.direction.pk %}?year={{ report.year }}&month={{ report.month }}" class="btn btn-outline-primary">
+                <i class="bi bi-calendar-check"></i> {% trans 'Programmer' %}
+            </a>
+            <button type="button" class="btn btn-light" onclick="window.print()"><i class="bi bi-printer"></i> {% trans 'Imprimer' %}</button>
+            <button type="button" class="btn btn-primary" onclick="window.print()"><i class="bi bi-download"></i> {% trans 'Exporter (PDF)' %}</button>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-xl-9">
+            <div class="direction-report-kpis">
+                <div class="direction-report-kpi">
+                    <div>
+                        <span>{% trans 'Total retards' %}</span>
+                        <strong>{{ report.total_lates }}</strong>
+                        <small class="text-danger">{% if report.late_trend_pct > 0 %}+{% endif %}{{ report.late_trend_pct }}% {% trans 'vs mois dernier' %}</small>
+                    </div>
+                    <i class="bi bi-clock-history text-danger"></i>
+                </div>
+                <div class="direction-report-kpi">
+                    <div>
+                        <span>{% trans 'Moyenne par agent' %}</span>
+                        <strong>{{ report.avg_per_agent }} min</strong>
+                        <small>{% trans 'Sur la période sélectionnée' %}</small>
+                    </div>
+                    <i class="bi bi-person text-primary"></i>
+                </div>
+                <div class="direction-report-kpi">
+                    <div>
+                        <span>{% trans 'Tendance hebdo' %}</span>
+                        <strong>{{ report.weekly_trend_label }}</strong>
+                        <small class="{% if report.weekly_trend_pct <= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {% if report.weekly_trend_pct <= 0 %}-{% else %}+{% endif %}{{ report.weekly_trend_pct|default:0 }}% {% trans 'cette semaine' %}
+                        </small>
+                    </div>
+                    <i class="bi bi-graph-up text-success"></i>
+                </div>
+            </div>
+
+            <div class="direction-report-card mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">{% trans 'Patterns mensuels' %}</h5>
+                    <div class="direction-heatmap-legend">
+                        <span class="level-0"></span> 0
+                        <span class="level-1"></span> 0-5m
+                        <span class="level-2"></span> 5-15m
+                        <span class="level-3"></span> 15m+
+                    </div>
+                </div>
+                <div class="direction-heatmap">
+                    <div class="direction-heatmap-header">
+                        {% for header in report.weekday_headers %}
+                        <div>{{ header }}</div>
+                        {% endfor %}
+                    </div>
+                    {% for week in report.heatmap_weeks %}
+                    <div class="direction-heatmap-row">
+                        {% for cell in week %}
+                        <div class="direction-heatmap-cell level-{{ cell.level }}{% if cell.is_weekend %} is-weekend{% endif %}{% if cell.is_padding %} is-empty{% endif %}">
+                            {% if cell.day_number %}{{ cell.day_number }}{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="direction-report-card">
+                <h5>{% trans 'Top 5 agents (retards cumulés)' %}</h5>
+                <div class="table-responsive">
+                    <table class="table onip-table direction-top-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>{% trans 'Agent' %}</th>
+                                <th>{% trans 'Rôle' %}</th>
+                                <th>{% trans 'Temps total' %}</th>
+                                <th>{% trans 'Fréquence' %}</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in report.top_agents %}
+                            <tr>
+                                <td>
+                                    <div class="direction-agent-cell">
+                                        <span class="direction-agent-avatar">{{ row.employee.first_name|default:'?'|slice:":1" }}{{ row.employee.last_name|default:''|slice:":1" }}</span>
+                                        {{ row.employee.full_name }}
+                                    </div>
+                                </td>
+                                <td>{{ row.role }}</td>
+                                <td class="text-danger fw-bold">{{ row.total_minutes }} min</td>
+                                <td>{% blocktrans count counter=row.frequency %}{{ counter }} fois{% plural %}{{ counter }} fois{% endblocktrans %}</td>
+                                <td><a href="{% url 'employee:change' row.employee.pk %}?year={{ report.year }}&month={{ report.month }}">{% trans 'Détails' %}</a></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-muted">{% trans 'Aucun retard enregistré pour cette direction.' %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3">
+            <div class="direction-report-side-card predictive mb-3">
+                <h6><i class="bi bi-lightbulb"></i> {% trans 'Analyse prédictive' %}</h6>
+                <p>{{ report.prediction }}</p>
+                <p class="mb-0"><strong>{% trans 'Recommandation' %} :</strong> {{ report.recommendation }}</p>
+            </div>
+
+            <div class="direction-report-side-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0">{% trans 'Notes de service' %}</h6>
+                    <i class="bi bi-plus-lg"></i>
+                </div>
+                <ul class="direction-notes-list">
+                    {% for note in report.service_notes %}
+                    <li>
+                        <strong>{{ note.title }}</strong>
+                        <span>{{ note.meta }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <button type="button" class="btn btn-sm btn-outline-primary w-100">{% trans 'Voir toutes les notes' %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

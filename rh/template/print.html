@@ -1,0 +1,45 @@
+{% load core %}
+{% load i18n %}
+{% load static %}
+{% load qr_code %}
+{% get_current_language as LANGUAGE_CODE %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'assets/css/onip-brand.css' %}">
+    <title></title>
+    <style>
+      p{
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      header{
+        margin-bottom: 25px !important;
+      }
+      footer{
+        margin-top: 25px !important;
+      }
+      .watermark{
+        z-index: -1 !important;
+        position: fixed !important;
+        top: 50% !important;
+        left: 25% !important;
+        color:  rgba(0,0,0, 0.1) !important;
+        transform: rotate(-45deg);
+      }
+      .watermark-title-text{
+        font-size: 5rem !important;
+      }
+    </style>
+  </head>
+
+  <body class="container-fluid">
+    {% include 'includes/onip_tricolor_bar.html' %}
+    {{ template }}
+  </body>
+
+</html>

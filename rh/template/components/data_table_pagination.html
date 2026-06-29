@@ -1,0 +1,42 @@
+{% load i18n %}
+{% load core %}
+
+{% if page_obj %}
+<div class="onip-table-footer">
+    <p class="onip-table-count">
+        {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=page_obj.paginator.count %}
+        Affichage de {{ start }}-{{ end }} sur {{ total }}
+        {% endblocktrans %}
+        {{ model|getattr:'_meta'|getattr:'verbose_name_plural'|lower }}
+    </p>
+    <nav aria-label="{% trans 'Pagination' %}">
+        <ul class="onip-pagination pagination mb-0">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?{% query_transform page=page_obj.previous_page_number %}"><i class="bi bi-chevron-left"></i></a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-left"></i></span></li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num == 1 or num == page_obj.paginator.num_pages or num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                <li class="page-item"><a class="page-link" href="?{% query_transform page=num %}">{{ num }}</a></li>
+                {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?{% query_transform page=page_obj.next_page_number %}"><i class="bi bi-chevron-right"></i></a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-right"></i></span></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}

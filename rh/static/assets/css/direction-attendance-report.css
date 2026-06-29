@@ -1,0 +1,191 @@
+.direction-report-page {
+    --dr-primary: #0f2744;
+    --dr-border: #e2e8f0;
+}
+
+.direction-report-toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+}
+
+.direction-report-toolbar h2 {
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.direction-report-kpis {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.direction-report-kpi {
+    background: #fff;
+    border: 1px solid var(--dr-border);
+    border-radius: 16px;
+    padding: 1rem 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.direction-report-kpi span {
+    display: block;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 700;
+}
+
+.direction-report-kpi strong {
+    display: block;
+    font-size: 1.75rem;
+    color: #0f172a;
+}
+
+.direction-report-kpi small {
+    display: block;
+    font-size: 0.78rem;
+    color: #64748b;
+}
+
+.direction-report-kpi i {
+    font-size: 1.6rem;
+}
+
+.direction-report-card,
+.direction-report-side-card {
+    background: #fff;
+    border: 1px solid var(--dr-border);
+    border-radius: 16px;
+    padding: 1.1rem 1.2rem;
+}
+
+.direction-heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.direction-heatmap-legend span {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.direction-heatmap-legend .level-0 { background: #eff6ff; }
+.direction-heatmap-legend .level-1 { background: #dbeafe; }
+.direction-heatmap-legend .level-2 { background: #93c5fd; }
+.direction-heatmap-legend .level-3 { background: #0f2744; }
+
+.direction-heatmap-header,
+.direction-heatmap-row {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.35rem;
+}
+
+.direction-heatmap-header div {
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    padding-bottom: 0.35rem;
+}
+
+.direction-heatmap-row {
+    margin-bottom: 0.35rem;
+}
+
+.direction-heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.direction-heatmap-cell.level-0 { background: #eff6ff; }
+.direction-heatmap-cell.level-1 { background: #bfdbfe; }
+.direction-heatmap-cell.level-2 { background: #60a5fa; color: #fff; }
+.direction-heatmap-cell.level-3 { background: #0f2744; color: #fff; }
+.direction-heatmap-cell.is-weekend { background: #f8fafc; color: #94a3b8; }
+.direction-heatmap-cell.is-empty { background: transparent; }
+
+.direction-top-table thead th {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+}
+
+.direction-agent-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.direction-agent-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #dbeafe;
+    color: var(--dr-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.78rem;
+}
+
+.direction-report-side-card.predictive {
+    background: linear-gradient(135deg, #0f2744, #132f52);
+    color: #fff;
+}
+
+.direction-report-side-card.predictive h6,
+.direction-report-side-card.predictive p {
+    color: #fff;
+}
+
+.direction-notes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+}
+
+.direction-notes-list li {
+    padding: 0.65rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.direction-notes-list li strong {
+    display: block;
+    font-size: 0.88rem;
+}
+
+.direction-notes-list li span {
+    font-size: 0.78rem;
+    color: #64748b;
+}
+
+@media (max-width: 992px) {
+    .direction-report-kpis {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media print {
+    .no-print { display: none !important; }
+    #sidebar, header, footer { display: none !important; }
+}

@@ -1,0 +1,665 @@
+{% extends 'base.html' %}
+
+
+
+{% load i18n %}
+
+{% load static %}
+
+
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'assets/css/employee-profile-dossier.css' %}">
+
+
+
+<div class="epd-page page-content">
+
+    <div class="epd-topbar">
+
+        <a href="{% url 'core:home' %}" class="epd-back" aria-label="{% trans 'Retour' %}">
+
+            <i class="bi bi-arrow-left"></i>
+
+        </a>
+
+        <h1 class="epd-topbar-title">{% trans "Dossier de l'Agent" %}</h1>
+
+    </div>
+
+
+
+    {% include 'components/employee_dossier_header.html' %}
+
+
+
+    <div class="epd-tabs-wrap">
+
+        <ul class="nav epd-tabs" role="tablist">
+
+            <li class="nav-item" role="presentation">
+
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#epd-tab-personal" type="button" role="tab">
+
+                    {% trans 'Informations Personnelles' %}
+
+                </button>
+
+            </li>
+
+            <li class="nav-item" role="presentation">
+
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#epd-tab-admin" type="button" role="tab">
+
+                    {% trans 'Dossier Administratif' %}
+
+                </button>
+
+            </li>
+
+            <li class="nav-item" role="presentation">
+
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#epd-tab-education" type="button" role="tab">
+
+                    {% trans 'Formations & Compétences' %}
+
+                </button>
+
+            </li>
+
+            <li class="nav-item" role="presentation">
+
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#epd-tab-documents" type="button" role="tab">
+
+                    {% trans 'Documents' %}
+
+                </button>
+
+            </li>
+
+        </ul>
+
+    </div>
+
+
+
+    <div class="epd-tab-body tab-content">
+
+        <div class="tab-pane fade show active" id="epd-tab-personal" role="tabpanel">
+
+            <div class="epd-layout">
+
+                <div class="epd-main">
+
+                    <div class="epd-card">
+
+                        <div class="epd-card-header">
+
+                            <i class="bi bi-person"></i>
+
+                            <h3 class="epd-card-title">{% trans 'Détails Personnels' %}</h3>
+
+                        </div>
+
+                        <div class="epd-card-body">
+
+                            <div class="epd-field-grid">
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Nom Complet' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.personal.full_name }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Nationalité' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.personal.citizenship }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Date de Naissance' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.personal.date_of_birth }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Genre' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.personal.gender }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Lieu de Naissance' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.personal.place_of_birth }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'État civil' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.personal.marital_status }}</span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="epd-card">
+
+                        <div class="epd-card-header">
+
+                            <i class="bi bi-telephone"></i>
+
+                            <h3 class="epd-card-title">{% trans 'Coordonnées de Contact' %}</h3>
+
+                        </div>
+
+                        <div class="epd-card-body">
+
+                            <div class="epd-field-grid">
+
+                                <div class="epd-field-grid" style="grid-column: 1 / -1;">
+
+                                    <div>
+
+                                        <span class="epd-field-label">{% trans 'Adresse Domicile' %}</span>
+
+                                        <span class="epd-field-value">{{ dossier.contact.address }}</span>
+
+                                    </div>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Email Professionnel' %}</span>
+
+                                    <span class="epd-field-value">
+
+                                        {% if dossier.contact.email_professional != '—' %}
+
+                                        <a href="mailto:{{ dossier.contact.email_professional }}">{{ dossier.contact.email_professional }}</a>
+
+                                        {% else %}—{% endif %}
+
+                                    </span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Téléphone Professionnel' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.contact.telephone_professional }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Téléphone Personnel' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.contact.telephone_personal }}</span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="epd-card">
+
+                        <div class="epd-card-header">
+
+                            <i class="bi bi-exclamation-triangle text-danger"></i>
+
+                            <h3 class="epd-card-title">{% trans "Contact d'Urgence" %}</h3>
+
+                        </div>
+
+                        <div class="epd-card-body">
+
+                            <div class="epd-emergency-box">
+
+                                <div class="epd-field-grid epd-field-grid--3">
+
+                                    <div>
+
+                                        <span class="epd-field-label">{% trans 'Nom' %}</span>
+
+                                        <span class="epd-field-value">{{ dossier.emergency.name }}</span>
+
+                                    </div>
+
+                                    <div>
+
+                                        <span class="epd-field-label">{% trans 'Téléphone' %}</span>
+
+                                        <span class="epd-field-value">{{ dossier.emergency.phone }}</span>
+
+                                    </div>
+
+                                    <div>
+
+                                        <span class="epd-field-label">{% trans 'Relation' %}</span>
+
+                                        <span class="epd-field-value">{{ dossier.emergency.relationship }}</span>
+
+                                    </div>
+
+                                </div>
+
+                                {% if dossier.emergency.information %}
+
+                                <p class="epd-list-meta mt-2 mb-0">{{ dossier.emergency.information }}</p>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                {% include 'components/employee_dossier_sidebar.html' %}
+
+            </div>
+
+        </div>
+
+
+
+        <div class="tab-pane fade" id="epd-tab-admin" role="tabpanel">
+
+            <div class="epd-layout">
+
+                <div class="epd-main">
+
+                    <div class="epd-card">
+
+                        <div class="epd-card-header">
+
+                            <i class="bi bi-building"></i>
+
+                            <h3 class="epd-card-title">{% trans 'Affectation & contrat' %}</h3>
+
+                        </div>
+
+                        <div class="epd-card-body">
+
+                            <div class="epd-field-grid">
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Matricule' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.registration_number }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'N° sécurité sociale' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.social_security_number }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Direction' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.direction }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Sous-direction' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.sub_direction }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Service' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.service }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans "Site d'affectation" %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.site }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Type de contrat' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.agreement }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans "Date d'engagement" %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.date_of_join }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Début ONIP' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.onip_start_date }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Échelon / Grade' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.echelon_grade }}</span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="epd-card">
+
+                        <div class="epd-card-header">
+
+                            <i class="bi bi-card-text"></i>
+
+                            <h3 class="epd-card-title">{% trans "Pièce d'identité" %}</h3>
+
+                        </div>
+
+                        <div class="epd-card-body">
+
+                            <div class="epd-field-grid">
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Type' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.type_of_identity }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Numéro' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.identity_number }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Délivrance' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.date_of_issue }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Expiration' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.date_of_expiry }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'Lieu de délivrance' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.place_of_issue }}</span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="epd-field-label">{% trans 'N° nomination' %}</span>
+
+                                    <span class="epd-field-value">{{ dossier.admin.appointment_number }}</span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    {% if experiences %}
+
+                    <div class="epd-card">
+
+                        <div class="epd-card-header">
+
+                            <i class="bi bi-clock-history"></i>
+
+                            <h3 class="epd-card-title">{% trans 'Historique des postes' %}</h3>
+
+                        </div>
+
+                        <div class="epd-card-body">
+
+                            {% for item in experiences %}
+
+                            <div class="epd-list-item">
+
+                                <div class="epd-list-icon"><i class="bi bi-briefcase"></i></div>
+
+                                <div>
+
+                                    <p class="epd-list-title">{{ item.position|default:'—' }} — {{ item.organization|default:'—' }}</p>
+
+                                    <p class="epd-list-meta">
+
+                                        {% if item.start_date %}{{ item.start_date|date:'d/m/Y' }}{% else %}—{% endif %}
+
+                                        →
+
+                                        {% if item.end_date %}{{ item.end_date|date:'d/m/Y' }}{% else %}{% trans 'Présent' %}{% endif %}
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+
+
+                {% include 'components/employee_dossier_sidebar.html' %}
+
+            </div>
+
+        </div>
+
+
+
+        <div class="tab-pane fade" id="epd-tab-education" role="tabpanel">
+
+            <div class="epd-card">
+
+                <div class="epd-card-header">
+
+                    <i class="bi bi-mortarboard"></i>
+
+                    <h3 class="epd-card-title">{% trans 'Formations & Compétences' %}</h3>
+
+                </div>
+
+                <div class="epd-card-body">
+
+                    {% for item in educations %}
+
+                    <div class="epd-list-item">
+
+                        <div class="epd-list-icon"><i class="bi bi-mortarboard"></i></div>
+
+                        <div>
+
+                            <p class="epd-list-title">{{ item.institution|default:'—' }}</p>
+
+                            <p class="epd-list-meta">
+
+                                {{ item.study_level|default:'' }}{% if item.field_of_study %} — {{ item.field_of_study }}{% endif %}
+
+                                {% if item.degree %} · {{ item.degree }}{% endif %}
+
+                                {% if item.diploma_year %} · {{ item.diploma_year }}{% endif %}
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {% empty %}
+
+                    <p class="epd-empty">{% trans 'Aucune formation enregistrée.' %}</p>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="tab-pane fade" id="epd-tab-documents" role="tabpanel">
+
+            <div class="epd-card">
+
+                <div class="epd-card-header">
+
+                    <i class="bi bi-folder2"></i>
+
+                    <h3 class="epd-card-title">{% trans 'Documents' %}</h3>
+
+                </div>
+
+                <div class="epd-card-body">
+
+                    {% for item in documents %}
+
+                    <div class="epd-list-item">
+
+                        <div class="epd-list-icon"><i class="bi bi-file-earmark-text"></i></div>
+
+                        <div>
+
+                            <p class="epd-list-title">{{ item.name|default:item.document.name }}</p>
+
+                            {% if item.document %}
+
+                            <p class="epd-list-meta">
+
+                                <a href="{{ item.document.url }}" target="_blank" rel="noopener">{% trans 'Télécharger' %}</a>
+
+                            </p>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    {% empty %}
+
+                    <p class="epd-empty">{% trans 'Aucun document joint.' %}</p>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+document.querySelectorAll('.epd-copy-btn').forEach((btn) => {
+
+    btn.addEventListener('click', () => {
+
+        const value = btn.getAttribute('data-copy');
+
+        if (!value || !navigator.clipboard) return;
+
+        navigator.clipboard.writeText(value);
+
+        btn.innerHTML = '<i class="bi bi-check2"></i>';
+
+        setTimeout(() => { btn.innerHTML = '<i class="bi bi-clipboard"></i>'; }, 1500);
+
+    });
+
+});
+
+</script>
+
+{% endblock %}
+
+

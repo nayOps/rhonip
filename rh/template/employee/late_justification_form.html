@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="onip-form-page">
+    <div class="onip-form-header">
+        <div class="row">
+            <div class="col-lg-8 text-start">
+                <h1 class="onip-form-title">{% trans 'Justifier une anomalie de présence' %}</h1>
+                <p class="text-muted mb-0 mt-1">
+                    {{ employee.full_name }} — {{ day|date:'d/m/Y' }}
+                    {% if evaluation.delay_minutes %}
+                    · {% blocktrans with minutes=evaluation.delay_minutes %}Retard de {{ minutes }} min{% endblocktrans %}
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-lg-4 onip-form-header-actions">
+                <a href="{% url 'employee:change' employee.pk %}" class="onip-btn-cancel">{% trans 'Annuler' %}</a>
+                <button type="submit" form="form-late-justification" class="onip-btn-save">{% trans 'Envoyer' %}</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="onip-form-card">
+                    <div class="onip-form-tab-content">
+                        {% if approver %}
+                        <div class="alert alert-light border mb-4">
+                            <i class="bi bi-person-check me-2"></i>
+                            {% blocktrans with approver_name=approver %}Validation requise par le responsable N+1 : <strong>{{ approver_name }}</strong>{% endblocktrans %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning mb-4">
+                            {% trans 'Aucun responsable N+1 n’a été trouvé pour votre direction. La demande pourrait être refusée.' %}
+                        </div>
+                        {% endif %}
+
+                        <form method="post" enctype="multipart/form-data" class="onip-form" id="form-late-justification">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="onip-form-footer">
+        <div class="onip-form-footer-inner">
+            <a href="{% url 'employee:change' employee.pk %}" class="onip-btn-cancel">{% trans 'Annuler' %}</a>
+            <button type="submit" form="form-late-justification" class="onip-btn-save">{% trans 'Envoyer pour validation' %}</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

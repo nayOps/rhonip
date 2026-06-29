@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ARE HRMS - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1258e2",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                        "surface-dark": "#1a2234",
+                        "border-dark": "#2d3a54"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex h-screen overflow-hidden">
+<!-- Side Navigation -->
+<aside class="w-64 flex-shrink-0 bg-white dark:bg-background-dark border-r border-slate-200 dark:border-border-dark flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-2xl">bolt</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-none dark:text-white">ARE HRMS</h1>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Electricity Regulator</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-surface-dark transition-colors" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-medium">Personnel</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-surface-dark transition-colors" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-medium">Contracts</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-surface-dark transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-medium">Leaves</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-surface-dark transition-colors" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span class="font-medium">Evaluations</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-surface-dark transition-colors" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-medium">Training</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-surface-dark transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-border-dark">
+<button class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 dark:bg-surface-dark text-slate-700 dark:text-slate-200 rounded-lg font-semibold text-sm hover:bg-red-500/10 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-xl">logout</span>
+                    Logout
+                </button>
+</div>
+</aside>
+<!-- Main Content -->
+<div class="flex-1 flex flex-col overflow-hidden">
+<!-- Top Header -->
+<header class="h-16 flex items-center justify-between px-8 bg-white dark:bg-background-dark border-b border-slate-200 dark:border-border-dark z-10">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-surface-dark border-slate-200 dark:border-border-dark rounded-lg text-sm focus:ring-primary focus:border-primary dark:text-white" placeholder="Global search for staff, contracts or files..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex gap-2">
+<button class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-surface-dark rounded-lg relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark"></span>
+</button>
+<button class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-surface-dark rounded-lg">
+<span class="material-symbols-outlined">chat_bubble</span>
+</button>
+</div>
+<div class="h-8 w-px bg-slate-200 dark:border-border-dark"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-sm font-semibold dark:text-white leading-none">Admin Profile</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">HR Administrator</p>
+</div>
+<div class="size-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border-2 border-primary/30">
+<img alt="" data-alt="Professional avatar for admin user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuHxqFL_dkWWa4FdsMFS99XgC2IORWM1AB3yYhRyc8thwtIRB249Fuw2apa2kekyEZiOdts7ZMCpZu9MpJADCVX6sSl9f33VvjOATsC956qGL78_G3Riay0uLi5kSo5Te1u7QyEYWaPqfrQAypI_hlfEzF8an8OPxvB-ELCfPg6DsdJIaKSqpPK-Uxlf1UHh1WiviC5klD2tGJ7i9dL5pRHNelmSqMq51ip675INfZyLWz-gbofja91GHNxwhGaDNGHwyQiFRl-5Q"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark p-8">
+<!-- Security Reminder Banner -->
+<div class="mb-8 p-4 bg-primary/10 border border-primary/20 rounded-xl flex items-center gap-4">
+<div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white flex-shrink-0">
+<span class="material-symbols-outlined">security</span>
+</div>
+<div class="flex-1">
+<h4 class="text-sm font-bold text-primary">Security Reminder</h4>
+<p class="text-sm text-slate-600 dark:text-slate-300">Confidentiality is paramount. Ensure you log out before leaving your workstation and never share your HRMS credentials.</p>
+</div>
+<button class="text-primary font-bold text-sm hover:underline px-4">Review Policy</button>
+</div>
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="bg-white dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-border-dark shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Employees</p>
+<span class="material-symbols-outlined text-primary">group</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold dark:text-white">142</h3>
+<span class="text-green-500 text-xs font-bold">+2.4%</span>
+</div>
+<p class="text-xs text-slate-400 mt-2">v.s. last month</p>
+</div>
+<div class="bg-white dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-border-dark shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">On Leave</p>
+<span class="material-symbols-outlined text-orange-500">flight_takeoff</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold dark:text-white">08</h3>
+</div>
+<p class="text-xs text-slate-400 mt-2">Active today</p>
+</div>
+<div class="bg-white dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-border-dark shadow-sm ring-1 ring-red-500/20">
+<div class="flex justify-between items-start mb-4">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Pending Evaluations</p>
+<span class="material-symbols-outlined text-red-500">assignment_late</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold dark:text-white">12</h3>
+<span class="bg-red-500/10 text-red-500 text-[10px] px-2 py-0.5 rounded-full font-bold">URGENT</span>
+</div>
+<p class="text-xs text-slate-400 mt-2">Due this week</p>
+</div>
+<div class="bg-white dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-border-dark shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Active Contracts</p>
+<span class="material-symbols-outlined text-green-500">verified</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold dark:text-white">135</h3>
+<span class="text-green-500 text-xs font-bold">+12</span>
+</div>
+<p class="text-xs text-slate-400 mt-2">Renewals in progress</p>
+</div>
+</div>
+<!-- Main Grid -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Left Column: Actions & Requests -->
+<div class="col-span-12 lg:col-span-8 space-y-6">
+<!-- Quick Actions Section -->
+<section>
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-xl font-bold dark:text-white">Quick Actions</h2>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<button class="flex flex-col items-center gap-3 p-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-xl hover:shadow-md transition-shadow group">
+<div class="size-12 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">folder_managed</span>
+</div>
+<span class="text-sm font-semibold dark:text-slate-200">Manage Files</span>
+</button>
+<button class="flex flex-col items-center gap-3 p-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-xl hover:shadow-md transition-shadow group">
+<div class="size-12 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">database</span>
+</div>
+<span class="text-sm font-semibold dark:text-slate-200">Agent Database</span>
+</button>
+<button class="flex flex-col items-center gap-3 p-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-xl hover:shadow-md transition-shadow group">
+<div class="size-12 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">history_edu</span>
+</div>
+<span class="text-sm font-semibold dark:text-slate-200">Contracts</span>
+</button>
+<button class="flex flex-col items-center gap-3 p-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-xl hover:shadow-md transition-shadow group">
+<div class="size-12 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">event_busy</span>
+</div>
+<span class="text-sm font-semibold dark:text-slate-200">Leaves</span>
+</button>
+<button class="flex flex-col items-center gap-3 p-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-xl hover:shadow-md transition-shadow group">
+<div class="size-12 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">rule</span>
+</div>
+<span class="text-sm font-semibold dark:text-slate-200">Evaluations</span>
+</button>
+<button class="flex flex-col items-center gap-3 p-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-xl hover:shadow-md transition-shadow group">
+<div class="size-12 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">model_training</span>
+</div>
+<span class="text-sm font-semibold dark:text-slate-200">Training</span>
+</button>
+<button class="flex flex-col items-center gap-3 p-4 bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-xl hover:shadow-md transition-shadow group">
+<div class="size-12 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">account_tree</span>
+</div>
+<span class="text-sm font-semibold dark:text-slate-200">Org Chart</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-1 p-4 bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-300 dark:border-border-dark rounded-xl text-slate-400 hover:text-primary hover:border-primary transition-all">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="text-xs font-medium">Add Action</span>
+</button>
+</div>
+</section>
+<!-- Leave Requests Section -->
+<section>
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-xl font-bold dark:text-white">Leave Requests to Validate</h2>
+<a class="text-primary text-sm font-semibold hover:underline" href="#">View All</a>
+</div>
+<div class="bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-border-dark overflow-hidden">
+<table class="w-full text-left">
+<thead class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-border-dark">
+<tr>
+<th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase">Employee</th>
+<th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase">Period</th>
+<th class="px-6 py-3 text-xs font-bold text-slate-500 uppercase">Type</th>
+<th class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-border-dark">
+<tr class="hover:bg-slate-50 dark:hover:bg-background-dark/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-200 overflow-hidden">
+<img alt="" data-alt="Avatar of employee requested leave" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUf8uYkax9Ecj1Jk9QI16htc1QyO0Hchw2-5wX7QgEXG1fsgS6_XkrRlpYQ9EpOzLp0xJ0TLf5Upa2rU0EDTGCOUe6gusZhq2jIi-eWVhdj1wJCcH17zeaK3E0Q41oJ_IlBAGBEXBkORGzn_eTaREjxv5wcDM14gEcG7IRK5rFqAza9Z44Rkh7NXK9hGPeZ0UHg5e04wImpObrKOozRUT8PgjV-U-5ZEEqIVml0XlQT3m2qSDYUsFqZha8t3bbvLD-OZsEnAamP0I"/>
+</div>
+<div>
+<p class="text-sm font-bold dark:text-white">Jean Dupont</p>
+<p class="text-xs text-slate-500">Legal Counsel</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="text-sm dark:text-slate-300">Jun 12 - Jun 15</p>
+<p class="text-xs text-slate-500">4 days</p>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-xs font-bold uppercase">Annual</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+<button class="p-1.5 text-green-500 hover:bg-green-50 dark:hover:bg-green-500/10 rounded transition-colors">
+<span class="material-symbols-outlined">check</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-background-dark/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-200 overflow-hidden">
+<img alt="" data-alt="Avatar of employee requested leave" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXaDOivoNaMKLUrq_VWSeWAeedJR_vgRcu_9_-9izN015C-43UIO_23YC0wHoR4KOtdHWDyivqyhcaW-ufEy7bqdnAbpzH8ztDWUo62U9fURT8THuwIEzE70AsGSGFDteNRhn1UQ4gqA364vUX1j6qcmZB-ylHPHNbSiII8bTb1zvuLrhaHqEaQYpeAm743rdhC2YjQZmq1ok-ta1gNRgq3HWKvSwd_1lhvXrJf9e9W89FoTKTIQ70My-tQxFs_KpxOnRDVPX6EtQ"/>
+</div>
+<div>
+<p class="text-sm font-bold dark:text-white">Fatou Sylla</p>
+<p class="text-xs text-slate-500">IT Administrator</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="text-sm dark:text-slate-300">Jul 01 - Jul 05</p>
+<p class="text-xs text-slate-500">5 days</p>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded text-xs font-bold uppercase">Training</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+<button class="p-1.5 text-green-500 hover:bg-green-50 dark:hover:bg-green-500/10 rounded transition-colors">
+<span class="material-symbols-outlined">check</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- Right Column: Alerts & Sidebars -->
+<div class="col-span-12 lg:col-span-4 space-y-6">
+<!-- Recent Alerts & Activities -->
+<section class="bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-border-dark overflow-hidden">
+<div class="p-4 border-b border-slate-200 dark:border-border-dark flex items-center justify-between">
+<h3 class="font-bold dark:text-white">Alerts &amp; Activities</h3>
+<span class="material-symbols-outlined text-slate-400">more_vert</span>
+</div>
+<div class="p-4 space-y-4">
+<!-- Alert Item -->
+<div class="flex gap-4 p-3 rounded-lg bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20">
+<div class="size-8 bg-orange-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
+<span class="material-symbols-outlined text-lg">alarm</span>
+</div>
+<div>
+<p class="text-sm font-bold text-orange-800 dark:text-orange-400">Imminent Contract End</p>
+<p class="text-xs text-orange-700 dark:text-orange-500 mt-1">3 contracts expire in less than 30 days.</p>
+</div>
+</div>
+<!-- Activity Items -->
+<div class="space-y-4 pt-2">
+<div class="flex gap-3">
+<div class="size-10 rounded-full bg-slate-200 overflow-hidden flex-shrink-0">
+<img alt="" data-alt="Portrait of Marc Kouassi" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBb4AgUpXWtHGYjzLmdO1Bpsy9btXU_SS_H1cCFB--lFNuKsZSuTp2iMgU5r4TBuHQ0JbyNyECkpMLCZtzu8crBLPfpH6KHnkBt9ZlpX0-qCIqpQW-vfTXWDyT-2XSYSZB17VmJ_7ZbwrIxOQi2ZvhgmSYujdTXeLlaR_vrq-1VEmjbQY4I_S6jwRXxsuUeQgGftyC7g4MekSe3roVfKhSelpofrbS95MzSYMbV4SgCL0oKqis_D6kqW7kyS91TLQHCHRwNrwAYkVM"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold dark:text-white">Marc Kouassi</p>
+<p class="text-xs text-slate-500">Expert Régulation Senior</p>
+<div class="mt-2 flex items-center gap-2">
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded text-[10px] font-bold">PROMOTION</span>
+<span class="text-[10px] text-slate-400">2 hours ago</span>
+</div>
+</div>
+</div>
+<div class="flex gap-3">
+<div class="size-10 rounded-full bg-slate-200 overflow-hidden flex-shrink-0">
+<img alt="" data-alt="Portrait of Sonia Bakary" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4hzyD-pztNdml6cEFYO8cNK-pRaF9pW89OoycugG1gVn_1cRjpqAwW4AmNWfNrI1VSXxha2SJOzBZwRZVcgyYNe2Etv0LWc5zUFsFFi453AOwtOR_HDXZYPLkMSBZwo3yfsfXIbHGW1lDKLKbSpvc9vdFZofA8XKQ7pTbYpFDDEvUcGkEIJoKIYx05BCFdi9Y9Gi4MHJFgWGmt-T8CB-ywQEUlgncY0ozFA8k0-DqFol20uKHeJyq3i5uP8kJxqHCTzNDy30brfI"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold dark:text-white">Sonia Bakary</p>
+<p class="text-xs text-slate-500">Assistante Administrative</p>
+<div class="mt-2 flex items-center gap-2">
+<span class="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px] font-bold">NEW HIRE</span>
+<span class="text-[10px] text-slate-400">Yesterday</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Monthly Birthdays -->
+<section class="bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-border-dark overflow-hidden">
+<div class="p-4 border-b border-slate-200 dark:border-border-dark flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">cake</span>
+<h3 class="font-bold dark:text-white">June Birthdays</h3>
+</div>
+<div class="p-4 space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 font-bold text-xs">AM</div>
+<div>
+<p class="text-sm font-semibold dark:text-white">Alice Mbaye</p>
+<p class="text-xs text-slate-500">Jun 14</p>
+</div>
+</div>
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-lg">celebration</span>
+</button>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 font-bold text-xs">KT</div>
+<div>
+<p class="text-sm font-semibold dark:text-white">Koffi Traoré</p>
+<p class="text-xs text-slate-500">Jun 22</p>
+</div>
+</div>
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-lg">celebration</span>
+</button>
+</div>
+</div>
+</section>
+<!-- System Status -->
+<div class="p-6 bg-gradient-to-br from-primary to-blue-700 rounded-xl text-white shadow-lg shadow-primary/20">
+<div class="flex items-center justify-between mb-4">
+<span class="text-xs font-bold tracking-widest uppercase opacity-80">Cloud Sync Status</span>
+<span class="size-2 bg-green-400 rounded-full animate-pulse"></span>
+</div>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-sm mb-1">
+<span>Backup integrity</span>
+<span>98%</span>
+</div>
+<div class="h-1.5 w-full bg-white/20 rounded-full overflow-hidden">
+<div class="h-full bg-white rounded-full" style="width: 98%"></div>
+</div>
+</div>
+<p class="text-[10px] opacity-70 italic text-center">Last synced: Today at 04:12 AM</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>

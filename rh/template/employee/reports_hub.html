@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/company-attendance.css' %}">
+
+<div class="company-attendance-page">
+    <div class="page-heading">
+        <div class="card">
+            <div class="card-body">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
+                    <li class="breadcrumb-item active">{% trans 'Rapports' %}</li>
+                </ol>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h3 class="page-title m-0">{% trans 'Rapports RH' %}</h3>
+                        <p class="text-muted mb-0">{% trans 'Génération et programmation des rapports' %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="row g-4">
+            {% for report in reports %}
+            <div class="col-lg-6">
+                <div class="company-attendance-card h-100">
+                    <div class="d-flex align-items-start gap-3 mb-3">
+                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
+                            <i class="bi {{ report.icon }} fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">{{ report.title }}</h5>
+                            <p class="text-muted mb-0">{{ report.description }}</p>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ report.preview_url }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-eye"></i> {% trans 'Aperçu' %}
+                        </a>
+                        <a href="{{ report.export_url }}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-file-earmark-pdf"></i> {% trans 'Exporter PDF' %}
+                        </a>
+                        <a href="{{ report.schedule_url }}" class="btn btn-light btn-sm">
+                            <i class="bi bi-calendar-check"></i> {% trans 'Programmer' %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="company-attendance-card text-muted">{% trans 'Aucun rapport configuré.' %}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

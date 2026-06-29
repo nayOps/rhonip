@@ -1,0 +1,71 @@
+{% load i18n %}
+
+<aside class="epd-sidebar">
+    <div class="epd-card epd-admin-card">
+        <div class="epd-card-header">
+            <i class="bi bi-folder2-open"></i>
+            <h3 class="epd-card-title">{% trans 'Dossier Administratif' %}</h3>
+        </div>
+        <div class="epd-card-body">
+            <div class="epd-admin-field">
+                <span class="epd-admin-label">{% trans 'Matricule' %}</span>
+                <span class="epd-admin-value">
+                    {{ dossier.admin.registration_number }}
+                    {% if dossier.admin.registration_number != '—' %}
+                    <button type="button" class="epd-copy-btn" data-copy="{{ dossier.admin.registration_number }}" title="{% trans 'Copier' %}">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="epd-admin-field">
+                <span class="epd-admin-label">{% trans "Site d'affectation" %}</span>
+                <span class="epd-admin-value">{{ dossier.admin.site }}</span>
+            </div>
+            <div class="epd-admin-field">
+                <span class="epd-admin-label">{% trans 'Type de Contrat' %}</span>
+                <span class="epd-admin-value">{{ dossier.admin.agreement }}</span>
+            </div>
+            <div class="epd-admin-field">
+                <span class="epd-admin-label">{% trans "Date d'Embauche" %}</span>
+                <span class="epd-admin-value">{{ dossier.admin.onip_start_date|default:dossier.admin.date_of_join }}</span>
+            </div>
+            <div class="epd-admin-field">
+                <span class="epd-admin-label">{% trans 'Échelon / Grade' %}</span>
+                <span class="epd-admin-value">{{ dossier.admin.echelon_grade }}</span>
+            </div>
+            {% if full_dossier_url %}
+            <a href="{{ full_dossier_url }}" class="epd-admin-cta">{% trans 'Consulter le dossier complet' %}</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="epd-card epd-actions-card">
+        <div class="epd-card-header">
+            <span class="epd-actions-title">{% trans 'Actions de Dossier' %}</span>
+        </div>
+        <ul class="epd-action-list">
+            <li class="epd-action-item{% if not can_edit %} is-disabled{% endif %}">
+                <a href="{% if can_edit and edit_url %}{{ edit_url }}#document{% else %}#{% endif %}">
+                    <i class="bi bi-file-earmark-plus"></i>
+                    {% trans 'Ajouter un document' %}
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+            <li class="epd-action-item">
+                <a href="#epd-tab-admin" data-bs-toggle="tab" data-bs-target="#epd-tab-admin">
+                    <i class="bi bi-clock-history"></i>
+                    {% trans 'Historique des postes' %}
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+            <li class="epd-action-item is-disabled">
+                <a href="#">
+                    <i class="bi bi-mortarboard"></i>
+                    {% trans 'Évaluations annuelles' %}
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>

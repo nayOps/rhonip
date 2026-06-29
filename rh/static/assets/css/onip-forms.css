@@ -1,0 +1,485 @@
+/* ——— ONIP — Charte graphique des formulaires ——— */
+
+:root {
+    --onip-form-primary: #0f2744;
+    --onip-form-primary-hover: #132f52;
+    --onip-form-bg: #f9fafb;
+    --onip-form-card-bg: #ffffff;
+    --onip-form-input-bg: #f3f4f6;
+    --onip-form-border: #e5e7eb;
+    --onip-form-label: #4b5563;
+    --onip-form-text: #111827;
+    --onip-form-muted: #6b7280;
+    --onip-form-focus: #2563eb;
+    --onip-form-error: #dc2626;
+    --onip-form-radius: 8px;
+    --onip-form-card-radius: 12px;
+}
+
+#main {
+    background: var(--onip-form-bg);
+}
+
+.onip-form-page {
+    padding-bottom: 2rem;
+}
+
+/* ——— En-tête de page formulaire ——— */
+.onip-form-header {
+    background: var(--onip-form-card-bg);
+    border: 1px solid var(--onip-form-border);
+    border-radius: var(--onip-form-card-radius);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    margin-bottom: 1.25rem;
+    padding: 1.25rem 1.5rem;
+}
+
+.onip-form-header .row {
+    align-items: center;
+}
+
+.onip-form-title {
+    color: var(--onip-form-primary);
+    font-size: 1.65rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 0.35rem;
+}
+
+.onip-form-header .breadcrumb {
+    font-size: 0.82rem;
+    margin: 0;
+}
+
+.onip-form-header .breadcrumb-item a {
+    color: var(--onip-form-focus);
+    text-decoration: none;
+}
+
+.onip-form-header .breadcrumb-item.active,
+.onip-form-header .breadcrumb-item + .breadcrumb-item::before {
+    color: var(--onip-form-muted);
+}
+
+.onip-form-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    justify-content: flex-end;
+}
+
+/* ——— Boutons formulaire ——— */
+.onip-btn-cancel {
+    background: #fff;
+    border: 1px solid var(--onip-form-border);
+    border-radius: var(--onip-form-radius);
+    color: var(--onip-form-text);
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0.55rem 1.15rem;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.onip-btn-cancel:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: var(--onip-form-text);
+}
+
+.onip-btn-save {
+    background: var(--onip-form-primary);
+    border: 1px solid var(--onip-form-primary);
+    border-radius: var(--onip-form-radius);
+    color: #fff;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0.55rem 1.25rem;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.onip-btn-save:hover,
+.onip-btn-save:focus {
+    background: var(--onip-form-primary-hover);
+    border-color: var(--onip-form-primary-hover);
+    color: #fff;
+}
+
+.onip-btn-danger {
+    background: #fff;
+    border: 1px solid #fecaca;
+    border-radius: var(--onip-form-radius);
+    color: #b91c1c;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0.55rem 1.15rem;
+    text-decoration: none;
+}
+
+.onip-btn-danger:hover {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+/* ——— Carte formulaire ——— */
+.onip-form-card {
+    background: var(--onip-form-card-bg);
+    border: 1px solid var(--onip-form-border);
+    border-radius: var(--onip-form-card-radius);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+}
+
+.onip-form-card > .card-body {
+    padding: 0;
+}
+
+/* ——— Onglets ——— */
+.onip-form-tabs {
+    background: #fff;
+    border-bottom: 1px solid var(--onip-form-border);
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+    overflow-x: auto;
+    padding: 0 1rem;
+}
+
+.onip-form-tabs .nav-link {
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    color: var(--onip-form-muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-bottom: -1px;
+    padding: 0.9rem 1rem;
+    white-space: nowrap;
+}
+
+.onip-form-tabs .nav-link:hover {
+    color: var(--onip-form-primary);
+}
+
+.onip-form-tabs .nav-link.active {
+    background: transparent;
+    border-bottom-color: var(--onip-form-primary);
+    color: var(--onip-form-primary);
+}
+
+.onip-form-tab-content {
+    padding: 1.25rem 1.5rem 1.5rem;
+}
+
+/* ——— Sections (fieldset crispy) ——— */
+.onip-form .onip-form-section {
+    background: transparent;
+    border: none;
+    margin: 0 0 1.75rem;
+    padding: 0;
+}
+
+.onip-form .onip-form-section > legend {
+    border-left: 4px solid var(--onip-form-primary);
+    color: var(--onip-form-primary);
+    float: none;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1.1rem;
+    padding-left: 0.75rem;
+    width: auto;
+}
+
+.onip-form .onip-form-section > .row,
+.onip-form .onip-form-section > .mb-3,
+.onip-form .onip-form-section > div > .row {
+    margin-bottom: 0;
+}
+
+.onip-form .onip-form-subsection-label {
+    color: var(--onip-form-focus);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin: 1rem 0 0.75rem;
+    text-transform: uppercase;
+}
+
+.onip-form .onip-form-subsection-label:first-child {
+    margin-top: 0;
+}
+
+/* ——— Champs ——— */
+.onip-form .form-label,
+.onip-form label.form-label {
+    color: var(--onip-form-label);
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+.onip-form .form-control,
+.onip-form .form-select,
+.onip-form select.form-control,
+.onip-form textarea.form-control,
+.onip-form .select2-container--default .select2-selection--single,
+.onip-form .select2-container--default .select2-selection--multiple {
+    background-color: var(--onip-form-input-bg) !important;
+    border: 1px solid transparent !important;
+    border-radius: var(--onip-form-radius) !important;
+    box-shadow: none !important;
+    color: var(--onip-form-text);
+    font-size: 0.88rem;
+    min-height: 2.65rem;
+    padding: 0.55rem 0.85rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.onip-form textarea.form-control {
+    min-height: 6.5rem;
+    resize: vertical;
+}
+
+.onip-form .form-control:focus,
+.onip-form .form-select:focus,
+.onip-form select.form-control:focus,
+.onip-form textarea.form-control:focus,
+.onip-form .select2-container--default.select2-container--focus .select2-selection--multiple,
+.onip-form .select2-container--default.select2-container--open .select2-selection--single {
+    background-color: #fff !important;
+    border-color: var(--onip-form-focus) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+    outline: none;
+}
+
+.onip-form .form-control:disabled,
+.onip-form .form-control[readonly],
+.onip-form .form-select:disabled {
+    background-color: #e5e7eb !important;
+    color: var(--onip-form-muted);
+    cursor: not-allowed;
+}
+
+.onip-form .form-control.is-invalid,
+.onip-form .form-select.is-invalid {
+    background-color: #fff !important;
+    border-color: var(--onip-form-error) !important;
+    box-shadow: none !important;
+}
+
+.onip-form .invalid-feedback,
+.onip-form .text-danger.help-block {
+    color: var(--onip-form-error);
+    font-size: 0.78rem;
+    margin-top: 0.3rem;
+}
+
+.onip-form .form-text,
+.onip-form .helptext {
+    color: var(--onip-form-muted);
+    font-size: 0.78rem;
+    margin-top: 0.3rem;
+}
+
+.onip-form .mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+.onip-form .row {
+    --bs-gutter-x: 1rem;
+}
+
+/* Select2 alignement */
+.onip-form .select2-container {
+    width: 100% !important;
+}
+
+.onip-form .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: var(--onip-form-text);
+    line-height: 1.6rem;
+    padding-left: 0;
+}
+
+.onip-form .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 100%;
+}
+
+/* Input group (téléphone avec +) */
+.onip-form .input-group-text {
+    background: var(--onip-form-input-bg);
+    border: 1px solid transparent;
+    border-radius: var(--onip-form-radius) 0 0 var(--onip-form-radius);
+    color: var(--onip-form-muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.onip-form .input-group .form-control {
+    border-radius: 0 var(--onip-form-radius) var(--onip-form-radius) 0 !important;
+}
+
+/* Fichiers */
+.onip-form input[type="file"].form-control {
+    padding: 0.45rem 0.75rem;
+}
+
+.onip-form .form-check-input {
+    border-color: var(--onip-form-border);
+}
+
+.onip-form .form-check-input:checked {
+    background-color: var(--onip-form-primary);
+    border-color: var(--onip-form-primary);
+}
+
+/* ——— Formsets inline (tableaux) ——— */
+.onip-form .table {
+    border-color: var(--onip-form-border);
+    font-size: 0.85rem;
+}
+
+.onip-form .table thead th {
+    background: var(--onip-form-input-bg);
+    border-bottom: 1px solid var(--onip-form-border);
+    color: var(--onip-form-label);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.onip-form .table td .form-control,
+.onip-form .table td .form-select {
+    min-height: 2.35rem;
+    padding: 0.4rem 0.65rem;
+}
+
+.onip-form .add-row a,
+.onip-form .delete-row {
+    color: var(--onip-form-focus);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* ——— Pied de page actions ——— */
+.onip-form-footer {
+    background: var(--onip-form-card-bg);
+    border: 1px solid var(--onip-form-border);
+    border-radius: var(--onip-form-card-radius);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    margin-top: 1rem;
+    padding: 1rem 1.5rem;
+}
+
+.onip-form-footer .onip-form-footer-inner {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+.onip-form-footer .onip-btn-save {
+    padding: 0.7rem 1.5rem;
+}
+
+/* ——— Carte profil employé (dossier agent) ——— */
+.employee-dossier-profile {
+    background: var(--onip-form-card-bg);
+    border: 1px solid var(--onip-form-border);
+    border-radius: var(--onip-form-card-radius);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    margin-bottom: 1.25rem;
+    padding: 1.35rem 1.5rem;
+}
+
+.employee-dossier-profile-inner {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+}
+
+.employee-dossier-avatar {
+    border: 3px solid var(--onip-form-border);
+    border-radius: 50%;
+    flex-shrink: 0;
+    height: 4.5rem;
+    object-fit: cover;
+    width: 4.5rem;
+}
+
+.employee-dossier-avatar-placeholder {
+    align-items: center;
+    background: var(--onip-form-input-bg);
+    border: 3px solid var(--onip-form-border);
+    border-radius: 50%;
+    color: var(--onip-form-primary);
+    display: inline-flex;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    height: 4.5rem;
+    justify-content: center;
+    width: 4.5rem;
+}
+
+.employee-dossier-main {
+    flex: 1;
+    min-width: 220px;
+}
+
+.employee-dossier-name-row {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-bottom: 0.5rem;
+}
+
+.employee-dossier-name {
+    color: var(--onip-form-text);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.employee-dossier-badge {
+    background: #dcfce7;
+    border-radius: 999px;
+    color: #15803d;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 0.2rem 0.55rem;
+    text-transform: uppercase;
+}
+
+.employee-dossier-meta {
+    color: var(--onip-form-muted);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    gap: 0.85rem 1.25rem;
+}
+
+.employee-dossier-meta span {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.35rem;
+}
+
+.employee-dossier-meta i {
+    color: var(--onip-form-focus);
+    font-size: 0.9rem;
+}
+
+/* Masquer la photo dans l'onglet Informations (affichée dans la carte profil) */
+.employee-form-pane .onip-form-section-photo {
+    display: none !important;
+}
+
+.onip-date-input {
+    max-width: 16rem;
+    min-height: 2.5rem;
+}

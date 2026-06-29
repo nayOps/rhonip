@@ -1,0 +1,86 @@
+{% load core %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% with model_name=model|getattr:'_meta'|getattr:'model_name' %}
+
+<form method="post" enctype="multipart/form-data" class="onip-form" id="form-{{ model_name }}">
+    {% csrf_token %}
+
+    <div class="tab-content onip-form-tab-content">
+        <div class="tab-pane fade show active employee-tab-pane" id="attendance" role="tabpanel">
+            <div class="employee-summary-card border-0 shadow-none mb-0">
+                <div class="card-body px-0 pt-0">
+                    <div class="row align-items-start mb-3">
+                        <div class="col-lg-5">
+                            <div class="employee-month-nav">
+                                <a class="btn-nav" href="?year={{ attendance_summary.prev.year }}&month={{ attendance_summary.prev.month }}&week={{ attendance_week.week_start|date:'Y-m-d' }}" aria-label="{% trans 'Mois précédent' %}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                                <div>
+                                    <div class="employee-month-label">{{ attendance_summary.month_label }} {{ attendance_summary.year }}</div>
+                                    {% if attendance_summary.is_current_month %}
+                                    <div class="employee-month-sub">{% trans 'Mois en cours' %}</div>
+                                    {% endif %}
+                                </div>
+                                <a class="btn-nav" href="?year={{ attendance_summary.next.year }}&month={{ attendance_summary.next.month }}&week={{ attendance_week.week_start|date:'Y-m-d' }}" aria-label="{% trans 'Mois suivant' %}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="employee-metrics">
+                        <div class="employee-metric">
+                            <div>
+                                <div class="employee-metric-label">{% trans 'Taux de présence' %}</div>
+                                <div class="employee-metric-value">{{ attendance_summary.presence_rate }}%</div>
+                            </div>
+                            <span class="employee-metric-icon success"><i class="bi bi-check-circle-fill"></i></span>
+                        </div>
+                        <div class="employee-metric">
+                            <div>
+                                <div class="employee-metric-label">{% trans 'Retards' %}</div>
+                                <div class="employee-metric-value">{{ attendance_summary.late_count }}</div>
+                            </div>
+                            <span class="employee-metric-icon warning"><i class="bi bi-clock-fill"></i></span>
+                        </div>
+                        <div class="employee-metric">
+                            <div>
+                                <div class="employee-metric-label">{% trans 'Absences' %}</div>
+                                <div class="employee-metric-value">{{ attendance_summary.absence_count }}</div>
+                            </div>
+                            <span class="employee-metric-icon danger"><i class="bi bi-exclamation-circle-fill"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% include 'components/employee_attendance_panel.html' %}
+        </div>
+
+        <div class="tab-pane fade employee-tab-pane employee-form-pane" id="{{ model_name }}" role="tabpanel">
+            {% crispy form %}
+            {{ form.media }}
+        </div>
+
+        {% for formset in formsets %}
+        <div class="tab-pane fade employee-tab-pane" id="{{ formset.model|getattr:'_meta'|getattr:'model_name' }}" role="tabpanel">
+            <div id="formset-{{ forloop.counter }}">
+                {{ formset.non_form_errors }}
+                {% crispy formset inline_formset_helper %}
+            </div>
+            {% if not formset.fk.unique %}
+            <script>$(function(){$('#formset-{{ forloop.counter }} tbody tr').formset({prefix: '{{ formset.prefix }}'});})</script>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.formset/1.2.2/jquery.formset.js" integrity="sha512-Tsdobfrx6IMRPi8d5z3AtjWNSbZxGm58IZFnblaRaepw562ZITlRhUM2Zu87vbvZjQxGmmto+31zEBLZ4wjs+w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        const inputs = document.querySelectorAll('input[id*="DELETE"]');
+        inputs.forEach(input => input.type = 'checkbox');
+    });
+</script>
+{% endwith %}

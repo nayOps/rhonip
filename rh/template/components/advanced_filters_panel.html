@@ -1,0 +1,17 @@
+{% load i18n %}
+{% load core %}
+{% load crispy_forms_filters %}
+
+<aside class="onip-filters-card">
+    <div class="onip-filters-header">
+        <h3>{% trans 'Filtres avancés' %}</h3>
+        <a href="{% url 'core:list' app model|getattr:'_meta'|getattr:'model_name' %}" class="onip-filters-reset">{% trans 'Réinitialiser' %}</a>
+    </div>
+    <form method="get" id="filter-form">
+        {% if request.GET.q %}
+        <input type="hidden" name="q" value="{{ request.GET.q }}">
+        {% endif %}
+        {{ qs_filter.form|crispy }}
+        <button type="submit" class="onip-btn-apply-filters">{% trans 'Appliquer les filtres' %}</button>
+    </form>
+</aside>

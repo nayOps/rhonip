@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% load core %}
+{% load i18n %}
+{% load static %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/employee-detail.css' %}">
+<link rel="stylesheet" href="{% static 'assets/css/employee-profile-dossier.css' %}">
+
+<div class="employee-detail-page onip-form-page epd-page">
+    <div class="epd-topbar">
+        <a href="{% url 'core:list' app model|getattr:'_meta'|getattr:'model_name' %}" class="epd-back" aria-label="{% trans 'Retour' %}">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <h1 class="epd-topbar-title">{% trans "Dossier de l'Agent" %}</h1>
+    </div>
+
+    {% include 'components/employee_dossier_header.html' with can_edit=True profile_mode='edit' employee=obj %}
+
+    <div class="page-content">
+        <section>
+            {% if obj.approvers %}
+                {% include 'components/approvals.html' %}
+            {% endif %}
+
+            <div class="onip-form-card employee-tabs-card">
+                <ul class="nav nav-tabs onip-form-tabs employee-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#attendance" role="tab">{% trans 'Présences' %}</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" data-bs-toggle="tab" href="#{{ model|getattr:'_meta'|getattr:'model_name' }}" role="tab">{% trans 'Informations' %}</a>
+                    </li>
+                    {% for formset in formsets %}
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" data-bs-toggle="tab" href="#{{ formset.model|getattr:'_meta'|getattr:'model_name' }}" role="tab">
+                            {{ formset.model|getattr:'_meta'|getattr:'verbose_name_plural'|title }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                {% include 'components/employee_change_form.html' %}
+            </div>
+        </section>
+    </div>
+
+    <div class="onip-form-footer">
+        <div class="onip-form-footer-inner">
+            <a href="{% url 'core:list' app model|getattr:'_meta'|getattr:'model_name' %}" class="onip-btn-cancel">{% trans 'Annuler les modifications' %}</a>
+            <button type="submit" form="form-{{ model|getattr:'_meta'|getattr:'model_name' }}" class="onip-btn-save">
+                <i class="bi bi-floppy me-1"></i>{% trans 'Sauvegarder le dossier' %}
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'assets/js/employee-detail.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,542 @@
+/* Tableau de bord agent ONIP */
+.onip-agent-dash {
+    --dash-bg: #f0f4f8;
+    --dash-card: #ffffff;
+    --dash-border: #e8edf3;
+    --dash-text: #1a2b42;
+    --dash-muted: #6b7c93;
+    --dash-blue: #0f2744;
+    --dash-blue-soft: #e8eef6;
+    --dash-blue-mid: #1a3a5c;
+    --dash-orange: #f59e0b;
+    --dash-green: #10b981;
+    --dash-red: #ef4444;
+    padding: 0 1.25rem 2rem;
+    background: var(--dash-bg);
+    min-height: calc(100vh - 120px);
+}
+
+.onip-agent-dash__topbar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0 1.25rem;
+    flex-wrap: wrap;
+}
+
+.onip-agent-dash__search {
+    flex: 1;
+    min-width: 220px;
+    max-width: 520px;
+    position: relative;
+}
+
+.onip-agent-dash__search input {
+    width: 100%;
+    border: 1px solid var(--dash-border);
+    border-radius: 10px;
+    padding: 0.65rem 1rem 0.65rem 2.5rem;
+    background: var(--dash-card);
+    font-size: 0.9rem;
+    color: var(--dash-text);
+}
+
+.onip-agent-dash__search input:focus {
+    outline: none;
+    border-color: var(--dash-blue);
+    box-shadow: 0 0 0 3px rgba(15, 39, 68, 0.08);
+}
+
+.onip-agent-dash__search i {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dash-muted);
+}
+
+.onip-agent-dash__top-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
+}
+
+.onip-agent-dash__icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid var(--dash-border);
+    background: var(--dash-card);
+    color: var(--dash-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    position: relative;
+}
+
+.onip-agent-dash__icon-btn:hover {
+    color: var(--dash-blue);
+    border-color: #c5d0de;
+}
+
+.onip-agent-dash__icon-btn .badge-dot {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--dash-red);
+    border: 2px solid #fff;
+}
+
+.onip-agent-dash__user-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.35rem 0.5rem 0.35rem 0.85rem;
+    background: var(--dash-card);
+    border: 1px solid var(--dash-border);
+    border-radius: 12px;
+}
+
+.onip-agent-dash__user-chip strong {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--dash-text);
+    line-height: 1.2;
+}
+
+.onip-agent-dash__user-chip span {
+    font-size: 0.72rem;
+    color: var(--dash-muted);
+}
+
+.onip-agent-dash__avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--dash-blue-soft);
+}
+
+.onip-agent-dash__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.onip-agent-dash__header h1 {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: var(--dash-text);
+    margin: 0 0 0.35rem;
+}
+
+.onip-agent-dash__header p {
+    margin: 0;
+    color: var(--dash-muted);
+    font-size: 0.95rem;
+}
+
+.onip-agent-dash__header-actions {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+}
+
+.onip-agent-dash__btn-outline {
+    border: 1px solid var(--dash-border);
+    background: var(--dash-card);
+    color: var(--dash-text);
+    border-radius: 10px;
+    padding: 0.55rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.onip-agent-dash__btn-outline:hover {
+    border-color: var(--dash-blue);
+    color: var(--dash-blue);
+}
+
+.onip-agent-dash__btn-primary {
+    background: var(--dash-blue);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0.55rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.onip-agent-dash__btn-primary:hover {
+    background: var(--dash-blue-mid);
+    color: #fff;
+}
+
+.onip-agent-dash__stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.onip-agent-dash__stat {
+    background: var(--dash-card);
+    border: 1px solid var(--dash-border);
+    border-radius: 14px;
+    padding: 1.1rem 1.15rem;
+}
+
+.onip-agent-dash__stat-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.onip-agent-dash__stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.onip-agent-dash__stat-icon--blue { background: #e8eef6; color: var(--dash-blue); }
+.onip-agent-dash__stat-icon--green { background: #d1fae5; color: var(--dash-green); }
+.onip-agent-dash__stat-icon--orange { background: #fef3c7; color: var(--dash-orange); }
+.onip-agent-dash__stat-icon--red { background: #fee2e2; color: var(--dash-red); }
+
+.onip-agent-dash__stat-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.2rem 0.45rem;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.onip-agent-dash__stat-badge--orange { background: #fef3c7; color: #b45309; }
+.onip-agent-dash__stat-badge--green { background: #d1fae5; color: #047857; }
+.onip-agent-dash__stat-badge--blue { background: #dbeafe; color: #1d4ed8; }
+.onip-agent-dash__stat-badge--red { background: #fee2e2; color: #b91c1c; }
+
+.onip-agent-dash__stat-label {
+    font-size: 0.78rem;
+    color: var(--dash-muted);
+    margin-bottom: 0.2rem;
+}
+
+.onip-agent-dash__stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--dash-text);
+    line-height: 1.1;
+}
+
+.onip-agent-dash__grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.onip-agent-dash__announce {
+    background: linear-gradient(135deg, #dce8f5 0%, #edf3fa 55%, #f7fafc 100%);
+    border: 1px solid #c5d8eb;
+    border-radius: 16px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(15, 39, 68, 0.06);
+}
+
+.onip-agent-dash__announce-tag {
+    display: inline-block;
+    background: var(--dash-blue);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.55rem;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+}
+
+.onip-agent-dash__announce h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--dash-text);
+    margin: 0 0 0.65rem;
+    max-width: 85%;
+}
+
+.onip-agent-dash__announce p {
+    color: var(--dash-muted);
+    font-size: 0.88rem;
+    line-height: 1.55;
+    margin: 0 0 1.1rem;
+    max-width: 90%;
+}
+
+.onip-agent-dash__announce-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.onip-agent-dash__announce-megaphone {
+    position: absolute;
+    right: 1.5rem;
+    top: 1.25rem;
+    font-size: 2.5rem;
+    color: rgba(15, 39, 68, 0.12);
+}
+
+.onip-agent-dash__row2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.onip-agent-dash__panel {
+    background: var(--dash-card);
+    border: 1px solid var(--dash-border);
+    border-radius: 14px;
+    padding: 1.15rem 1.25rem;
+}
+
+.onip-agent-dash__panel h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--dash-text);
+    margin: 0 0 1rem;
+}
+
+.onip-agent-dash__progress-item {
+    margin-bottom: 1rem;
+}
+
+.onip-agent-dash__progress-item:last-child {
+    margin-bottom: 0.75rem;
+}
+
+.onip-agent-dash__progress-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    margin-bottom: 0.35rem;
+}
+
+.onip-agent-dash__progress-head span:first-child {
+    color: var(--dash-text);
+    font-weight: 600;
+}
+
+.onip-agent-dash__progress-head span:last-child {
+    color: var(--dash-muted);
+}
+
+.onip-agent-dash__progress-bar {
+    height: 7px;
+    background: #eef2f7;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.onip-agent-dash__progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: var(--dash-blue);
+}
+
+.onip-agent-dash__progress-fill--alt {
+    background: #b45309;
+}
+
+.onip-agent-dash__doc-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--dash-border);
+}
+
+.onip-agent-dash__doc-item:last-of-type {
+    border-bottom: none;
+}
+
+.onip-agent-dash__doc-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.onip-agent-dash__doc-icon--pdf { background: #fee2e2; color: #dc2626; }
+.onip-agent-dash__doc-icon--doc { background: #dbeafe; color: #2563eb; }
+
+.onip-agent-dash__doc-info strong {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--dash-text);
+}
+
+.onip-agent-dash__doc-info small {
+    color: var(--dash-muted);
+    font-size: 0.72rem;
+}
+
+.onip-agent-dash__link-all {
+    display: block;
+    text-align: center;
+    margin-top: 0.75rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--dash-blue);
+    text-decoration: none;
+}
+
+.onip-agent-dash__notifications {
+    background: var(--dash-card);
+    border: 1px solid var(--dash-border);
+    border-radius: 14px;
+    padding: 1.15rem 0 0;
+    position: sticky;
+    top: 1rem;
+}
+
+.onip-agent-dash__notif-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.15rem 0.85rem;
+    border-bottom: 1px solid var(--dash-border);
+}
+
+.onip-agent-dash__notif-header h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--dash-text);
+}
+
+.onip-agent-dash__notif-header a {
+    font-size: 0.75rem;
+    color: var(--dash-blue);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.onip-agent-dash__notif-item {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.85rem 1.15rem;
+    border-bottom: 1px solid var(--dash-border);
+    text-decoration: none;
+    color: inherit;
+    border-left: 3px solid transparent;
+    transition: background 0.15s;
+}
+
+.onip-agent-dash__notif-item:hover {
+    background: #f8fafc;
+}
+
+.onip-agent-dash__notif-item--urgent { border-left-color: var(--dash-red); }
+.onip-agent-dash__notif-item--update { border-left-color: var(--dash-green); }
+.onip-agent-dash__notif-item--system { border-left-color: var(--dash-blue); }
+.onip-agent-dash__notif-item--hr { border-left-color: var(--dash-orange); }
+
+.onip-agent-dash__notif-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+}
+
+.onip-agent-dash__notif-icon--urgent { background: #fee2e2; color: var(--dash-red); }
+.onip-agent-dash__notif-icon--update { background: #d1fae5; color: var(--dash-green); }
+.onip-agent-dash__notif-icon--system { background: #e8eef6; color: var(--dash-blue); }
+.onip-agent-dash__notif-icon--hr { background: #fef3c7; color: var(--dash-orange); }
+
+.onip-agent-dash__notif-body strong {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--dash-text);
+    margin-bottom: 0.15rem;
+}
+
+.onip-agent-dash__notif-body p {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--dash-muted);
+    line-height: 1.4;
+}
+
+.onip-agent-dash__notif-time {
+    font-size: 0.68rem;
+    color: var(--dash-muted);
+    white-space: nowrap;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.onip-agent-dash__notif-footer {
+    padding: 0.85rem 1.15rem;
+    text-align: center;
+}
+
+.onip-agent-dash__notif-footer a {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--dash-blue);
+    text-decoration: none;
+}
+
+.onip-agent-dash__empty {
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--dash-muted);
+    font-size: 0.85rem;
+}
+
+@media (max-width: 1200px) {
+    .onip-agent-dash__stats { grid-template-columns: repeat(2, 1fr); }
+    .onip-agent-dash__grid { grid-template-columns: 1fr; }
+    .onip-agent-dash__notifications { position: static; }
+}
+
+@media (max-width: 640px) {
+    .onip-agent-dash__stats { grid-template-columns: 1fr; }
+    .onip-agent-dash__row2 { grid-template-columns: 1fr; }
+    .onip-agent-dash__topbar { flex-direction: column; align-items: stretch; }
+    .onip-agent-dash__top-actions { margin-left: 0; justify-content: flex-end; }
+}

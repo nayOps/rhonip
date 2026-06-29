@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/employee-detail.css' %}">
+
+<div class="employee-detail-page">
+    <div class="page-heading">
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="m-0">{% trans 'Programmation du rapport' %}</h3>
+                        <p class="text-muted mb-0">{{ obj.full_name }} · {{ report.period_label }}</p>
+                    </div>
+                    <div class="col text-end">
+                        <a href="{% url 'employee:change' obj.pk %}?year={{ report.year }}&month={{ report.month }}" class="btn btn-light">
+                            {% trans 'Retour' %}
+                        </a>
+                        <a href="{% url 'employee:attendance_report' obj.pk %}?year={{ report.year }}&month={{ report.month }}" class="btn btn-outline-primary">
+                            {% trans 'Aperçu du rapport' %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card employee-tabs-card">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3">{% trans 'Paramètres de génération automatique' %}</h5>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">{% trans 'Périodicité' %}</label>
+                                    <select name="frequency" class="form-select">
+                                        {% for value, label in frequencies %}
+                                        <option value="{{ value }}"{% if form_data.frequency == value %} selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{% trans 'Format' %}</label>
+                                    <select name="format" class="form-select">
+                                        {% for value, label in formats %}
+                                        <option value="{{ value }}"{% if form_data.format == value %} selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{% trans "Jour d'envoi" %}</label>
+                                    <select name="send_day" class="form-select">
+                                        <option value="1"{% if form_data.send_day == '1' %} selected{% endif %}>1</option>
+                                        <option value="5"{% if form_data.send_day == '5' %} selected{% endif %}>5</option>
+                                        <option value="10"{% if form_data.send_day == '10' %} selected{% endif %}>10</option>
+                                        <option value="15"{% if form_data.send_day == '15' %} selected{% endif %}>15</option>
+                                        <option value="last"{% if form_data.send_day == 'last' %} selected{% endif %}>{% trans 'Dernier jour du mois' %}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{% trans 'Destinataire email' %}</label>
+                                    <input type="email" name="recipient" class="form-control" value="{{ form_data.recipient }}" placeholder="rh@onip.local">
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="active" id="schedule-active"{% if form_data.active %} checked{% endif %}>
+                                        <label class="form-check-label" for="schedule-active">{% trans 'Activer la programmation' %}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save"></i> {% trans 'Enregistrer la programmation' %}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card employee-summary-card">
+                    <div class="card-body">
+                        <h6 class="text-uppercase text-muted mb-3">{% trans 'Aperçu de la période' %}</h6>
+                        <ul class="attendance-summary-list">
+                            <li>
+                                <span>{% trans 'Taux de présence' %}</span>
+                                <strong>{{ report.summary.presence_rate }}%</strong>
+                            </li>
+                            <li>
+                                <span>{% trans 'Retards' %}</span>
+                                <strong>{{ report.summary.late_count }}</strong>
+                            </li>
+                            <li>
+                                <span>{% trans 'Absences' %}</span>
+                                <strong>{{ report.summary.absence_count }}</strong>
+                            </li>
+                            <li>
+                                <span>{% trans 'Heures travaillées' %}</span>
+                                <strong>{{ report.summary.hours_worked_label }}</strong>
+                            </li>
+                        </ul>
+                        <p class="text-muted small mb-0">
+                            {% trans 'Le rapport sera généré à partir des pointages enregistrés pour la période sélectionnée sur la fiche employé.' %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

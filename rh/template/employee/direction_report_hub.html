@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/company-attendance.css' %}">
+
+<div class="company-attendance-page">
+    <div class="page-heading">
+        <div class="card">
+            <div class="card-body">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employee:company_attendance' %}">{% trans 'Présences' %}</a></li>
+                    <li class="breadcrumb-item active">{% trans 'Rapports par direction' %}</li>
+                </ol>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h3 class="page-title m-0">{% trans 'Programmation des rapports par direction' %}</h3>
+                        <p class="text-muted mb-0">{{ hub.month_label }} {{ hub.year }}</p>
+                    </div>
+                    <a href="{% url 'employee:company_attendance' %}?year={{ hub.year }}&month={{ hub.month }}" class="btn btn-light">{% trans 'Retour aux présences' %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="company-attendance-filters mb-3">
+            <a class="company-attendance-filter" href="?year={{ hub.prev.year }}&month={{ hub.prev.month }}"><i class="bi bi-chevron-left"></i></a>
+            <span class="company-attendance-filter"><i class="bi bi-calendar3"></i> {{ hub.month_label }} {{ hub.year }}</span>
+            <a class="company-attendance-filter" href="?year={{ hub.next.year }}&month={{ hub.next.month }}"><i class="bi bi-chevron-right"></i></a>
+        </div>
+
+        <div class="company-attendance-card">
+            <h5 class="mb-3">{% trans 'Directions' %}</h5>
+            <div class="table-responsive">
+                <table class="table onip-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>{% trans 'Direction' %}</th>
+                            <th>{% trans 'Agents' %}</th>
+                            <th>{% trans 'Retards' %}</th>
+                            <th>{% trans 'Moyenne / agent' %}</th>
+                            <th class="text-end">{% trans 'Actions' %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in hub.rows %}
+                        <tr>
+                            <td><strong>{{ row.direction.name }}</strong></td>
+                            <td>{{ row.agent_count }}</td>
+                            <td>{{ row.total_lates }}</td>
+                            <td>{{ row.avg_per_agent }} min</td>
+                            <td class="text-end">
+                                <a href="{% url 'employee:direction_attendance_report' row.direction.pk %}?year={{ hub.year }}&month={{ hub.month }}" class="btn btn-sm btn-outline-primary">{% trans 'Aperçu' %}</a>
+                                <a href="{% url 'employee:direction_report_schedule' row.direction.pk %}?year={{ hub.year }}&month={{ hub.month }}" class="btn btn-sm btn-primary">{% trans 'Programmer' %}</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-muted">{% trans 'Aucune direction configurée.' %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,226 @@
+{% load i18n %}
+
+<div class="attendance-toolbar">
+    <div class="attendance-view-toggle" role="group" aria-label="{% trans 'Vue des présences' %}">
+        <button type="button" id="attendance-view-weekly" class="active">{% trans 'Vue Hebdomadaire' %}</button>
+        <button type="button" id="attendance-view-monthly">{% trans 'Vue Mensuelle' %}</button>
+    </div>
+
+    <div id="attendance-week-nav" class="attendance-week-nav">
+        <a href="?year={{ attendance_year }}&month={{ attendance_month_num }}&week={{ attendance_week.prev_week|date:'Y-m-d' }}" aria-label="{% trans 'Semaine précédente' %}">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+        <span class="attendance-week-label">
+            <i class="bi bi-calendar3 me-1"></i>{{ attendance_week.range_label }}
+        </span>
+        <a href="?year={{ attendance_year }}&month={{ attendance_month_num }}&week={{ attendance_week.next_week|date:'Y-m-d' }}" aria-label="{% trans 'Semaine suivante' %}">
+            <i class="bi bi-chevron-right"></i>
+        </a>
+    </div>
+
+    <div id="attendance-month-nav" class="attendance-month-nav" hidden>
+        <a class="btn-nav" href="?year={{ attendance_summary.prev.year }}&month={{ attendance_summary.prev.month }}&week={{ attendance_week.week_start|date:'Y-m-d' }}" aria-label="{% trans 'Mois précédent' %}">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+        <span class="attendance-month-nav-label">{{ attendance_summary.month_label }} {{ attendance_summary.year }}</span>
+        <a class="btn-nav" href="?year={{ attendance_summary.next.year }}&month={{ attendance_summary.next.month }}&week={{ attendance_week.week_start|date:'Y-m-d' }}" aria-label="{% trans 'Mois suivant' %}">
+            <i class="bi bi-chevron-right"></i>
+        </a>
+    </div>
+
+    <a href="{% url 'employee:attendance_report_schedule' obj.pk %}?year={{ attendance_year }}&month={{ attendance_month_num }}" class="btn btn-primary attendance-schedule-btn">
+        <i class="bi bi-calendar-check"></i> {% trans 'Programmer un rapport' %}
+    </a>
+</div>
+
+<div id="attendance-weekly-panel">
+    <div class="attendance-week-strip">
+        {% for day in attendance_week.days %}
+        <div class="attendance-day-card{% if day.status == 'weekend' %} is-weekend{% endif %}{% if forloop.first %} is-selected{% endif %}">
+            <div class="attendance-day-weekday">{{ day.weekday_short }}</div>
+            <div class="attendance-day-number">{{ day.day_number|stringformat:"02d" }}</div>
+            <span class="attendance-status-dot {{ day.status }}"></span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h5 class="attendance-section-title">{% trans 'Détails de la semaine' %}</h5>
+    <div class="table-responsive">
+        <table class="attendance-table onip-table">
+            <thead>
+                <tr>
+                    <th>{% trans 'Date' %}</th>
+                    <th>{% trans 'Jour' %}</th>
+                    <th>{% trans 'Statut' %}</th>
+                    <th class="ed-actions-col">{% trans 'Départ anticipé' %}</th>
+                    <th class="ed-actions-col">{% trans 'Justification' %}</th>
+                    {% for header in attendance_week.slot_headers %}
+                    <th class="ed-slot-col">{{ header }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in attendance_week.rows %}
+                <tr>
+                    <td>{{ row.date_label }}</td>
+                    <td>{{ row.weekday }}</td>
+                    <td>
+                        <span class="attendance-status-badge">
+                            <span class="attendance-status-dot {% if row.display_status == 'justified_late' %}justified{% elif row.display_status == 'early_leave' %}early_leave{% else %}{{ row.status }}{% endif %}"></span>
+                            {% if row.display_status == 'early_leave' %}{% trans 'Départ anticipé' %}
+                            {% elif row.display_status == 'justified_late' %}{% trans 'Retard justifié' %}
+                            {% elif row.status == 'present' %}{% trans 'Présent' %}
+                            {% elif row.status == 'late' %}{% trans 'Retard' %}
+                            {% elif row.status == 'partial' %}{% trans 'Partiel' %}
+                            {% else %}{% trans 'Absent' %}{% endif %}
+                        </span>
+                        <span class="ed-validated-slots">{{ row.validated_slots }}/{{ attendance_total_slots }}</span>
+                    </td>
+                    <td class="ed-early-leave-col">
+                        {% if row.early_leave %}
+                        <a href="{{ row.early_leave.read_url }}" class="ed-early-leave-badge {{ row.early_leave.badge_class }}">
+                            <span class="ed-early-leave-type">{{ row.early_leave.label }}</span>
+                            <span class="ed-early-leave-time">{{ row.early_leave.time_range }}</span>
+                            <span class="ed-early-leave-status">{{ row.early_leave.status_label }}</span>
+                        </a>
+                        {% else %}
+                        <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="ed-justify-col">
+                        {% if row.justification %}
+                        <a href="{{ row.justification.read_url }}" class="ed-justification-badge {{ row.justification.badge_class }}">
+                            {{ row.justification.label }}
+                        </a>
+                        {% elif row.can_justify %}
+                        <a href="{{ row.justify_url }}" class="btn btn-sm btn-warning ed-justify-btn">
+                            <i class="bi bi-file-earmark-text"></i> {% trans 'Justifier' %}
+                        </a>
+                        {% else %}
+                        <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    {% for slot in row.slots_display %}
+                    <td class="ed-slot-cell">
+                        <div class="ed-slot-time">{{ slot.time }}</div>
+                        <span class="ed-slot-badge {{ slot.badge_class }}">{{ slot.badge }}</span>
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-muted">{% trans 'Aucune donnée de présence pour cette semaine.' %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="attendance-monthly-panel" hidden>
+    <div class="attendance-month-calendar">
+        <div class="attendance-month-header">
+            {% for header in attendance_month.weekday_headers %}
+            <div class="attendance-month-header-cell">{{ header }}</div>
+            {% endfor %}
+        </div>
+
+        {% for week in attendance_month.weeks %}
+        <div class="attendance-month-row">
+            {% for cell in week %}
+            <div class="attendance-month-cell{% if cell.is_padding %} is-empty{% elif cell.status == 'weekend' %} is-weekend{% elif cell.status == 'present' %} is-present{% elif cell.status == 'late' %} is-late{% elif cell.status == 'partial' %} is-partial{% elif cell.status == 'early_leave' %} is-early-leave{% elif cell.status == 'absent' %} is-absent{% endif %}">
+                {% if not cell.is_padding %}
+                <div class="attendance-month-cell-top">
+                    <span class="attendance-month-cell-day">{{ cell.day_number }}</span>
+                    {% if cell.status_label %}
+                    <span class="attendance-month-cell-label">{{ cell.status_label }}</span>
+                    {% endif %}
+                </div>
+                {% if cell.status_label %}
+                <div class="attendance-month-cell-bottom">
+                    <span class="attendance-status-dot {{ cell.status }}"></span>
+                    {% if cell.schedule %}
+                    <span class="attendance-month-cell-time">{{ cell.schedule }}</span>
+                    {% elif cell.note %}
+                    <span class="attendance-month-cell-note">{{ cell.note }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="attendance-month-legend-bar">
+        <div class="attendance-month-legend">
+            <span class="attendance-legend-item">
+                <span class="attendance-status-dot present"></span>
+                {% trans "Vert : Présent (À l'heure)" %}
+            </span>
+            <span class="attendance-legend-item">
+                <span class="attendance-status-dot late"></span>
+                {% trans 'Orange : Retard (après 08h00)' %}
+            </span>
+            <span class="attendance-legend-item">
+                <span class="attendance-status-dot partial"></span>
+                {% trans 'Jaune : Présence partielle (plages manquantes)' %}
+            </span>
+            <span class="attendance-legend-item">
+                <span class="attendance-status-dot absent"></span>
+                {% trans 'Rouge : Absent (Sans motif)' %}
+            </span>
+            <span class="attendance-legend-item">
+                <span class="attendance-status-dot early_leave"></span>
+                {% trans 'Bleu : Départ anticipé validé' %}
+            </span>
+        </div>
+        <div class="attendance-month-inline-stats">
+            <div class="attendance-inline-stat">
+                <span class="attendance-inline-stat-label">{% trans 'Taux de présence' %}</span>
+                <strong>{{ attendance_summary.presence_rate }}%</strong>
+            </div>
+            <div class="attendance-inline-stat">
+                <span class="attendance-inline-stat-label">{% trans 'Retards (cumul)' %}</span>
+                <strong class="text-warning">{{ attendance_summary.total_late_minutes }}m</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="attendance-month-footer">
+        <div class="attendance-footer-card">
+            <h6>{% trans 'Résumé du mois' %}</h6>
+            <ul class="attendance-summary-list">
+                <li>
+                    <span>{% trans 'Jours ouvrés' %}</span>
+                    <strong>{{ attendance_summary.working_days_count }} {% trans 'jours' %}</strong>
+                </li>
+                <li>
+                    <span>{% trans 'Heures travaillées' %}</span>
+                    <strong>{{ attendance_summary.hours_worked_label }}</strong>
+                </li>
+                <li>
+                    <span>{% trans 'Départs anticipés validés' %}</span>
+                    <strong>{{ attendance_summary.early_leave_days }} {% trans 'jours' %}</strong>
+                </li>
+            </ul>
+        </div>
+
+        <div class="attendance-footer-card">
+            <h6>{% trans 'Dernières actions' %}</h6>
+            {% if attendance_recent_actions %}
+            <ul class="attendance-actions-list">
+                {% for action in attendance_recent_actions %}
+                <li>
+                    <span class="attendance-action-date">{% trans 'Modification manuelle le' %} {{ action.date_label }}</span>
+                    <span class="attendance-action-meta">{{ action.user }}{% if action.description %} — « {{ action.description }} »{% endif %}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="attendance-actions-empty">{% trans 'Aucune action récente enregistrée.' %}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>

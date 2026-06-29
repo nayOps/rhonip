@@ -39,6 +39,7 @@ Thumbs.db
 attendanceapk/configtablette/sdk/**/Code_Samples/
 attendanceapk/.git.bak/
 datas/.git.bak/
+rh/.git.bak/
 
 # Données sensibles (dump BD autorisé — repo privé)
 datas/.env

@@ -1,0 +1,511 @@
+/* Dossier Agent — page profil (design Stitch) */
+
+.epd-page {
+    --epd-navy: #0f2744;
+    --epd-blue: #2563eb;
+    --epd-border: #e2e8f0;
+    --epd-muted: #64748b;
+    --epd-bg: #f8fafc;
+    --epd-card-radius: 12px;
+    color: #0f172a;
+}
+
+.epd-topbar {
+    align-items: center;
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.epd-back {
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--epd-border);
+    border-radius: 10px;
+    color: var(--epd-navy);
+    display: inline-flex;
+    height: 38px;
+    justify-content: center;
+    text-decoration: none;
+    width: 38px;
+}
+
+.epd-topbar-title {
+    color: var(--epd-navy);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* ——— En-tête profil ——— */
+.epd-hero {
+    background: #fff;
+    border: 1px solid var(--epd-border);
+    border-radius: var(--epd-card-radius);
+    margin-bottom: 1rem;
+    padding: 1.35rem 1.5rem;
+}
+
+.epd-hero-inner {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    justify-content: space-between;
+}
+
+.epd-hero-left {
+    align-items: center;
+    display: flex;
+    flex: 1;
+    gap: 1.15rem;
+    min-width: 260px;
+}
+
+.epd-avatar-wrap {
+    flex-shrink: 0;
+    position: relative;
+}
+
+.epd-avatar {
+    border: 3px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--epd-border);
+    height: 88px;
+    object-fit: cover;
+    width: 88px;
+}
+
+.epd-avatar-placeholder {
+    align-items: center;
+    background: linear-gradient(135deg, #e8eef6, #dbeafe);
+    border-radius: 50%;
+    color: var(--epd-navy);
+    display: inline-flex;
+    font-size: 1.5rem;
+    font-weight: 700;
+    height: 88px;
+    justify-content: center;
+    width: 88px;
+}
+
+.epd-status-dot {
+    background: #22c55e;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    bottom: 4px;
+    height: 14px;
+    position: absolute;
+    right: 4px;
+    width: 14px;
+}
+
+.epd-hero-name {
+    font-size: 1.55rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 0.35rem;
+}
+
+.epd-hero-subtitle {
+    color: var(--epd-muted);
+    font-size: 0.92rem;
+    margin: 0 0 0.65rem;
+}
+
+.epd-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.epd-badge {
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 0.22rem 0.65rem;
+}
+
+.epd-badge--primary {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.epd-badge--muted {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.epd-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+/* Dossier agent (édition RH) : masquer Supprimer / Sauvegarder de l'en-tête */
+.employee-detail-page .epd-hero-actions a.text-danger,
+.employee-detail-page .epd-hero-actions button[form="form-employee"] {
+    display: none !important;
+}
+
+.epd-btn-outline {
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--epd-border);
+    border-radius: 10px;
+    color: var(--epd-navy);
+    display: inline-flex;
+    font-size: 0.85rem;
+    font-weight: 600;
+    gap: 0.4rem;
+    padding: 0.55rem 1rem;
+    text-decoration: none;
+}
+
+.epd-btn-primary {
+    align-items: center;
+    background: var(--epd-blue);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    display: inline-flex;
+    font-size: 0.85rem;
+    font-weight: 600;
+    gap: 0.4rem;
+    padding: 0.55rem 1rem;
+    text-decoration: none;
+}
+
+/* ——— Onglets ——— */
+.epd-tabs-wrap {
+    background: #fff;
+    border: 1px solid var(--epd-border);
+    border-radius: var(--epd-card-radius) var(--epd-card-radius) 0 0;
+    border-bottom: none;
+    padding: 0 1rem;
+}
+
+.epd-tabs {
+    border-bottom: 1px solid var(--epd-border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.epd-tabs .nav-link {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    color: var(--epd-muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-bottom: -1px;
+    padding: 0.95rem 1rem;
+}
+
+.epd-tabs .nav-link.active {
+    border-bottom-color: var(--epd-blue);
+    color: var(--epd-blue);
+}
+
+.epd-tab-body {
+    background: var(--epd-bg);
+    border: 1px solid var(--epd-border);
+    border-radius: 0 0 var(--epd-card-radius) var(--epd-card-radius);
+    border-top: none;
+    padding: 1.25rem;
+}
+
+.epd-layout {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+@media (max-width: 991px) {
+    .epd-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ——— Cartes contenu ——— */
+.epd-card {
+    background: #fff;
+    border: 1px solid var(--epd-border);
+    border-radius: var(--epd-card-radius);
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.epd-card:last-child {
+    margin-bottom: 0;
+}
+
+.epd-card-header {
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    gap: 0.55rem;
+    padding: 0.9rem 1.15rem;
+}
+
+.epd-card-header i {
+    color: var(--epd-blue);
+    font-size: 1rem;
+}
+
+.epd-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.epd-card-body {
+    padding: 1.15rem;
+}
+
+.epd-field-grid {
+    display: grid;
+    gap: 1rem 1.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 575px) {
+    .epd-field-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.epd-field-grid--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 767px) {
+    .epd-field-grid--3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+.epd-field-label {
+    color: var(--epd-muted);
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+}
+
+.epd-field-value {
+    color: #0f172a;
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.epd-field-value a {
+    color: var(--epd-blue);
+    text-decoration: none;
+}
+
+.epd-emergency-box {
+    background: #f8fafc;
+    border: 1px solid var(--epd-border);
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+/* ——— Sidebar ——— */
+.epd-admin-card {
+    background: linear-gradient(160deg, #0f2744 0%, #1e3a5f 100%);
+    border: none;
+    border-radius: var(--epd-card-radius);
+    color: #fff;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.epd-admin-card .epd-card-header {
+    border-bottom-color: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+.epd-admin-card .epd-card-header i {
+    color: #93c5fd;
+}
+
+.epd-admin-card .epd-card-body {
+    padding: 1rem 1.15rem 1.15rem;
+}
+
+.epd-admin-field {
+    margin-bottom: 0.85rem;
+}
+
+.epd-admin-field:last-of-type {
+    margin-bottom: 1rem;
+}
+
+.epd-admin-label {
+    color: rgba(255, 255, 255, 0.65);
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.2rem;
+    text-transform: uppercase;
+}
+
+.epd-admin-value {
+    align-items: center;
+    color: #fff;
+    display: flex;
+    font-size: 0.92rem;
+    font-weight: 600;
+    gap: 0.45rem;
+}
+
+.epd-copy-btn {
+    background: rgba(255, 255, 255, 0.12);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.8rem;
+    line-height: 1;
+    padding: 0.2rem 0.35rem;
+}
+
+.epd-admin-cta {
+    background: #fff;
+    border: none;
+    border-radius: 10px;
+    color: var(--epd-navy);
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.65rem 1rem;
+    text-align: center;
+    text-decoration: none;
+    width: 100%;
+}
+
+.epd-actions-card .epd-card-header {
+    background: #f8fafc;
+}
+
+.epd-actions-title {
+    color: var(--epd-muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.epd-action-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.epd-action-item a {
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    display: flex;
+    font-size: 0.88rem;
+    font-weight: 600;
+    gap: 0.65rem;
+    padding: 0.85rem 1.15rem;
+    text-decoration: none;
+}
+
+.epd-action-item:last-child a {
+    border-bottom: none;
+}
+
+.epd-action-item a:hover {
+    background: #f8fafc;
+}
+
+.epd-action-item i.bi:first-child {
+    color: var(--epd-blue);
+    font-size: 1rem;
+}
+
+.epd-action-item .bi-chevron-right {
+    color: #cbd5e1;
+    margin-left: auto;
+}
+
+.epd-action-item.is-disabled a {
+    color: #94a3b8;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* ——— Listes formations / documents ——— */
+.epd-list-item {
+    align-items: flex-start;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    gap: 0.85rem;
+    padding: 0.95rem 0;
+}
+
+.epd-list-item:last-child {
+    border-bottom: none;
+}
+
+.epd-list-icon {
+    align-items: center;
+    background: #eff6ff;
+    border-radius: 10px;
+    color: var(--epd-blue);
+    display: flex;
+    flex-shrink: 0;
+    height: 40px;
+    justify-content: center;
+    width: 40px;
+}
+
+.epd-list-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    margin: 0 0 0.15rem;
+}
+
+.epd-list-meta {
+    color: var(--epd-muted);
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+.epd-empty {
+    color: var(--epd-muted);
+    font-size: 0.88rem;
+    margin: 0;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+@media print {
+    .epd-hero-actions,
+    .epd-actions-card,
+    .epd-back,
+    .sidebar-wrapper,
+    .navbar-top,
+    .onip-tricolor-bar {
+        display: none !important;
+    }
+
+    .epd-layout {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+{% load i18n %}
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>{{ title }}</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 1cm 0.8cm 1.2cm 0.8cm;
+        }
+
+        body {
+            color: #0f2744;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 8pt;
+            margin: 0;
+        }
+
+        .tricolor {
+            background: #0f2744;
+            height: 5px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .tricolor span {
+            display: inline-block;
+            height: 5px;
+            width: 33.33%;
+        }
+
+        .tricolor .yellow { background: #fff24b; }
+        .tricolor .red { background: #db3832; }
+
+        .header-table {
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            width: 100%;
+        }
+
+        .header-table td { vertical-align: top; }
+
+        .org-name {
+            font-size: 14pt;
+            font-weight: bold;
+            margin: 0 0 2px 0;
+        }
+
+        .doc-title {
+            font-size: 12pt;
+            font-weight: bold;
+            margin: 0;
+            text-align: right;
+        }
+
+        .doc-meta {
+            color: #64748b;
+            font-size: 7.5pt;
+            margin: 2px 0 0 0;
+            text-align: right;
+        }
+
+        .summary {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 12px;
+            padding: 8px 10px;
+            width: 100%;
+        }
+
+        .summary-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .summary-table td {
+            padding: 2px 8px 2px 0;
+            width: 25%;
+        }
+
+        .summary-label {
+            color: #64748b;
+            display: block;
+            font-size: 7pt;
+        }
+
+        .summary-value {
+            font-size: 11pt;
+            font-weight: bold;
+        }
+
+        table.agents {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table.agents th,
+        table.agents td {
+            border: 1px solid #cbd5e1;
+            padding: 4px 5px;
+            vertical-align: top;
+        }
+
+        table.agents th {
+            background: #0f2744;
+            color: #fff;
+            font-size: 7.5pt;
+            text-align: left;
+        }
+
+        .photo {
+            height: 42px;
+            object-fit: cover;
+            width: 42px;
+        }
+
+        .photo-placeholder {
+            background: #e2e8f0;
+            color: #94a3b8;
+            display: inline-block;
+            font-size: 7pt;
+            height: 42px;
+            line-height: 42px;
+            text-align: center;
+            width: 42px;
+        }
+
+        .finger-grid {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .finger-grid td {
+            border: none;
+            font-size: 6.5pt;
+            padding: 1px 2px;
+            white-space: nowrap;
+        }
+
+        .finger-ok { color: #15803d; }
+        .finger-missing { color: #94a3b8; }
+
+        .status-complete { color: #15803d; font-weight: bold; }
+        .status-partial { color: #b45309; font-weight: bold; }
+        .status-none { color: #64748b; font-weight: bold; }
+
+        .footer {
+            border-top: 1px solid #cbd5e1;
+            color: #64748b;
+            font-size: 7pt;
+            margin-top: 10px;
+            padding-top: 6px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="tricolor">
+        <span class="yellow"></span>
+        <span class="red"></span>
+    </div>
+
+    <table class="header-table">
+        <tr>
+            <td style="width:55%;">
+                {% if organization %}
+                <p class="org-name">{{ organization.name }}</p>
+                {% endif %}
+                <p style="color:#64748b;font-size:8pt;margin:0;">{% trans 'Ressources Humaines' %}</p>
+            </td>
+            <td style="width:45%;">
+                <p class="doc-title">{{ title }}</p>
+                <p class="doc-meta">{{ report_ref }} · {% trans 'Généré le' %} {{ generated_at_label }}</p>
+            </td>
+        </tr>
+    </table>
+
+    <div class="summary">
+        <table class="summary-table">
+            <tr>
+                <td>
+                    <span class="summary-label">{% trans 'Agents listés' %}</span>
+                    <span class="summary-value">{{ total_count }}</span>
+                </td>
+                <td>
+                    <span class="summary-label">{% trans 'Enrôlement complet' %}</span>
+                    <span class="summary-value">{{ complete_count }}</span>
+                </td>
+                <td>
+                    <span class="summary-label">{% trans 'Enrôlement partiel' %}</span>
+                    <span class="summary-value">{{ partial_count }}</span>
+                </td>
+                <td>
+                    <span class="summary-label">{% trans 'Sans empreinte' %}</span>
+                    <span class="summary-value">{{ none_count }}</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <table class="agents">
+        <thead>
+            <tr>
+                <th style="width:5%;">{% trans 'Photo' %}</th>
+                <th style="width:8%;">{% trans 'Matricule' %}</th>
+                <th style="width:16%;">{% trans 'Agent' %}</th>
+                <th style="width:14%;">{% trans 'Direction' %}</th>
+                <th style="width:8%;">{% trans 'Statut' %}</th>
+                <th style="width:7%;">{% trans 'Score' %}</th>
+                <th style="width:42%;">{% trans 'Empreintes (10 doigts)' %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>
+                    {% if row.photo_uri %}
+                    <img src="{{ row.photo_uri }}" alt="" class="photo">
+                    {% else %}
+                    <span class="photo-placeholder">—</span>
+                    {% endif %}
+                </td>
+                <td>{{ row.employee.registration_number|default:"—" }}</td>
+                <td>{{ row.employee.full_name }}</td>
+                <td>{{ row.employee.direction.name|default:"—" }}</td>
+                <td>
+                    {% if row.is_complete %}
+                    <span class="status-complete">{% trans 'Complet' %}</span>
+                    {% elif row.has_any %}
+                    <span class="status-partial">{% trans 'Partiel' %}</span>
+                    {% else %}
+                    <span class="status-none">{% trans 'Non enrôlé' %}</span>
+                    {% endif %}
+                </td>
+                <td>{{ row.enrolled_count }}/{{ row.total_fingers }}</td>
+                <td>
+                    <table class="finger-grid">
+                        <tr>
+                            {% for finger in row.fingers|slice:":5" %}
+                            <td class="{% if finger.captured %}finger-ok{% else %}finger-missing{% endif %}">
+                                {% if finger.captured %}✓{% else %}○{% endif %} {{ finger.label }}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            {% for finger in row.fingers|slice:"5:" %}
+                            <td class="{% if finger.captured %}finger-ok{% else %}finger-missing{% endif %}">
+                                {% if finger.captured %}✓{% else %}○{% endif %} {{ finger.label }}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">{% trans 'Aucun agent.' %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        {% if organization %}{{ organization.name }} — {% endif %}{% trans 'Document interne RH' %}
+    </div>
+</body>
+</html>

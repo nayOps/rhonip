@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/company-attendance.css' %}">
+
+<div class="company-attendance-page">
+    {% with registry=dashboard.registry %}
+    {% with current_kpis=registry.sheet_kpis_current %}
+
+    <header class="ca-page-header">
+        <div class="ca-page-title">
+            <h1>{% trans 'Feuille de Présence' %}</h1>
+            <span class="ca-page-divider" aria-hidden="true"></span>
+            <span class="ca-page-date">{{ registry.focus_day_long_label }}</span>
+        </div>
+    </header>
+
+    <form method="get" class="ca-filters-panel" id="ca-filters-form">
+        <input type="hidden" name="year" id="ca-year" value="{{ dashboard.year }}">
+        <input type="hidden" name="month" id="ca-month" value="{{ dashboard.month }}">
+        <input type="hidden" name="week" id="ca-week" value="{{ dashboard.week_start|date:'Y-m-d' }}">
+        <input type="hidden" name="period_view" value="{{ registry.period_view }}">
+        <input type="hidden" name="display_mode" value="{{ registry.display_mode }}">
+        <input type="hidden" name="page" value="1" id="ca-search-page-reset">
+
+        <div class="ca-filters-panel__top">
+            <div class="ca-filters-panel__title">
+                <i class="bi bi-sliders2" aria-hidden="true"></i>
+                <span>{% trans 'Filtres & période' %}</span>
+            </div>
+            <div class="ca-filter-chips" aria-label="{% trans 'Filtres actifs' %}">
+                {% if registry.period_view == 'daily' %}
+                <span class="ca-filter-chip ca-filter-chip--period"><i class="bi bi-calendar-day"></i> {% trans 'Vue jour' %}</span>
+                {% elif registry.period_view == 'weekly' %}
+                <span class="ca-filter-chip ca-filter-chip--period"><i class="bi bi-calendar-week"></i> {% trans 'Vue semaine' %}</span>
+                {% else %}
+                <span class="ca-filter-chip ca-filter-chip--period"><i class="bi bi-calendar-month"></i> {% trans 'Vue mois' %}</span>
+                {% endif %}
+                {% if dashboard.selected_direction %}
+                <span class="ca-filter-chip"><i class="bi bi-building"></i> {{ dashboard.selected_direction.name }}</span>
+                {% endif %}
+                {% if dashboard.search_query %}
+                <span class="ca-filter-chip ca-filter-chip--search"><i class="bi bi-search"></i> « {{ dashboard.search_query }} »</span>
+                {% endif %}
+                {% if not registry.is_today %}
+                <span class="ca-filter-chip ca-filter-chip--history"><i class="bi bi-clock-history"></i> {{ registry.focus_day_label }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="ca-filters-grid">
+            <div class="ca-filter-block ca-filter-block--search">
+                <span class="ca-filter-label">{% trans 'Rechercher' %}</span>
+                <div class="ca-page-search">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    <input
+                        type="search"
+                        name="q"
+                        id="ca-agent-search"
+                        value="{{ dashboard.search_query }}"
+                        placeholder="{% trans 'Matricule, nom, direction…' %}"
+                        autocomplete="off"
+                    >
+                    {% if dashboard.search_query %}
+                    <a href="?{{ registry.urls.clear_search }}" class="ca-search-clear" title="{% trans 'Effacer la recherche' %}">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="ca-filter-block ca-filter-block--period">
+                <span class="ca-filter-label">{% trans 'Granularité' %}</span>
+                <div class="ca-period-tabs" role="group" aria-label="{% trans 'Période' %}">
+                    <a href="?{{ registry.urls.period_daily }}" class="ca-period-tab{% if registry.period_view == 'daily' %} active{% endif %}">
+                        <i class="bi bi-calendar-day"></i> {% trans 'Jour' %}
+                    </a>
+                    <a href="?{{ registry.urls.period_weekly }}" class="ca-period-tab{% if registry.period_view == 'weekly' %} active{% endif %}">
+                        <i class="bi bi-calendar-week"></i> {% trans 'Semaine' %}
+                    </a>
+                    <a href="?{{ registry.urls.period_monthly }}" class="ca-period-tab{% if registry.period_view == 'monthly' %} active{% endif %}">
+                        <i class="bi bi-calendar-month"></i> {% trans 'Mois' %}
+                    </a>
+                </div>
+            </div>
+
+            <div class="ca-filter-block ca-filter-block--direction">
+                <span class="ca-filter-label">{% trans 'Direction' %}</span>
+                <label class="ca-direction-select">
+                    <i class="bi bi-diagram-3" aria-hidden="true"></i>
+                    <select name="direction" onchange="this.form.submit()">
+                        <option value="">{% trans 'Toutes les directions' %}</option>
+                        {% for direction in dashboard.directions %}
+                        <option value="{{ direction.pk }}"{% if dashboard.selected_direction_id == direction.pk|stringformat:'s' %} selected{% endif %}>{{ direction.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <i class="bi bi-chevron-down ca-select-caret" aria-hidden="true"></i>
+                </label>
+            </div>
+
+            <div class="ca-filter-block ca-filter-block--export">
+                <span class="ca-filter-label ca-filter-label--invisible">{% trans 'Export' %}</span>
+                <button type="button" class="ca-export-btn" onclick="window.print()">
+                    <i class="bi bi-printer"></i>
+                    {% trans 'Imprimer' %}
+                </button>
+            </div>
+        </div>
+
+        <div class="ca-date-nav" aria-label="{% trans 'Navigation par date' %}">
+            {% if registry.period_view == 'daily' %}
+                {% with prev_url=registry.urls.prev_day next_url=registry.urls.next_day prev_title=_('Jour précédent') next_title=_('Jour suivant') %}
+                {% include 'employee/includes/company_attendance_date_nav.html' %}
+                {% endwith %}
+            {% elif registry.period_view == 'weekly' %}
+                {% with prev_url=registry.urls.prev_week next_url=registry.urls.next_week prev_title=_('Semaine précédente') next_title=_('Semaine suivante') %}
+                {% include 'employee/includes/company_attendance_date_nav.html' %}
+                {% endwith %}
+            {% else %}
+                {% with prev_url=registry.urls.prev_month next_url=registry.urls.next_month prev_title=_('Mois précédent') next_title=_('Mois suivant') %}
+                {% include 'employee/includes/company_attendance_date_nav.html' %}
+                {% endwith %}
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="ca-kpi-grid">
+        <div class="ca-kpi-card ca-kpi-total">
+            <span class="ca-kpi-label">{% trans 'Effectif Total' %}</span>
+            <strong>{{ current_kpis.total }}</strong>
+            <small>{% trans 'Agents' %}</small>
+        </div>
+        <div class="ca-kpi-card ca-kpi-present">
+            <span class="ca-kpi-label">{% trans 'Présents (Matin)' %}</span>
+            <strong>{{ current_kpis.present_morning }}</strong>
+            <small>({{ current_kpis.present_morning_pct }}%)</small>
+        </div>
+        <div class="ca-kpi-card ca-kpi-late">
+            <span class="ca-kpi-label">{% trans 'En Retard' %}</span>
+            <strong>{{ current_kpis.late }}</strong>
+            <small>{% trans 'Agents' %}</small>
+        </div>
+        <div class="ca-kpi-card ca-kpi-absent">
+            <span class="ca-kpi-label">{% trans 'Absents' %}</span>
+            <strong>{{ current_kpis.absent }}</strong>
+            <small>{% trans 'Agents' %}</small>
+        </div>
+    </div>
+
+    {% include 'employee/includes/company_attendance_registry.html' %}
+
+    {% endwith %}
+    {% endwith %}
+
+    <a href="{% url 'core:create' 'employee' 'employee' %}" class="ca-fab" title="{% trans 'Nouvel agent' %}">
+        <i class="bi bi-plus-lg"></i>
+    </a>
+</div>
+
+<script>
+(function () {
+    var form = document.getElementById('ca-filters-form');
+    var searchInput = document.getElementById('ca-agent-search');
+    var dateInput = document.getElementById('ca-focus-date');
+    if (!form) return;
+
+    function mondayIso(isoDate) {
+        var parts = isoDate.split('-');
+        var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        var day = d.getDay();
+        var offset = day === 0 ? -6 : 1 - day;
+        d.setDate(d.getDate() + offset);
+        var month = String(d.getMonth() + 1).padStart(2, '0');
+        var dom = String(d.getDate()).padStart(2, '0');
+        return d.getFullYear() + '-' + month + '-' + dom;
+    }
+
+    function syncDateFields(isoDate) {
+        if (!isoDate) return;
+        var parts = isoDate.split('-');
+        var yearField = document.getElementById('ca-year');
+        var monthField = document.getElementById('ca-month');
+        var weekField = document.getElementById('ca-week');
+        var pageReset = document.getElementById('ca-search-page-reset');
+        if (yearField) yearField.value = parts[0];
+        if (monthField) monthField.value = String(Number(parts[1]));
+        if (weekField) weekField.value = mondayIso(isoDate);
+        if (pageReset) pageReset.value = '1';
+    }
+
+    if (dateInput) {
+        dateInput.addEventListener('change', function () {
+            if (!dateInput.value) return;
+            syncDateFields(dateInput.value);
+            form.submit();
+        });
+    }
+
+    if (searchInput) {
+        var timer = null;
+        var lastSubmitted = searchInput.value.trim();
+
+        function submitSearch() {
+            var value = searchInput.value.trim();
+            if (value === lastSubmitted) return;
+            lastSubmitted = value;
+            var pageReset = document.getElementById('ca-search-page-reset');
+            if (pageReset) pageReset.value = '1';
+            form.submit();
+        }
+
+        searchInput.addEventListener('input', function () {
+            window.clearTimeout(timer);
+            timer = window.setTimeout(submitSearch, 450);
+        });
+
+        searchInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                window.clearTimeout(timer);
+                submitSearch();
+            }
+        });
+    }
+})();
+</script>
+{% endblock %}
