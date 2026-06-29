@@ -38,9 +38,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    const activeTab = localStorage.getItem('payday-employee-last-tab');
-    if (activeTab) {
-        const tabEl = document.querySelector('.employee-tabs a[href="' + activeTab + '"]');
+    const hashTab = window.location.hash;
+    const savedTab = localStorage.getItem('payday-employee-last-tab');
+    const targetTab = hashTab || savedTab;
+    if (targetTab) {
+        const tabEl = document.querySelector('.employee-tabs a[href="' + targetTab + '"]');
         if (tabEl) {
             bootstrap.Tab.getOrCreateInstance(tabEl).show();
         }

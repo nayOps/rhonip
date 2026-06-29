@@ -51,19 +51,25 @@ class Autocomplete(autocomplete.Select2QuerySetView):
             if not forwarded.get('province'):
                 return model.objects.none()
             qs = model.objects.filter(province_id=forwarded['province']).order_by('name')
-            return self._filter_by_name(qs, model)
+            if not self.q:
+                return qs[:200]
+            return self._filter_by_name(qs, model)[:200]
 
         if model_name == 'sector':
             if not forwarded.get('territory'):
                 return model.objects.none()
             qs = model.objects.filter(territory_id=forwarded['territory']).order_by('name')
-            return self._filter_by_name(qs, model)
+            if not self.q:
+                return qs[:200]
+            return self._filter_by_name(qs, model)[:200]
 
         if model_name == 'groupement':
             if not forwarded.get('sector'):
                 return model.objects.none()
             qs = model.objects.filter(sector_id=forwarded['sector']).order_by('name')
-            return self._filter_by_name(qs, model)
+            if not self.q:
+                return qs[:300]
+            return self._filter_by_name(qs, model)[:300]
 
         if model_name == 'village':
             qs = model.objects.select_related(
@@ -92,6 +98,16 @@ class Autocomplete(autocomplete.Select2QuerySetView):
             elif province_id:
                 qs = qs.filter(groupement__sector__territory__province_id=province_id)
             return qs.order_by('name')[:50]
+
+        # Référentiels RH (direction, grade, …) : liste initiale sans saisie
+        if model_name in {
+            'direction', 'subdirection', 'service', 'grade', 'designation',
+            'agreement', 'branch',
+        }:
+            qs = model.objects.all().order_by('name')
+            if not self.q:
+                return qs[:80]
+            return self._filter_by_name(qs, model)[:80]
 
         qs = model.objects.all()
         if not self.q:

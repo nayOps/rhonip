@@ -64,16 +64,18 @@ class Employee(Base):
         blank=True,
         null=True,
         default=None,
+        autocomplete_min_length=0,
     )
     date_of_join = DateField(_('date d\'engagement'), blank=True, null=True, default=None)
     onip_start_date = DateField(_('date début de travail ONIP'), blank=True, null=True, default=None)
     photo = models.ImageField(_('photo'), blank=True, null=True)
 
-    designation = ModelSelect(Designation, verbose_name=_('position'), blank=True, null=True, on_delete=models.SET_NULL)
+    designation = ModelSelect(Designation, verbose_name=_('position'), blank=True, null=True, on_delete=models.SET_NULL, autocomplete_min_length=0)
     branch = ModelSelect(
-        'employee.Branch', verbose_name=_('site'), blank=True, null=True, on_delete=models.SET_NULL, default=None
+        'employee.Branch', verbose_name=_('site'), blank=True, null=True, on_delete=models.SET_NULL, default=None,
+        autocomplete_min_length=0,
     )
-    grade = ModelSelect(Grade, verbose_name=_('grade'), blank=True, null=True, on_delete=models.SET_NULL)
+    grade = ModelSelect(Grade, verbose_name=_('grade'), blank=True, null=True, on_delete=models.SET_NULL, autocomplete_min_length=0)
 
     direction = ModelSelect(
         Direction,
@@ -82,9 +84,10 @@ class Employee(Base):
         null=True,
         on_delete=models.SET_NULL,
         default=None,
+        autocomplete_min_length=0,
     )
-    sub_direction = ModelSelect(SubDirection, verbose_name=_('sous-direction'), blank=True, null=True, on_delete=models.SET_NULL, default=None)
-    service = ModelSelect(Service, verbose_name=_('service'), blank=True, null=True, on_delete=models.SET_NULL, default=None)
+    sub_direction = ModelSelect(SubDirection, verbose_name=_('sous-direction'), blank=True, null=True, on_delete=models.SET_NULL, default=None, autocomplete_min_length=0)
+    service = ModelSelect(Service, verbose_name=_('service'), blank=True, null=True, on_delete=models.SET_NULL, default=None, autocomplete_min_length=0)
 
     first_name = models.CharField(_('prénom'), max_length=100, blank=True, null=True, default=None)
     middle_name = models.CharField(_('post-nom'), max_length=100, blank=True, null=True, default=None)

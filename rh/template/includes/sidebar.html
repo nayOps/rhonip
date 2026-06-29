@@ -18,7 +18,7 @@
 
                         class="onip-sidebar-logo"
 
-                        src="{% if organization.logo %}{{ organization.logo.url }}{% else %}{% static 'assets/images/logo/logo-onip.png' %}{% endif %}"
+                        src="{% if organization.logo %}{{ organization.logo.url }}{% else %}{% static 'assets/images/logo/logo-onip-white.svg' %}{% endif %}"
 
                         alt="ONIP"
 
@@ -52,7 +52,7 @@
 
                             <i class="bi {{ el.icon }}"></i>
 
-                            <span>{{ el.title|title }}</span>
+                            <span>{{ el.title }}</span>
 
                             {% if el.badge %}
 
@@ -80,7 +80,7 @@
 
                             <li class="submenu-item{% if child.active %} active{% endif %}">
 
-                                <a href="{{ child.href }}">{{ child.title|title }}</a>
+                                <a href="{{ child.href }}">{{ child.title }}</a>
 
                             </li>
 
@@ -116,7 +116,9 @@
 
                         {% else %}
 
-                        <img src="{% static 'assets/images/faces/1.jpg' %}" alt="">
+                        <span class="sidebar-user-avatar-fallback" aria-hidden="true">
+                            <i class="bi bi-person-fill"></i>
+                        </span>
 
                         {% endif %}
 

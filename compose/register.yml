@@ -197,16 +197,20 @@ services:
     environment:
       NODE_ENV: development
       NEXT_PUBLIC_API_URL: http://localhost:${ENROLLMENT_GATEWAY_PORT:-8001}
+      ENROLLMENT_GATEWAY_INTERNAL_URL: http://fgp_enrollment_gateway:8000
       NEXT_PUBLIC_FGP_CORE_URL: http://localhost:${FGP_CORE_PORT:-8000}
       NEXT_PUBLIC_BIOMETRIC_URL: http://localhost:${BIOMETRIC_SERVICE_PORT:-8003}
       NEXT_PUBLIC_FINGERPRINT_URL: http://localhost:${FINGERPRINT_SERVICE_PORT:-8010}
       NEXT_PUBLIC_DEVICE_BRIDGE_URL: http://127.0.0.1:8765
       DEVICE_BRIDGE_INTERNAL_URL: http://host.docker.internal:8765
       NEXT_PUBLIC_USE_DEVICE_BRIDGE_DIRECT: "true"
-      NEXT_PUBLIC_RH_API_URL: ${NEXT_PUBLIC_RH_API_URL:-http://${SERVER_LAN_IP:-localhost}:${RH_SERVER_PORT:-8100}}
+      NEXT_PUBLIC_ICAO_FACE_SERVICE_URL: http://127.0.0.1:50270
+      ICAO_FACE_SERVICE_URL: http://host.docker.internal:50270
+      NEXT_PUBLIC_RH_API_URL: ${NEXT_PUBLIC_RH_API_URL:-http://localhost:${RH_SERVER_PORT:-8100}}
       NEXT_PUBLIC_GUICHET_INTERNAL_API_KEY: ${GUICHET_INTERNAL_API_KEY:-fgp_guichet_internal_dev}
-      RH_INTERNAL_API_URL: http://server:8000
-      RH_FALLBACK_API_URL: http://host.docker.internal:${RH_SERVER_PORT:-8100}
+      RH_INTERNAL_API_URL: ${RH_INTERNAL_API_URL:-http://server:8000}
+      RH_FALLBACK_API_URL: ${RH_FALLBACK_API_URL:-http://host.docker.internal:${RH_SERVER_PORT:-8100}}
+      RH_PROXY_DOCKER_DEFAULTS: ${RH_PROXY_DOCKER_DEFAULTS:-1}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:

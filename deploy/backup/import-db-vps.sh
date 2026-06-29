@@ -48,9 +48,9 @@ if [[ "${confirm,,}" != "o" && "${confirm,,}" != "oui" ]]; then
 fi
 
 if [[ "$DUMP_FILE" == *.gz ]]; then
-  gunzip -c "$DUMP_FILE" | docker exec -i "$CONTAINER" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1
+  gunzip -c "$DUMP_FILE" | docker exec -i -e PGCLIENTENCODING=UTF8 "$CONTAINER" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1
 else
-  docker exec -i "$CONTAINER" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 < "$DUMP_FILE"
+  docker exec -i -e PGCLIENTENCODING=UTF8 "$CONTAINER" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 < "$DUMP_FILE"
 fi
 
 echo "==> Restauration terminée."

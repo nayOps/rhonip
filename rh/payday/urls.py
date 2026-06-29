@@ -21,6 +21,8 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.urls import re_path
+from django.views.static import serve
 
 from core.views.login import EmployeeLogin
 
@@ -41,4 +43,28 @@ if settings.DEBUG:
     urlpatterns.append(path('__debug__/', include('debug_toolbar.urls')))
 
 urlpatterns += staticfiles_urlpatterns()
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Prod : secours si WhiteNoise / collectstatic ne livre pas les assets (évite CSS en text/html).
+if not settings.DEBUG:
+    static_prefix = settings.STATIC_URL.lstrip('/').rstrip('/')
+    if static_prefix:
+        urlpatterns += [
+            re_path(
+                rf'^{static_prefix}/(?P<path>.*)$',
+                serve,
+                {'document_root': settings.STATIC_ROOT},
+            ),
+        ]
+
+# static() n'enregistre les médias que si DEBUG=1 — en prod on sert /media/ explicitement
+media_prefix = settings.MEDIA_URL.lstrip('/').rstrip('/')
+if media_prefix:
+    urlpatterns += [
+        re_path(
+            rf'^{media_prefix}/(?P<path>.*)$',
+            serve,
+            {'document_root': settings.MEDIA_ROOT},
+        ),
+    ]
+elif settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

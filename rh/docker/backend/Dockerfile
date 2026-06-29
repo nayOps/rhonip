@@ -19,3 +19,13 @@ ADD ./docker /app/docker
 RUN sed -i 's/\r$//' /app/docker/backend/server-entrypoint.sh /app/docker/backend/worker-entrypoint.sh
 RUN chmod +x /app/docker/backend/server-entrypoint.sh
 RUN chmod +x /app/docker/backend/worker-entrypoint.sh
+
+# Pré-collecte des assets dans l'image (secours si entrypoint échoue).
+WORKDIR /app/backend
+ENV DJANGO_SETTINGS_MODULE=payday.settings
+ENV SECRET_KEY=build-collectstatic-only
+ENV DATABASE_URL=sqlite:////tmp/onip-build.sqlite3
+ENV DEBUG=0
+ENV WHITENOISE_USE_FINDERS=1
+RUN python manage.py collectstatic --noinput || \
+    (mkdir -p staticfiles && cp -a static/. staticfiles/)

@@ -34,9 +34,30 @@ print('DEBUG:', DEBUG)
 ALLOWED_HOSTS = []
 ALLOWED_HOSTS = list(os.getenv('ALLOWED_HOSTS', '*').split(','))
 
-_csrf_origins = os.getenv('CSRF_TRUSTED_ORIGINS', '')
-if _csrf_origins:
-    CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _csrf_origins.split(',') if origin.strip()]
+def _build_csrf_trusted_origins():
+  """Origines CSRF : variable d'env + dérivées du domaine public / IP VPS."""
+  origins = [
+      origin.strip()
+      for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+      if origin.strip()
+  ]
+  public_host = (os.getenv('RH_PUBLIC_HOST') or '').strip()
+  if public_host and public_host not in ('*', 'localhost', '127.0.0.1'):
+      for scheme in ('https', 'http'):
+          origin = f'{scheme}://{public_host}'
+          if origin not in origins:
+              origins.append(origin)
+  server_ip = (os.getenv('SERVER_LAN_IP') or '').strip()
+  if server_ip:
+      for origin in (f'http://{server_ip}:8100', f'http://{server_ip}'):
+          if origin not in origins:
+              origins.append(origin)
+  return origins
+
+
+_csrf_list = _build_csrf_trusted_origins()
+if _csrf_list:
+    CSRF_TRUSTED_ORIGINS = _csrf_list
 elif DEBUG:
     CSRF_TRUSTED_ORIGINS = [
         'http://localhost:8100',
@@ -84,6 +105,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -153,13 +175,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'fr'
+LANGUAGE_CODE = 'fr-fr'
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
 USE_TZ = True
+
+DEFAULT_CHARSET = 'utf-8'
 
 if DEBUG:
     print('LANGUAGE_CODE:', LANGUAGE_CODE)
@@ -168,10 +192,20 @@ if DEBUG:
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_URL = os.getenv("STATIC_URL", STATIC_URL)
-STATICFILES_DIRS =[os.path.join(BASE_DIR, 'static')]
-#STATIC_ROOT = os.getenv("STATIC_ROOT", STATIC_URL.replace('/', ''))
+
+def _absolute_url_path(value, default):
+    """Chemin absolu avec slash initial (requis pour /login/, /employee/change/, etc.)."""
+    path = (value or default).strip() or default
+    if not path.startswith('/'):
+        path = '/' + path
+    if not path.endswith('/'):
+        path += '/'
+    return path
+
+
+STATIC_URL = _absolute_url_path(os.getenv('STATIC_URL'), '/static/')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.getenv('STATIC_ROOT', str(BASE_DIR / 'staticfiles'))
 
 AWS_LOCATION = os.getenv('AWS_LOCATION', default='')
 AWS_DEFAULT_ACL = os.getenv('AWS_DEFAULT_ACL', default='public-read')
@@ -184,13 +218,22 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
 
-STATICFILES_STORAGE = os.getenv("STATICFILES_STORAGE", 'django.contrib.staticfiles.storage.StaticFilesStorage')
+STATICFILES_STORAGE = os.getenv(
+    'STATICFILES_STORAGE',
+    'whitenoise.storage.StaticFilesStorage',
+)
+
+# Sert les fichiers depuis STATICFILES_DIRS si collectstatic a échoué (VPS / volume monté).
+WHITENOISE_USE_FINDERS = os.getenv('WHITENOISE_USE_FINDERS', '1').lower() in (
+    '1', 'true', 'yes',
+)
+WHITENOISE_MAX_AGE = int(os.getenv('WHITENOISE_MAX_AGE', '31536000'))
 
 PUBLIC_MEDIA_LOCATION = os.getenv('PUBLIC_MEDIA_LOCATION', default='media')
 DEFAULT_FILE_STORAGE = os.getenv('DEFAULT_FILE_STORAGE', default='django.core.files.storage.FileSystemStorage')
 
 MEDIA_ROOT = BASE_DIR / 'media'
-MEDIA_URL = os.getenv("MEDIA_URL", 'media/')
+MEDIA_URL = _absolute_url_path(os.getenv('MEDIA_URL'), '/media/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -338,25 +381,45 @@ if not DEBUG:
     INDEX_OF_COMMON_MIDDLEWARE = MIDDLEWARE.index('django.middleware.common.CommonMiddleware')
     MIDDLEWARE.insert(INDEX_OF_COMMON_MIDDLEWARE, 'corsheaders.middleware.CorsMiddleware')
 
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 3600
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+    _rh_ssl_redirect = os.environ.get('RH_SSL_REDIRECT', '1').lower() in ('1', 'true', 'yes')
+    _rh_public_host = (os.getenv('RH_PUBLIC_HOST') or '').strip() or None
+
+    SECURE_SSL_REDIRECT = _rh_ssl_redirect
+    # Cookies Secure uniquement quand HTTPS est actif (sinon CSRF 403 sur http://IP:8100)
+    SESSION_COOKIE_SECURE = _rh_ssl_redirect
+    CSRF_COOKIE_SECURE = _rh_ssl_redirect
+    CSRF_COOKIE_SAMESITE = 'Lax'
+
+    if _rh_ssl_redirect:
+        # Proxy Traefik : Django doit voir HTTPS pour redirects / cookies Secure
+        SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+        SECURE_SSL_HOST = _rh_public_host
+        SECURE_HSTS_SECONDS = 3600
+        SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+        SECURE_HSTS_PRELOAD = True
+
     SECURE_REFERRER_POLICY = 'same-origin'
 
     # Security settings
     SECURE_BROWSER_XSS_FILTER = True
     X_FRAME_OPTIONS = 'DENY'
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_SSL_HOST = True
 
     # CORS settings
     CORS_ORIGIN_ALLOW_ALL = True
     CORS_ALLOW_CREDENTIALS = True
     CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
+    CORS_ALLOW_HEADERS = [
+        'accept',
+        'accept-encoding',
+        'authorization',
+        'content-type',
+        'origin',
+        'user-agent',
+        'x-csrftoken',
+        'x-requested-with',
+        'x-guichet-internal-key',
+    ]
     CORS_ORIGIN_WHITELIST = os.getenv("CORS_ORIGIN_WHITELIST", '*').split(',')
 
     # Monitoring settings

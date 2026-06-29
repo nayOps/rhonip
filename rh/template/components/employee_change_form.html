@@ -59,7 +59,7 @@
 
         <div class="tab-pane fade employee-tab-pane employee-form-pane" id="{{ model_name }}" role="tabpanel">
             {% crispy form %}
-            {{ form.media }}
+            {{ form.media.css }}
         </div>
 
         {% for formset in formsets %}

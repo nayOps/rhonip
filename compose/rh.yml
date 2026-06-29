@@ -37,6 +37,8 @@ services:
       CELERY_BROKER_URL: redis://:${REDIS_PASSWORD}@onip_redis:6379/3
       REDIS_URL: redis://:${REDIS_PASSWORD}@onip_redis:6379/3
       DEBUG: ${RH_DEBUG:-1}
+      RH_PUBLIC_HOST: ${RH_PUBLIC_HOST:-rh.onip.gouv.local}
+      RH_SSL_REDIRECT: ${RH_SSL_REDIRECT:-1}
       SECRET_KEY: ${RH_SECRET_KEY:-change-me-rh-secret}
       ALLOWED_HOSTS: ${RH_ALLOWED_HOSTS:-localhost,127.0.0.1,rh.onip.gouv.local,rh.onip.localhost,rh.onip.gouv.lan,rh_server,server,192.168.1.79,192.168.1.74,192.168.1.72,192.168.10.104,10.142.19.246}
       CSRF_TRUSTED_ORIGINS: ${RH_CSRF_TRUSTED_ORIGINS:-http://rh.onip.gouv.local,http://192.168.10.104:8100,http://10.142.19.246:8100,http://192.168.1.72:8100,http://localhost:8100,http://127.0.0.1:8100}
@@ -111,6 +113,8 @@ services:
       CELERY_BROKER_URL: redis://:${REDIS_PASSWORD}@onip_redis:6379/3
       REDIS_URL: redis://:${REDIS_PASSWORD}@onip_redis:6379/3
       DEBUG: ${RH_DEBUG:-1}
+      RH_PUBLIC_HOST: ${RH_PUBLIC_HOST:-rh.onip.gouv.local}
+      RH_SSL_REDIRECT: ${RH_SSL_REDIRECT:-1}
       SECRET_KEY: ${RH_SECRET_KEY:-change-me-rh-secret}
       ALLOWED_HOSTS: ${RH_ALLOWED_HOSTS:-localhost,127.0.0.1,rh.onip.gouv.local,rh.onip.localhost,rh.onip.gouv.lan,rh_server,server,192.168.1.79,192.168.1.74,192.168.1.72,192.168.10.104,10.142.19.246}
       CSRF_TRUSTED_ORIGINS: ${RH_CSRF_TRUSTED_ORIGINS:-http://rh.onip.gouv.local,http://192.168.10.104:8100,http://10.142.19.246:8100,http://192.168.1.72:8100,http://localhost:8100,http://127.0.0.1:8100}

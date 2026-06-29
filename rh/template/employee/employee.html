@@ -5,10 +5,12 @@
 {% load static %}
 {% load crispy_forms_filters %}
 
-{% block content %}
+{% block extra_head %}
 <link rel="stylesheet" href="{% static 'assets/css/employee-detail.css' %}">
 <link rel="stylesheet" href="{% static 'assets/css/employee-profile-dossier.css' %}">
+{% endblock %}
 
+{% block content %}
 <div class="employee-detail-page onip-form-page epd-page">
     <div class="epd-topbar">
         <a href="{% url 'core:list' app model|getattr:'_meta'|getattr:'model_name' %}" class="epd-back" aria-label="{% trans 'Retour' %}">
@@ -56,6 +58,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block extra_scripts %}
 <script src="{% static 'assets/js/employee-detail.js' %}"></script>
 {% endblock %}
