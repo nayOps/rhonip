@@ -1,0 +1,23 @@
+@startuml
+start 
+:IrisInitialize (LicenseFilePath,LKMS_SP_URL,LKMSURL, ... );
+partition API {
+if (License file available\nin LicenseFilePath) then (yes)
+  :Setup license file \nread and keep in memory for initisation;
+  
+else (no)
+  :Call LKMS Service Provider to get a licence request token;
+  :Call LKMS Server with the license token;
+  :Call LKMS Server to activate license an retrieve license file;
+  :Validate license file signature;
+  :Store license file in specified path;
+  :Setup license file \nread and keep in memory for initisation;
+
+endif;
+:Initialize IrisEngine;
+}
+:Return Initialisation result;
+
+
+stop
+@enduml

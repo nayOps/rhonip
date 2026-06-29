@@ -1,0 +1,28 @@
+================================================================================
+📧 DEMANDE DE SDK ARATEK A400
+================================================================================
+
+Pour obtenir le SDK officiel du lecteur Aratek A400 :
+
+1. Site web : https://www.aratek.co/product/fingerprint-scanner-fap10-a400
+2. Page contact : https://www.aratek.co/
+
+Informations à fournir dans votre demande :
+- Modèle : Aratek A400 (FBI FAP 10)
+- VID:PID : 28ed:1063
+- Numéro de série : 00000000050B
+- Utilisation : Développement d'application biométrique
+- OS : Linux (Kali)
+
+SDK mentionnés sur le site :
+- TrustFinger SDK : SDK principal pour lecteurs d'empreintes
+- BMAPI SDK : API biométrique
+
+Demandez spécifiquement :
+- Documentation du protocole USB
+- SDK pour Linux (ou documentation des commandes)
+- Exemples de code Python si disponibles
+- Drivers Linux
+
+================================================================================
+

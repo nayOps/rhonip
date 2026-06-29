@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RH App Three Step</string>
+    
+    <!-- Authentication -->
+    <string name="auth_title">Authentification Biométrique</string>
+    <string name="auth_description">Placez votre doigt sur le capteur pour vous authentifier</string>
+    <string name="auth_button">Authentification</string>
+    <string name="auth_success">Authentification réussie !</string>
+    <string name="auth_failed">Authentification échouée. Veuillez réessayer.</string>
+    
+    <!-- Main Menu -->
+    <string name="welcome_message">Bienvenue dans le système\nde gestion des employés ONIP</string>
+    <string name="add_employee">Ajouter un Employé</string>
+    <string name="view_employees">Voir les Employés</string>
+    <string name="settings">Paramètres</string>
+    <string name="logout">Déconnexion</string>
+    
+    <!-- Employee Enrollment -->
+    <string name="enrollment_title">Enregistrement d\'Employé</string>
+    <string name="step_identity">Identité</string>
+    <string name="step_origin">Origine</string>
+    <string name="step_address">Adresse</string>
+    <string name="step_family">Situation Familiale</string>
+    <string name="step_education">Formation</string>
+    <string name="step_professional">Informations Professionnelles</string>
+    <string name="step_documents">Documents</string>
+    <string name="step_emergency">Contact d\'Urgence</string>
+    <string name="step_banking">Informations Bancaires</string>
+    <string name="step_medical">Informations Médicales</string>
+    <string name="step_equipment">Équipements</string>
+    <string name="step_biometric">Données Biométriques</string>
+    
+    <!-- Navigation -->
+    <string name="previous">Précédent</string>
+    <string name="next">Suivant</string>
+    <string name="save">Sauvegarder</string>
+    <string name="cancel">Annuler</string>
+    
+    <!-- Status -->
+    <string name="step_progress">Étape %1$d sur %2$d</string>
+    <string name="employee_saved">Employé enregistré avec succès !</string>
+    <string name="error_biometric_service">Erreur d\'initialisation du service biométrique</string>
+    <string name="error_authentication">Erreur lors de l\'authentification</string>
+    
+    <!-- Form Fields -->
+    <string name="nin">NIN</string>
+    <string name="first_name">Prénom</string>
+    <string name="last_name">Nom</string>
+    <string name="middle_name">Postnom</string>
+    <string name="other_names">Autre(s) nom(s)</string>
+    <string name="gender">Sexe</string>
+    <string name="birth_place">Lieu de naissance</string>
+    <string name="birth_date">Date de naissance</string>
+    <string name="nationality">Nationalité</string>
+    <string name="eye_color">Couleur des yeux</string>
+    <string name="height">Taille</string>
+    <string name="email">Adresse e-mail</string>
+    <string name="phone">Téléphone</string>
+    
+    <!-- Gender Options -->
+    <string name="gender_male">Masculin</string>
+    <string name="gender_female">Féminin</string>
+    
+    <!-- Marital Status -->
+    <string name="marital_single">Célibataire</string>
+    <string name="marital_married">Marié(e)</string>
+    <string name="marital_divorced">Divorcé(e)</string>
+    <string name="marital_widowed">Veuf(ve)</string>
+    
+    <!-- Contract Types -->
+    <string name="contract_cdi">CDI</string>
+    <string name="contract_cdd">CDD</string>
+    <string name="contract_internship">Stage</string>
+    <string name="contract_temporary">Intérim</string>
+    <string name="contract_freelance">Freelance</string>
+    
+    <!-- Work Status -->
+    <string name="work_full_time">Temps plein</string>
+    <string name="work_part_time">Temps partiel</string>
+    
+    <!-- Payment Methods -->
+    <string name="payment_transfer">Virement</string>
+    <string name="payment_check">Chèque</string>
+    <string name="payment_cash">Cash</string>
+    
+    <!-- Currencies -->
+    <string name="currency_usd">USD</string>
+    <string name="currency_cdf">CDF</string>
+    <string name="currency_other">Autre</string>
+</resources>

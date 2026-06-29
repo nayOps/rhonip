@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_primary">
+
+    <!-- Barre Tricolore -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="@drawable/tricolor_bar_horizontal" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Header avec titre amélioré -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="32dp">
+
+            <Button
+                android:id="@+id/btn_back_attendance"
+                style="@style/ButtonOutline"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:text="←"
+                android:textSize="20sp" />
+
+            <TextView
+                style="@style/Heading1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Marquer Présence"
+                android:textAlignment="center"
+                android:textColor="@color/rdc_blue" />
+
+            <View
+                android:layout_width="48dp"
+                android:layout_height="48dp" />
+
+        </LinearLayout>
+
+        <!-- Main Content -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="16dp">
+
+            <!-- Glassmorphic Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/glassmorphic_card"
+                android:padding="32dp"
+                android:layout_marginBottom="32dp"
+                android:gravity="center">
+
+                <!-- Fingerprint Image -->
+                <ImageView
+                    android:id="@+id/img_fingerprint"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="32dp"
+                    android:src="@android:drawable/ic_menu_myplaces"
+                    android:contentDescription="Empreinte digitale" />
+
+                <!-- Progress Bar (Synchronisée) -->
+                <ProgressBar
+                    android:id="@+id/progress_attendance"
+                    style="@style/ProgressBarFlat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    android:max="100"
+                    android:progress="0"
+                    android:visibility="visible" />
+
+                <!-- Status Text (Minimal) -->
+                <TextView
+                    android:id="@+id/txt_attendance_status"
+                    style="@style/Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Chargement..."
+                    android:textAlignment="center" />
+
+            </LinearLayout>
+
+            <!-- Capture Button (Glassmorphic) -->
+            <Button
+                android:id="@+id/btn_capture_attendance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Capturer Empreinte"
+                android:textColor="@color/rdc_blue"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:background="@drawable/glassmorphic_button"
+                android:enabled="false" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

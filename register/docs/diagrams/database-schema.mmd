@@ -1,0 +1,274 @@
+erDiagram
+    FGP_PERSON_CORE {
+        varchar nin PK "Numéro d'Identification Nationale"
+        text nom "Nom de famille"
+        text postnom "Postnom"
+        text prenom "Prénom"
+        char sexe "Sexe (M/F)"
+        date date_naissance "Date de naissance"
+        text lieu_naissance "Lieu de naissance"
+        text province_naissance "Province de naissance"
+        text nationalite "Nationalité"
+        varchar statut_matrimonial "Statut matrimonial"
+        text nom_pere "Nom du père"
+        text nom_mere "Nom de la mère"
+        text province_residence "Province de résidence"
+        text territoire_residence "Territoire de résidence"
+        text commune_residence "Commune de résidence"
+        text quartier_residence "Quartier de résidence"
+        text avenue_residence "Avenue de résidence"
+        text numero_residence "Numéro de résidence"
+        varchar telephone "Numéro de téléphone"
+        varchar email "Adresse email"
+        text profession "Profession"
+        varchar niveau_etude "Niveau d'étude"
+        varchar type_piece_identite "Type de pièce d'identité"
+        varchar numero_piece_identite "Numéro de pièce d'identité"
+        date date_emission_piece "Date d'émission de la pièce"
+        text lieu_emission_piece "Lieu d'émission de la pièce"
+        timestamptz created_at "Date de création"
+        timestamptz updated_at "Date de mise à jour"
+        varchar created_by "Créé par"
+        varchar updated_by "Mis à jour par"
+        integer version "Version"
+    }
+    
+    FGP_BIOMETRIC {
+        uuid id PK "Identifiant unique"
+        varchar nin FK "Référence vers FGP_PERSON_CORE"
+        text photo_uri "URI de la photo faciale"
+        varchar photo_hash "Hash SHA-256 de la photo"
+        decimal photo_quality "Qualité de la photo (0.0-1.0)"
+        text fingerprints_uri "URI des empreintes digitales"
+        varchar fingerprints_hash "Hash SHA-256 des empreintes"
+        decimal fingerprints_quality "Qualité des empreintes (0.0-1.0)"
+        text iris_uri "URI de l'iris"
+        varchar iris_hash "Hash SHA-256 de l'iris"
+        decimal iris_quality "Qualité de l'iris (0.0-1.0)"
+        text signature_uri "URI de la signature"
+        varchar signature_hash "Hash SHA-256 de la signature"
+        timestamptz created_at "Date de création"
+        timestamptz updated_at "Date de mise à jour"
+        varchar created_by "Créé par"
+    }
+    
+    FGP_STRATA_MEMBERSHIP {
+        uuid id PK "Identifiant unique"
+        varchar nin FK "Référence vers FGP_PERSON_CORE"
+        varchar strate_code "Code de la strate"
+        date valid_from "Date de début de validité"
+        date valid_to "Date de fin de validité"
+        varchar status "Statut (ACTIVE/INACTIVE/SUSPENDED)"
+        timestamptz created_at "Date de création"
+        varchar created_by "Créé par"
+    }
+    
+    FGP_DOCUMENTS {
+        uuid id PK "Identifiant unique"
+        varchar nin FK "Référence vers FGP_PERSON_CORE"
+        varchar document_type "Type de document"
+        text document_uri "URI du document"
+        varchar document_hash "Hash SHA-256"
+        bigint file_size "Taille du fichier"
+        varchar mime_type "Type MIME"
+        boolean is_verified "Document vérifié"
+        varchar verified_by "Vérifié par"
+        timestamptz verified_at "Date de vérification"
+        timestamptz created_at "Date de création"
+        varchar created_by "Créé par"
+    }
+    
+    FGP_AUDIT_TRAIL {
+        uuid id PK "Identifiant unique"
+        varchar nin FK "Référence vers FGP_PERSON_CORE"
+        varchar action "Action effectuée"
+        varchar table_name "Table concernée"
+        jsonb old_values "Anciennes valeurs"
+        jsonb new_values "Nouvelles valeurs"
+        varchar user_id "Utilisateur"
+        inet user_ip "Adresse IP"
+        text user_agent "User Agent"
+        timestamptz timestamp "Timestamp"
+    }
+    
+    FGP_BIOMETRIC_TEMPLATES {
+        uuid id PK "Identifiant unique"
+        varchar nin FK "Référence vers FGP_PERSON_CORE"
+        varchar template_type "Type de gabarit"
+        bytea template_data "Données du gabarit"
+        varchar template_hash "Hash du gabarit"
+        decimal quality_score "Score de qualité"
+        timestamptz created_at "Date de création"
+        varchar created_by "Créé par"
+    }
+    
+    ABIS_MATCHES {
+        uuid id PK "Identifiant unique"
+        varchar nin_candidate FK "Personne candidate"
+        varchar nin_existing FK "Personne existante"
+        varchar match_type "Type de correspondance"
+        decimal similarity_score "Score de similarité"
+        decimal threshold "Seuil de décision"
+        varchar decision "Décision automatique"
+        varchar reviewed_by "Révisé par"
+        timestamptz reviewed_at "Date de révision"
+        varchar review_decision "Décision de révision"
+        text review_notes "Notes de révision"
+        timestamptz created_at "Date de création"
+    }
+    
+    %% Extensions par strate
+    EXT_ELEVES {
+        varchar nin PK,FK "Référence vers FGP_PERSON_CORE"
+        varchar matricule_scolaire "Matricule scolaire"
+        text etablissement "Nom de l'établissement"
+        varchar code_etablissement "Code de l'établissement"
+        varchar niveau "Niveau/Classe"
+        varchar cycle "Cycle scolaire"
+        varchar annee_scolaire "Année scolaire"
+        varchar section "Section/Spécialité"
+        varchar statut_scolaire "Statut scolaire"
+        text responsable_tuteur "Nom du tuteur"
+        varchar contact_tuteur "Contact du tuteur"
+        varchar lien_tuteur "Lien avec l'enfant"
+        timestamptz created_at "Date de création"
+        timestamptz updated_at "Date de mise à jour"
+        varchar created_by "Créé par"
+    }
+    
+    EXT_ETUDIANTS {
+        varchar nin PK,FK "Référence vers FGP_PERSON_CORE"
+        varchar matricule_universitaire "Matricule universitaire"
+        text universite "Nom de l'université"
+        varchar code_universite "Code de l'université"
+        text faculte "Faculté"
+        text departement "Département/Filière"
+        varchar niveau "Niveau (L1, L2, L3, M1, M2, D1, D2, D3)"
+        varchar annee_academique "Année académique"
+        varchar statut_academique "Statut académique"
+        boolean residence_universitaire "Résidence universitaire"
+        timestamptz created_at "Date de création"
+        timestamptz updated_at "Date de mise à jour"
+        varchar created_by "Créé par"
+    }
+    
+    EXT_ELECTEURS {
+        varchar nin PK,FK "Référence vers FGP_PERSON_CORE"
+        text centre_vote "Nom du centre de vote"
+        varchar code_centre_vote "Code du centre de vote"
+        text circonscription "Circonscription électorale"
+        text secteur_vote "Secteur de vote"
+        varchar statut_inscription "Statut d'inscription"
+        date date_inscription_ceni "Date d'inscription CENI"
+        varchar bureau_vote "Bureau de vote"
+        timestamptz created_at "Date de création"
+        timestamptz updated_at "Date de mise à jour"
+        varchar created_by "Créé par"
+    }
+    
+    EXT_PNC {
+        varchar nin PK,FK "Référence vers FGP_PERSON_CORE"
+        varchar matricule_pnc "Matricule PNC"
+        varchar grade "Grade"
+        text unite "Unité d'affectation"
+        text fonction "Fonction/Poste"
+        date date_integration "Date d'intégration"
+        varchar statut_service "Statut de service"
+        text zone_affectation "Zone d'affectation"
+        varchar type_arme "Type d'arme"
+        timestamptz created_at "Date de création"
+        timestamptz updated_at "Date de mise à jour"
+        varchar created_by "Créé par"
+    }
+    
+    EXT_FARDC {
+        varchar nin PK,FK "Référence vers FGP_PERSON_CORE"
+        varchar matricule_fardc "Matricule FARDC"
+        varchar grade "Grade"
+        text unite_affectation "Unité d'affectation"
+        text zone_operation "Zone d'opération"
+        text fonction "Fonction/Poste"
+        date date_integration "Date d'intégration"
+        varchar statut_militaire "Statut militaire"
+        varchar type_mission "Type de mission"
+        timestamptz created_at "Date de création"
+        timestamptz updated_at "Date de mise à jour"
+        varchar created_by "Créé par"
+    }
+    
+    EXT_PRISON {
+        varchar nin PK,FK "Référence vers FGP_PERSON_CORE"
+        varchar numero_dossier_judiciaire "Numéro de dossier judiciaire"
+        text centre_detention "Centre de détention"
+        varchar statut_detention "Statut de détention"
+        date date_incarceration "Date d'incarcération"
+        date date_liberation_prevue "Date de libération prévue"
+        text infraction "Nature de l'infraction"
+        text autorite_judiciaire "Autorité judiciaire"
+        timestamptz created_at "Date de création"
+        timestamptz updated_at "Date de mise à jour"
+        varchar created_by "Créé par"
+    }
+    
+    EXT_REFUGIES {
+        varchar nin PK,FK "Référence vers FGP_PERSON_CORE"
+        varchar numero_hcr "Numéro HCR"
+        text pays_origine "Pays d'origine"
+        varchar statut_juridique "Statut juridique"
+        varchar document_sejour "Type de document de séjour"
+        date date_entree_territoire "Date d'entrée en RDC"
+        text camp_refugie "Nom du camp"
+        varchar organisme_encadrement "Organisme d'encadrement"
+        timestamptz created_at "Date de création"
+        timestamptz updated_at "Date de mise à jour"
+        varchar created_by "Créé par"
+    }
+    
+    EXT_ENFANTS {
+        varchar nin PK,FK "Référence vers FGP_PERSON_CORE"
+        text tuteur_nom "Nom du tuteur"
+        varchar tuteur_nin "NIN du tuteur"
+        varchar lien_tuteur "Lien avec le tuteur"
+        text adresse_tuteur "Adresse du tuteur"
+        varchar document_parentalite "Type de document de parentalité"
+        boolean autorisation_parentale "Autorisation parentale"
+        text structure_accueil "Structure d'accueil"
+        timestamptz created_at "Date de création"
+        timestamptz updated_at "Date de mise à jour"
+        varchar created_by "Créé par"
+    }
+    
+    EXT_FONCTIONNAIRES {
+        varchar nin PK,FK "Référence vers FGP_PERSON_CORE"
+        varchar matricule_fonctionnaire "Matricule de fonctionnaire"
+        text ministere_affectation "Ministère d'affectation"
+        text service_affectation "Service d'affectation"
+        text poste "Poste/Fonction"
+        date date_recrutement "Date de recrutement"
+        varchar statut_service "Statut de service"
+        decimal salaire_brut "Salaire brut"
+        timestamptz created_at "Date de création"
+        timestamptz updated_at "Date de mise à jour"
+        varchar created_by "Créé par"
+    }
+    
+    %% Relations principales
+    FGP_PERSON_CORE ||--o{ FGP_STRATA_MEMBERSHIP : "nin"
+    FGP_PERSON_CORE ||--o| FGP_BIOMETRIC : "nin"
+    FGP_PERSON_CORE ||--o{ FGP_DOCUMENTS : "nin"
+    FGP_PERSON_CORE ||--o{ FGP_AUDIT_TRAIL : "nin"
+    FGP_PERSON_CORE ||--o{ FGP_BIOMETRIC_TEMPLATES : "nin"
+    FGP_PERSON_CORE ||--o{ ABIS_MATCHES : "nin_candidate"
+    FGP_PERSON_CORE ||--o{ ABIS_MATCHES : "nin_existing"
+    
+    %% Relations avec les extensions
+    FGP_PERSON_CORE ||--o| EXT_ELEVES : "nin"
+    FGP_PERSON_CORE ||--o| EXT_ETUDIANTS : "nin"
+    FGP_PERSON_CORE ||--o| EXT_ELECTEURS : "nin"
+    FGP_PERSON_CORE ||--o| EXT_PNC : "nin"
+    FGP_PERSON_CORE ||--o| EXT_FARDC : "nin"
+    FGP_PERSON_CORE ||--o| EXT_PRISON : "nin"
+    FGP_PERSON_CORE ||--o| EXT_REFUGIES : "nin"
+    FGP_PERSON_CORE ||--o| EXT_ENFANTS : "nin"
+    FGP_PERSON_CORE ||--o| EXT_FONCTIONNAIRES : "nin"
+

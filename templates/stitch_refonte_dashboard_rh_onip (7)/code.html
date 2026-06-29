@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ONIP HR - Connexion</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#072369",
+                        "secondary": "#264dd9",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "error": "#ba1a1a",
+                        "on-background": "#191c1e",
+                        "tertiary": "#461f00",
+                        "on-secondary": "#ffffff",
+                        "outline": "#757682",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#301400",
+                        "on-primary-fixed-variant": "#2d4287",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#fffbff",
+                        "tertiary-fixed-dim": "#ffb785",
+                        "surface-bright": "#f7f9fb",
+                        "on-primary-container": "#94a8f5",
+                        "surface": "#f7f9fb",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary-container": "#e89961",
+                        "on-secondary-fixed": "#001355",
+                        "inverse-primary": "#b6c4ff",
+                        "on-primary-fixed": "#00164f",
+                        "secondary-container": "#4568f3",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#444651",
+                        "surface-tint": "#465aa1",
+                        "surface-dim": "#d8dadc",
+                        "primary-fixed": "#dce1ff",
+                        "on-secondary-fixed-variant": "#0035bd",
+                        "surface-container": "#eceef0",
+                        "outline-variant": "#c5c5d2",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary-container": "#253b80",
+                        "on-tertiary-fixed-variant": "#703806",
+                        "secondary-fixed": "#dde1ff",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ffdcc6",
+                        "tertiary-container": "#673100",
+                        "inverse-surface": "#2d3133",
+                        "secondary-fixed-dim": "#b8c3ff",
+                        "on-surface": "#191c1e",
+                        "surface-variant": "#e0e3e5",
+                        "background": "#f7f9fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding": "1rem",
+                        "stack-space": "1.25rem",
+                        "section-margin": "2rem",
+                        "gutter": "1rem"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"],
+                        "label-bold": ["Hanken Grotesk"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-lg": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Hanken Grotesk', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-on-surface">
+<!-- Hero Background Animation Section -->
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+
+<div class="absolute inset-0 bg-gradient-to-br from-background via-surface-container-low/50 to-secondary-fixed/10"></div>
+</div>
+<!-- Main Content -->
+<main class="flex-grow flex items-center justify-center px-gutter py-12">
+<div class="w-full max-w-[1100px] flex flex-col md:flex-row bg-surface-container-lowest rounded-xl shadow-xl overflow-hidden border border-outline-variant/30">
+<!-- Branding/Info Side (Desktop) -->
+<div class="hidden md:flex md:w-5/12 bg-primary relative p-12 flex-col justify-between overflow-hidden">
+<div class="absolute inset-0 opacity-20">
+
+</div>
+<div class="relative z-10">
+<img alt="Logo ONIP" class="h-16 mb-8 brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6UcQWyiaIWxhvXyC3QEfHVxid03rIiDtAqCgtDQHKvoaGETZmAet_8cgKLSDo2kCWEfL4Ga8igd1IHM0rCeIzgz7seJyjX5PrjiZ14Cc3KB6yhZOF9wfdSacMBOeg7GhdAticaBjNpmQi9_XTT8KZXIWIbIf6KGBy97OPbS51hto5RBbL0db-uHNUHjhYXge4lJ7mMpHq7nZWRkwSIt3DEqfpQ63t-jFVjxPUN3QY23GQjkCqFn2X5WP0vFJJLCw0JQ81t-7WdDnV"/>
+<h1 class="font-headline-lg text-headline-lg text-white mb-4">Portail RH Administratif</h1>
+<p class="font-body-lg text-body-lg text-white/80 leading-relaxed">
+                        Bienvenue sur l'outil de gestion centralisé de l'Office National d'Identification et de Presse. Gérez vos effectifs avec précision et sécurité.
+                    </p>
+</div>
+<div class="relative z-10 pt-12 border-t border-white/10">
+<div class="flex items-center gap-4 text-white/70">
+<span class="material-symbols-outlined text-white">verified_user</span>
+<span class="font-label-sm text-label-sm">Connexion sécurisée SSL 256 bits</span>
+</div>
+</div>
+</div>
+<!-- Login Form Side -->
+<div class="w-full md:w-7/12 p-8 md:p-16 flex flex-col justify-center bg-white">
+<div class="md:hidden flex justify-center mb-10">
+<img alt="Logo ONIP" class="h-12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6UcQWyiaIWxhvXyC3QEfHVxid03rIiDtAqCgtDQHKvoaGETZmAet_8cgKLSDo2kCWEfL4Ga8igd1IHM0rCeIzgz7seJyjX5PrjiZ14Cc3KB6yhZOF9wfdSacMBOeg7GhdAticaBjNpmQi9_XTT8KZXIWIbIf6KGBy97OPbS51hto5RBbL0db-uHNUHjhYXge4lJ7mMpHq7nZWRkwSIt3DEqfpQ63t-jFVjxPUN3QY23GQjkCqFn2X5WP0vFJJLCw0JQ81t-7WdDnV"/>
+</div>
+<header class="mb-10 text-left">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-2">Se connecter.</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Veuillez entrer vos identifiants pour accéder à votre espace de travail.</p>
+</header>
+<form class="space-y-6" onsubmit="event.preventDefault();">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-on-surface-variant ml-1 uppercase tracking-wider" for="email">Adresse Email</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline group-focus-within:text-secondary transition-colors">
+<span class="material-symbols-outlined">alternate_email</span>
+</div>
+<input class="w-full pl-12 pr-4 py-4 bg-surface-container-low border border-outline-variant rounded-lg font-body-md text-body-md focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all placeholder:text-outline-variant" id="email" name="email" placeholder="nom@onip.local" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<div class="flex justify-between items-center px-1">
+<label class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider" for="password">Mot de passe</label>
+<button class="text-secondary font-label-bold text-label-bold hover:underline transition-all" type="button">Mot de passe oublié ?</button>
+</div>
+<div class="relative group" x-data="{ show: false }">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline group-focus-within:text-secondary transition-colors">
+<span class="material-symbols-outlined">lock</span>
+</div>
+<input class="w-full pl-12 pr-12 py-4 bg-surface-container-low border border-outline-variant rounded-lg font-body-md text-body-md focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all placeholder:text-outline-variant" id="password" name="password" placeholder="••••••••••••" type="password"/>
+<button class="absolute inset-y-0 right-0 pr-4 flex items-center text-outline hover:text-on-surface transition-colors" onclick="togglePasswordVisibility()" type="button">
+<span class="material-symbols-outlined" id="pw-toggle-icon">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex items-center space-x-3 py-2">
+<input class="w-5 h-5 text-secondary border-outline-variant rounded focus:ring-secondary/20" id="remember" type="checkbox"/>
+<label class="font-body-md text-body-md text-on-surface-variant select-none" for="remember">Rester connecté</label>
+</div>
+<!-- Primary Action -->
+<button class="w-full py-4 bg-[#253b80] hover:bg-primary text-white font-headline-md text-headline-md rounded-lg shadow-lg hover:shadow-xl transition-all active:scale-[0.98] mt-4 flex items-center justify-center gap-3 group">
+                        Se connecter
+                        <span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</form>
+<div class="mt-12 pt-8 border-t border-outline-variant/30 flex flex-col md:flex-row items-center justify-between gap-4">
+<p class="font-body-md text-body-md text-on-surface-variant">Pas encore de compte ?</p>
+<button class="px-6 py-2 border border-outline-variant rounded-lg font-label-bold text-label-bold text-on-surface-variant hover:bg-surface-container-high transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">help_center</span>
+                        Besoin d'aide ?
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-8 px-gutter border-t border-outline-variant/20 bg-surface-container-lowest/50 backdrop-blur-sm">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex flex-col items-center md:items-start">
+<p class="font-label-bold text-label-bold text-primary mb-1">Office National d'Identification et de Presse (ONIP)</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 République de Guinée. Tous droits réservés.</p>
+</div>
+<div class="flex items-center gap-8">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Politique de confidentialité</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Conditions d'utilisation</a>
+<div class="flex items-center gap-2 text-outline">
+<span class="material-symbols-outlined text-[18px]">language</span>
+<span class="font-label-bold text-label-bold">FR</span>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        function togglePasswordVisibility() {
+            const pwInput = document.getElementById('password');
+            const icon = document.getElementById('pw-toggle-icon');
+            if (pwInput.type === 'password') {
+                pwInput.type = 'text';
+                icon.innerText = 'visibility_off';
+            } else {
+                pwInput.type = 'password';
+                icon.innerText = 'visibility';
+            }
+        }
+
+        // Lightweight hover effect for the main card
+        const card = document.querySelector('main > div');
+        document.addEventListener('mousemove', (e) => {
+            if (window.innerWidth > 768) {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 100;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 100;
+                card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            }
+        });
+
+        // Reset transform on mouse leave
+        document.addEventListener('mouseleave', () => {
+            card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+        });
+    </script>
+</body></html>

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Fgp.DeviceBridge.Api</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="8.0.10" />
+  </ItemGroup>
+  <!-- Sidecar CameraGP (net8.0-windows) : copie binaire uniquement, pas de référence projet -->
+  <Target Name="CopyCameraGpSidecar" AfterTargets="Build">
+    <PropertyGroup>
+      <_CameraGpOut>$(MSBuildThisFileDirectory)..\Fgp.CameraGp.Bridge\bin\$(Configuration)\net8.0-windows\</_CameraGpOut>
+    </PropertyGroup>
+    <ItemGroup>
+      <_CameraGpFiles Include="$(_CameraGpOut)**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_CameraGpFiles)" DestinationFolder="$(OutputPath)%(RecursiveDir)" SkipUnchangedFiles="true" Condition="Exists('$(_CameraGpOut)')" />
+  </Target>
+</Project>

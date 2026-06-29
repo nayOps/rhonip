@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_blue">
+
+    <!-- Barre Tricolore -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="@drawable/tricolor_bar_horizontal" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:gravity="center">
+
+        <!-- Header -->
+        <TextView
+            style="@style/Heading1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ONIP RH"
+            android:textColor="@color/white"
+            android:textAlignment="center"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/txt_home_status"
+            style="@style/BodySmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Statut système..."
+            android:textColor="@color/white"
+            android:textAlignment="center"
+            android:layout_marginBottom="48dp" />
+
+        <!-- Main Actions -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="16dp">
+
+            <!-- Button: Marquer Présence (Glassmorphic) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/glassmorphic_card"
+                android:padding="32dp"
+                android:layout_marginBottom="24dp">
+
+                <Button
+                    android:id="@+id/btn_mark_attendance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="80dp"
+                    android:text="Marquer Présence"
+                    android:textColor="@color/rdc_blue"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/glassmorphic_button" />
+
+            </LinearLayout>
+
+            <!-- Button: Enregistrer Employé (Glassmorphic) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/glassmorphic_card"
+                android:padding="32dp">
+
+                <Button
+                    android:id="@+id/btn_register_employee"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="80dp"
+                    android:text="Enregistrer Employé"
+                    android:textColor="@color/rdc_blue"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/glassmorphic_button" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Settings Button -->
+        <Button
+            android:id="@+id/btn_settings"
+            style="@style/ButtonOutline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="⚙️ Paramètres"
+            android:layout_marginTop="16dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
+

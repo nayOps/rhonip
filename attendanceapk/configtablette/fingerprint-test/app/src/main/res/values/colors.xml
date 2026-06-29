@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="ic_launcher_background">#2563EB</color>
+    
+    <!-- Couleurs principales -->
+    <color name="purple">#9333ea</color>
+    <color name="purple_light">#c084fc</color>
+    <color name="blue">#3b82f6</color>
+    <color name="green">#22c55e</color>
+    <color name="orange">#f97316</color>
+    
+    <!-- Couleurs de fond -->
+    <color name="background_dark">#1e293b</color>
+    <color name="background_purple">#7c3aed</color>
+    
+    <!-- Couleurs de transparence -->
+    <color name="glass_white">#1AFFFFFF</color>
+    <color name="glass_border">#33FFFFFF</color>
+</resources>

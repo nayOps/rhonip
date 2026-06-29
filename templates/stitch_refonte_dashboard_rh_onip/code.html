@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dossier Agent - Présences - PayDay</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#f7f9fb",
+                    "on-primary-fixed": "#00164f",
+                    "on-primary-container": "#94a8f5",
+                    "tertiary-container": "#673100",
+                    "on-background": "#191c1e",
+                    "primary": "#072369",
+                    "secondary": "#264dd9",
+                    "error": "#ba1a1a",
+                    "surface-variant": "#e0e3e5",
+                    "outline-variant": "#c5c5d2",
+                    "tertiary-fixed": "#ffdcc6",
+                    "tertiary-fixed-dim": "#ffb785",
+                    "primary-fixed": "#dce1ff",
+                    "secondary-fixed-dim": "#b8c3ff",
+                    "on-tertiary-fixed-variant": "#703806",
+                    "tertiary": "#461f00",
+                    "surface-bright": "#f7f9fb",
+                    "surface-tint": "#465aa1",
+                    "on-surface": "#191c1e",
+                    "on-tertiary": "#ffffff",
+                    "inverse-surface": "#2d3133",
+                    "secondary-fixed": "#dde1ff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed-variant": "#2d4287",
+                    "on-primary": "#ffffff",
+                    "primary-container": "#253b80",
+                    "surface-container-high": "#e6e8ea",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "inverse-primary": "#b6c4ff",
+                    "surface-container-low": "#f2f4f6",
+                    "on-secondary-fixed": "#001355",
+                    "surface-container": "#eceef0",
+                    "primary-fixed-dim": "#b6c4ff",
+                    "surface": "#f7f9fb",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-tertiary-fixed": "#301400",
+                    "surface-dim": "#d8dadc",
+                    "on-secondary-container": "#fffbff",
+                    "secondary-container": "#4568f3",
+                    "outline": "#757682",
+                    "on-tertiary-container": "#e89961",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-surface-variant": "#444651",
+                    "on-secondary-fixed-variant": "#0035bd"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.5rem",
+                    "lg": "0.75rem",
+                    "xl": "1rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Hanken Grotesk"],
+                    "label-bold": ["Hanken Grotesk"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "body-md": ["Hanken Grotesk"],
+                    "label-sm": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Hanken Grotesk', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-item-active {
+            color: #253b80;
+            background-color: #f2f4f6;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface flex min-h-screen">
+<!-- Sidebar Navigation -->
+<aside class="w-64 bg-white border-r border-outline-variant flex flex-col fixed h-full z-30">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-white">person_filled</span>
+</div>
+<span class="text-2xl font-bold text-primary">PayDay</span>
+<div class="ml-auto flex items-center gap-1 bg-surface-container-low rounded-full px-2 py-1">
+<span class="material-symbols-outlined text-[14px]">light_mode</span>
+<div class="w-8 h-4 bg-outline-variant rounded-full relative">
+<div class="absolute left-1 top-0.5 w-3 h-3 bg-white rounded-full"></div>
+</div>
+<span class="material-symbols-outlined text-[14px]">dark_mode</span>
+</div>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-1">
+<p class="px-2 pb-2 text-[10px] font-bold uppercase tracking-wider text-outline">Menu</p>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary">dashboard</span>
+<span class="font-body-md">Tableau De Bord</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary">notifications</span>
+<span class="font-body-md">Notification</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors group" href="#">
+<span class="material-symbols-outlined text-outline group-hover:text-primary">bolt</span>
+<span class="font-body-md">Action Requise</span>
+</a>
+<div class="relative">
+<button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg sidebar-item-active group">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">badge</span>
+<span class="font-body-md font-semibold">Employé</span>
+<span class="material-symbols-outlined ml-auto text-[18px]">expand_more</span>
+</button>
+</div>
+<button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors group">
+<span class="material-symbols-outlined text-outline group-hover:text-primary">settings</span>
+<span class="font-body-md">Paramètres</span>
+<span class="material-symbols-outlined ml-auto text-[18px]">expand_more</span>
+</button>
+<button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors group">
+<span class="material-symbols-outlined text-outline group-hover:text-primary">account_circle</span>
+<span class="font-body-md">Profil</span>
+<span class="material-symbols-outlined ml-auto text-[18px]">expand_more</span>
+</button>
+</nav>
+</aside>
+<!-- Main Content Wrapper -->
+<div class="flex-1 ml-64 flex flex-col">
+<!-- Top Header -->
+<header class="h-16 bg-white border-b border-outline-variant px-8 flex items-center justify-between sticky top-0 z-20">
+<button class="p-2 hover:bg-surface-container rounded-full text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 cursor-pointer group">
+<span class="font-label-bold text-on-surface-variant group-hover:text-primary">FR</span>
+<span class="material-symbols-outlined text-outline text-[18px]">expand_more</span>
+</div>
+<div class="flex items-center gap-3 border-l border-outline-variant pl-6">
+<div class="text-right">
+<p class="text-sm font-bold text-on-surface">admin@onip.local</p>
+<p class="text-[10px] text-on-surface-variant">No designation</p>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-primary-container">
+<img alt="Admin" class="w-full h-full object-cover grayscale brightness-125 opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBr7sgZC-SSDK8RDxWkzg8gQ_QsUplKSVldaOXCk8oc8PfrbS9_aWIH94srdG34WpJCMj-gPdovGBp9SxZsfMlXuT7yCSm4iiHwZyM8fPQt1VVi2V5Egkmu8hnHYAz10xDeeAd0lQ15bf6p3XlhQYHyCdt5czxKVpHLII3u8r9fyqS7A-VSqQqYFzYr-VQgFq6lcOlPx2zX7oxetD4ZggfuI-gf_N3PDzlk4yAkviD-2uqQ1FotWTEq6VXw_9R5Jov5_tvHX_Y8gZDP"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<main class="p-8 space-y-8">
+<!-- Breadcrumbs & Header Actions -->
+<div class="flex items-start justify-between">
+<div>
+<h1 class="text-2xl font-bold text-primary mb-1">Employé #195</h1>
+<nav class="flex items-center gap-2 text-xs text-secondary font-medium">
+<a class="hover:underline" href="#">Tableau de bord</a>
+<span class="text-outline">/</span>
+<a class="hover:underline" href="#">Employés</a>
+<span class="text-outline">/</span>
+<span class="text-outline">Employé #195</span>
+</nav>
+</div>
+<div class="flex gap-3">
+<button class="px-5 py-2 rounded-lg bg-red-50 text-error hover:bg-red-100 transition-colors font-semibold border border-red-100">
+                        Supprimer
+                    </button>
+<button class="px-5 py-2 rounded-lg bg-[#e3fff2] text-[#008f51] hover:bg-[#d1f9e5] transition-colors font-semibold border border-[#c1f0d8]">
+                        Sauvegarder
+                    </button>
+</div>
+</div>
+<!-- Stats Header & KPI Row -->
+<div class="bg-white rounded-xl border border-outline-variant p-6 space-y-6">
+<div class="flex items-center justify-between border-b border-surface-container pb-4">
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container rounded-full text-outline">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="text-center">
+<h2 class="text-xl font-bold text-primary">Mars 2024</h2>
+<p class="text-[10px] uppercase font-bold tracking-tighter text-outline-variant">Mois en cours</p>
+</div>
+<button class="p-2 hover:bg-surface-container rounded-full text-outline opacity-30 cursor-not-allowed">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-end">
+<span class="text-lg font-bold text-on-surface">Jean-Marc Vallet</span>
+<span class="text-xs text-on-surface-variant">Matricule 88201-B</span>
+</div>
+<div class="w-12 h-12 rounded-full border-2 border-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBr7sgZC-SSDK8RDxWkzg8gQ_QsUplKSVldaOXCk8oc8PfrbS9_aWIH94srdG34WpJCMj-gPdovGBp9SxZsfMlXuT7yCSm4iiHwZyM8fPQt1VVi2V5Egkmu8hnHYAz10xDeeAd0lQ15bf6p3XlhQYHyCdt5czxKVpHLII3u8r9fyqS7A-VSqQqYFzYr-VQgFq6lcOlPx2zX7oxetD4ZggfuI-gf_N3PDzlk4yAkviD-2uqQ1FotWTEq6VXw_9R5Jov5_tvHX_Y8gZDP"/>
+</div>
+</div>
+</div>
+<!-- KPI Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant flex items-center justify-between">
+<div>
+<p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Taux de présence</p>
+<p class="text-3xl font-bold text-primary">95%</p>
+</div>
+<span class="material-symbols-outlined text-primary text-4xl opacity-20">check_circle</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant flex items-center justify-between">
+<div>
+<p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Retards</p>
+<p class="text-3xl font-bold text-tertiary-fixed-variant text-[#703806]">2</p>
+</div>
+<span class="material-symbols-outlined text-[#703806] text-4xl opacity-20">schedule</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant flex items-center justify-between">
+<div>
+<p class="text-xs font-bold text-outline uppercase tracking-wider mb-1">Absences</p>
+<p class="text-3xl font-bold text-error">1</p>
+</div>
+<span class="material-symbols-outlined text-error text-4xl opacity-20">error</span>
+</div>
+</div>
+</div>
+<!-- Tabs Section -->
+<div class="bg-white rounded-xl border border-outline-variant overflow-hidden">
+<div class="border-b border-outline-variant px-6 pt-4 flex gap-8">
+<button class="pb-4 px-1 text-primary border-b-2 border-primary font-bold text-sm">Présences</button>
+<button class="pb-4 px-1 text-on-surface-variant hover:text-primary transition-colors font-medium text-sm">Informations</button>
+<button class="pb-4 px-1 text-on-surface-variant hover:text-primary transition-colors font-medium text-sm">Enfants</button>
+<button class="pb-4 px-1 text-on-surface-variant hover:text-primary transition-colors font-medium text-sm">Educations</button>
+<button class="pb-4 px-1 text-on-surface-variant hover:text-primary transition-colors font-medium text-sm">Experiences</button>
+<button class="pb-4 px-1 text-on-surface-variant hover:text-primary transition-colors font-medium text-sm">Documents</button>
+</div>
+<!-- Journal Grid / Table -->
+<div class="p-6">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-md text-primary">Journal des présences - Mars 2024</h3>
+<button class="p-2 hover:bg-surface-container rounded-lg text-outline">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="px-4 py-3 text-xs font-bold text-outline uppercase">Date</th>
+<th class="px-4 py-3 text-xs font-bold text-outline uppercase">Jour</th>
+<th class="px-4 py-3 text-xs font-bold text-outline uppercase">Statut</th>
+<th class="px-4 py-3 text-xs font-bold text-outline uppercase">Horaires / Note</th>
+<th class="px-4 py-3 text-xs font-bold text-outline uppercase text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-4 py-4 font-bold text-on-surface">11 Mars 2024</td>
+<td class="px-4 py-4 text-on-surface-variant">Lundi</td>
+<td class="px-4 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="font-semibold text-green-700">Présent</span>
+</div>
+</td>
+<td class="px-4 py-4 text-on-surface-variant">08:00 — 17:00</td>
+<td class="px-4 py-4 text-right">
+<button class="p-1 hover:bg-surface-container rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-outline">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-4 py-4 font-bold text-on-surface">12 Mars 2024</td>
+<td class="px-4 py-4 text-on-surface-variant">Mardi</td>
+<td class="px-4 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-orange-500"></span>
+<span class="font-semibold text-orange-700">Retard</span>
+</div>
+</td>
+<td class="px-4 py-4 text-on-surface-variant">Arrivée 08:45 (Retard de 45m)</td>
+<td class="px-4 py-4 text-right">
+<button class="p-1 hover:bg-surface-container rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-outline">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="bg-error-container bg-opacity-5 hover:bg-opacity-10 transition-colors group">
+<td class="px-4 py-4 font-bold text-on-surface">13 Mars 2024</td>
+<td class="px-4 py-4 text-on-surface-variant">Mercredi</td>
+<td class="px-4 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span class="font-semibold text-error">Absent</span>
+</div>
+</td>
+<td class="px-4 py-4 text-error font-medium italic">Non justifié</td>
+<td class="px-4 py-4 text-right">
+<button class="p-1 hover:bg-surface-container rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-outline">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-lowest transition-colors group">
+<td class="px-4 py-4 font-bold text-on-surface">14 Mars 2024</td>
+<td class="px-4 py-4 text-on-surface-variant">Jeudi</td>
+<td class="px-4 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="font-semibold text-green-700">Présent</span>
+</div>
+</td>
+<td class="px-4 py-4 text-on-surface-variant">07:55 — 16:30</td>
+<td class="px-4 py-4 text-right">
+<button class="p-1 hover:bg-surface-container rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-outline">edit</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+        // Desktop micro-interactions could be added here
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('click', () => {
+                console.log('Row clicked: ' + row.cells[0]?.textContent);
+            });
+        });
+    </script>
+</body></html>

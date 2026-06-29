@@ -1,0 +1,167 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="css/styles/atelier-cave-light.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <title>Customization package tools</title>
+</head>
+<body>
+  <div id="header_content">
+    <h2>MorphoTablet Customization Package Guide</h2>
+    <!-- LINK TO SOURCE CODE -->
+    <h1>Customization package tools</h1>
+  </div>
+
+  <p>
+    MTabletCustoPackTool is a Linux tool which generates a customization package to customize MorphoTablet firmware.
+  </p>
+  <h1>Description</h1>
+  <p>
+    MTabletCustoPackTool can generate a customization package from "integration" folder.<br>
+	It can also generate an integrator key set, which is needed to sign customization packages and system applications.<br>
+	Each integrator key generated shall be signed by IDEMIA.<br><br>
+	Both tool and "integration" folder are located <a style="CURSOR: hand"href="../../../Customization_Package">here</a>.
+  </p>
+  <h2>Command line</h2>
+  <div id=codebash>
+    <pre><code class="bash">$ ./MTabletCustoPackTool OPTIONS</code></pre>
+  </div>
+
+  <h3></h3>
+  <table>
+    <tr>
+      <td><b>OPTIONS:</b></td>
+    </tr>
+    <tr>
+      <td>-k,</td>
+      <td>--generate-key-set KEYNAME</td>
+      <td>generate a customization package key set named KEYNAME, as well associated Android Studio keystore</td>
+    </tr>
+    <tr>
+      <td>-s,</td>
+      <td>--system-sign-apk KEYNAME INAPKFILE OUTAPKFILE</td>
+      <td>provide system permission to INAPKFILE using KEYNAME keyset</td>
+    </tr>
+    <tr>
+      <td>-e,</td>
+      <td>--export-unsigned-public-key KEYNAME OUTFILE</td>
+      <td>export OUTFILE to provide KEYNAME public key to MorphoTablet™ manufacturer for signature</td>
+    </tr>
+    <tr>
+      <td>-i,</td>
+      <td>--import-signed-public-key KEYNAME INFILE</td>
+      <td>import INFILE from MorphoTablet™ manufacturer to use as KEYNAME public signed key</td>
+    </tr>
+    <tr>
+      <td>-p,</td>
+      <td>--generate-customization-package KEYNAME OUTZIP [OPTIONS2]</td>
+      <td>generate a ready to install customization package OUTZIP using KEYNAME key set</td>
+    </tr>
+	<tr>
+      <td>-h,</td>
+      <td>--help</td>
+      <td>display this help</td>
+    </tr>
+  </table></br>
+  <table>
+    <tr>
+      <td><b>OPTIONS2:</b></td>
+    </tr>
+    <tr>
+      <td>-a,</td>
+      <td>--alternative-key-set ALTKEYNAME</td>
+      <td>generate a customization package allowing further update by KEYNAME or ALTKEYNAME signed customization packages</td>
+    </tr>
+    <tr>
+      <td>-v,</td>
+      <td>--customization-package-version VERSION</td>
+      <td>set customization package version (0-4294967295, 0 by default)</td>
+    </tr>
+    <tr>
+      <td>-d,</td>
+      <td>--downgrade-policy POLICY</td>
+      <td>after installing generated customization package, next update will be impacted by downgrade POLICY, see below</td>
+    </tr>
+    <tr>
+      <td>-x,</td>
+      <td>--key-check-disable</td>
+      <td>after flashing generated customization package, any integrator key will be accepted</td>
+    </tr>	
+  </table></br>
+  <table>
+    <tr>
+      <td><b>POLICY:</b></td>
+    </tr>
+    <tr>
+      <td>DOWNGRADE_ALLOWED</td>
+      <td>No restriction (by default)</td>
+    </tr>
+    <tr>
+      <td>NO_VERSION_DOWNGRADE</td>
+      <td>Customization package will refuse inferior version updates</td>
+    </tr>
+    <tr>
+      <td>NO_DATE_DOWNGRADE</td>
+      <td>Customization package will refuse inferior generation date updates</td>
+    </tr>
+    <tr>
+      <td>NO_DATE_NOR_VERSION_DOWNGRADE</td>
+      <td>Enable both NO_VERSION_DOWNGRADE and NO_DATE_DOWNGRADE usual process</td>
+    </tr>
+  </table></br>
+
+  <li style="font-size:20px";>1. Generating integrator keys:</li>
+  <div id=codebash>
+    <pre><code class="bash">$ ./MTabletCustoPackTool --generate-key-set mycompany1</code></pre>
+  </div>
+
+  <div style="margin-left:10px; padding:4px; border:4px solid #e0e0e0; display:inline-block;">
+  <div style="padding:3px; background-color:#e0e0e0;">
+  <strong style="color:#FF0000">WARNING:</strong><li>Please keep generated keyset in a safe place, since it allows full access to tablet.</li>
+	<li>Do not loose this keyset, since it might be the only way to update / remove a flashed customization package.</li>
+  </div>
+  </div>
+  <br></br>
+  
+  <li style="font-size:20px";>2. Signing integrator public keys:</li>
+	<div id=codebash>
+    <pre><code class="bash">$ ./MTabletCustoPackTool --export-unsigned-public-key mycompany1 mycompany1.bin</code></pre>
+    </div>
+	
+	<div style="margin-left:10px; padding:4px; border:4px solid #e0e0e0; display:inline-block;">
+	<div style="padding:3px; background-color:#e0e0e0;">
+	<strong> Note: </strong><li>Please provide "mycompany1.bin" to Idemia and get "mycompany1_signed.bin" back before proceeding ...</li>
+	</div>
+	</div>
+
+	<div id=codebash>
+    <pre><code class="bash">$ ./MTabletCustoPackTool --import-signed-public-key mycompany1 mycompany1_signed.bin</code></pre>
+    </div>
+
+    <li style="font-size:20px";>3. Generating integrator customization package:</li>
+    <div id=codebash>
+      <pre><code class="bash">$ ./MTabletCustoPackTool --generate-customization-package mycompany1 mycustpack_update.zip</code></pre>
+    </div>
+
+  <div style="margin-left:10px; padding:4px; border:4px solid #e0e0e0; display:inline-block;">
+  <div style="padding:3px; background-color:#e0e0e0;">
+  <strong style="color:#FF0000">WARNING:</strong><li>Flashing a Customization Package will lock tablet to customization package key. Tablet won't accept customization packages generated with another key.</li>
+	<li>Key can be changed by using --alternative-key-set option or --key-check-disable option. Please note that current flashed key is needed to do so.</li>
+	<li>Please note that --key-check-disable option will create a customization package that will allow anyone to flash any new key. Please keep such generated customization packages in a safe place or use this option with unsecure keys used for demo or for developpers for example.</li>
+  </div>
+  </div>
+  <br></br>
+
+
+    <li style="font-size:20px";>4. Importing customization package in MorphoTablet™ 2(i):</li>
+    <div><pre>Please refer to <a href="ImportingIP.html">Importing customization package in MorphoTablet™ 2(i)</a> chapter for more details</pre></div>
+
+    <footer>
+      Copyright (C) 2019, IDEMIA, All rights reserved. Reproduction in whole or in part in any form or medium without the express written permission of IDEMIA is prohibited
+    </footer>
+    </body>
+  </html>

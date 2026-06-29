@@ -1,0 +1,38 @@
+{
+  "fingerprint": {
+    "mode": "usb",
+    "usb": {
+      "vendor_id": "0x28ed",
+      "product_id": "0x1063",
+      "manufacturer": "Aratek Biometric",
+      "interface": 0,
+      "endpoint_in": null,
+      "endpoint_out": null
+    },
+    "serial": {
+      "port": "/dev/ttyUSB0",
+      "baudrate": 9600,
+      "timeout": 2
+    },
+    "threshold": 0.4,
+    "image_format": "png"
+  },
+  "iris": {
+    "camera_index": 2,
+    "device_name": "Sunplus HK 1M CAM",
+    "vendor_id": "0x1bcf",
+    "product_id": "0x0b15",
+    "resolution": {
+      "width": 640,
+      "height": 480
+    },
+    "threshold": 0.3,
+    "min_iris_radius": 50,
+    "max_iris_radius": 150
+  },
+  "database": {
+    "path": "biometric_data.db"
+  },
+  "debug": true
+}
+

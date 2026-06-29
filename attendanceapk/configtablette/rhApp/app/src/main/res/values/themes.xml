@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme (Design System RDC) -->
+    <style name="Theme.ONIPBiometric" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Couleurs Tricolores Officielles RDC -->
+        <item name="colorPrimary">@color/rdc_blue</item>
+        <item name="colorPrimaryDark">@color/rdc_blue_dark</item>
+        <item name="colorAccent">@color/rdc_yellow</item>
+        
+        <!-- Status bar color -->
+        <item name="android:statusBarColor">@color/rdc_blue_dark</item>
+        
+        <!-- Background and text -->
+        <item name="android:windowBackground">@color/background_primary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+    </style>
+    
+    <!-- NoActionBar theme for WebView activity -->
+    <style name="Theme.ONIPBiometric.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+    </style>
+</resources>
+

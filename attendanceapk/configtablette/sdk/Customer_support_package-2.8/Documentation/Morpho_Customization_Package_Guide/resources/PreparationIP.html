@@ -1,0 +1,42 @@
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="css/style.css">
+
+  <title>Prepare a customization package</title>
+</head>
+<body>
+  <div id="header_content">
+  <h2>MorphoTablet Customization Package Guide</h2>
+  <h1>Prepare a customization package</h1>
+  </div>
+
+<h2>Populate pre-defined file tree</h2>
+<p>
+  To prepare a customization package, you first need to populate a pre-defined file tree with your third-party applications.<br>
+  Current file tree is located <a style="CURSOR: hand"href="../../../Customization_Package/integration">here</a> and contains four important folders: "app", "priv-app", "preinstall" and "etc/security".<br>
+  Each folder has a specific role:
+</p>
+  <ul>
+    <li>Applications copied to integration/app won't have system privilegies and won't be removable by the user.</li>
+	<li>Applications copied to integration/preinstall won't have system privilegies and will be removable by the user.</li>
+    <li>Applications copied to integration/priv-app will have system privilegies and won't be removable by the user.</li>
+	<li>/etc/security is used to verify OTA update signature</li>
+  </ul>
+<p>
+<h2>Important notes:</h2>
+  <ul>
+    <li>It is recommended to copy each apk application in a specific folder, for example priv-app/myapp/myapp.apk. Indeed, if your application uses native libraries, customization package tool will extract them beside application, and if two application have same library file name, only one will be kept.</li>
+    <li>For Android firmware to provide third-party applications system permissions, a reference package called "com.morpho.integrator.refsignature" that is signed with third-party company platform key is present by default.</li>
+  </ul>
+<br>
+<p>Once integration folder is complete, it's time to generate the customization package with MTabletCustoPackTool.</p>
+</p>
+<footer>
+  Copyright (C) 2019, IDEMIA, All rights reserved. Reproduction in whole or in part in any form or medium without the express written permission of IDEMIA is prohibited
+</footer>
+</body>
+</html>

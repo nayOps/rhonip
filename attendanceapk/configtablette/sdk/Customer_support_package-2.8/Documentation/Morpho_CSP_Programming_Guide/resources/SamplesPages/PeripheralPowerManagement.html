@@ -1,0 +1,180 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <link rel="stylesheet" href="../css/styles/atelier-cave-light.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <title>PeripheralPowerManager</title>
+</head>
+
+  <body>
+    <div id="header_content">
+    <h2>MorphoTablet CSP Programming Guide</h2>
+    <h1>Understanding PeripheralPowerManagement Sample Application</h1>
+    <!-- LINK TO SOURCE CODE -->
+    <p><a style="CURSOR: hand"href="../../../../Code_Samples/Main_Demo/peripheral_power_management_demo">Click to View Source</a></p>
+    </div>
+  <div id=topic_content>
+
+<p>
+  A developer can turn on power for a particular hardware peripheral like SAM card, Smart Card, CBM, Usb host, etc...
+  For example if an application is accessing only smart card and CBM then developers can turn off other hardware peripheral devices.
+  If they do so, The tablet performance will be improved saving battery.
+</p>
+<h1>Functions</h1>
+
+<p>In order to use any hardware peripheral "get/set" feature developers need to add the two following permissions to the manifest file:</p>
+<div id="code"><pre><code class="java">&lt;uses-permission android:name="android.permission.READ_SETTINGS"&gt;
+&lt;uses-permission android:name="android.permission.WRITE_SETTINGS"&gt;
+</code></pre></div>
+<p>Import org.simalliance.openmobileapi.jar into sample application in the libs folder.</p>
+
+<h2>I) Initialization</h2>
+<p>
+  <b>Description</b> – Instantiate the following string that is used to know the status or to give power to a device
+</p>
+<div id="code"><pre><code class="java">public static final String DEVICE_MORE_CBM_ENABLED = "device_more_cbm_enabled";
+public static final String DEVICE_MORE_SMART_CARD_ENABLED = "device_more_smart_card_enabled";
+public static final String DEVICE_MORE_SAM_CARD_ENABLED = "device_more_sam_card_enabled";
+public static final String DEVICE_MORE_OTG_ENABLED = "device_more_otg_enabled";
+public static final String DEVICE_MORE_CRADLE_ENABLED = "device_more_cradle_enabled";
+public static final String DEVICE_MORE_TYPEA_ENABLED = "device_more_typea_enabled";
+</code></pre></div>
+
+
+<h2>II) Method available in software TA0 and higher (recommended)</h2>
+<p><b>Description</b> – The following methods are available in software TA0 and higher.</p>
+<h3>A) Get the hardware peripheral status</h3>
+<p><b>Description</b> – Below API is used to know the hardware peripheral status.</br></br>
+  Parameters:</br>
+  <b>ContentResolver</b> cr - ContentResolver.</br>
+  <b>String</b> name - string to select a device, example:"device_more_otg_enabled".</br>
+</p>
+
+<div id="code"><pre><code class="java">//Object of class Settings.System has method getInt(ContentResolver cr, String name),
+// this is the main function that we are using in our sample to get the hardware peripheral status
+int valueOTG = Settings.System.getInt(getContentResolver(), DEVICE_MORE_OTG_ENABLED);
+</code></pre></div>
+
+<h3>B) Swith On/OFF devices</h3>
+<p><b>Description</b> – Below API is used to give power to different peripheral components of the tablet, like USB,
+  Fingerprint sensor or Smart Card.</br></br>
+
+  Parameters:</br>
+  <b>ContentResolver</b> cr - ContentResolver.</br>
+  <b>String</b> name - string to select a device, example:"device_more_otg_enabled".</br>
+  <b>int</b> value - one to power on the device or zero to power off.</br>
+</p>
+<div id="code"><pre><code class="java">//Object of class Settings.System has method putInt(ContentResolver cr, String name, int value),
+//this is the main function that we are using in our sample to switch on or off devices
+Settings.System.putInt(getContentResolver(), DEVICE_MORE_OTG_ENABLED, value);</code></pre></div>
+
+<h2>III) Deprecated methods</h2>
+<p>
+  <b>Description</b> – The following methods are deprecated started at software TA0 and higher.
+</p>
+<h3>A) Turn ON/OFF SAM card reader</h3>
+
+<p><b>Description</b> – The below function is used to power on the SAM reader.</p>
+<div id="code"><pre><code class="java">private SEService seService = null;
+private void setSamCardPower(boolean on) {
+
+    try {
+        if (seService == null) {
+            SEService.CallBack callback = new SEService.CallBack() {
+                public void serviceConnected(SEService service) {
+                    seService = service;
+                }
+            };
+            seService = new SEService(this.getApplicationContext(),
+                    callback);
+            do {
+                Object mWaitOMACheckCert = new Object();
+                try {
+                    synchronized (mWaitOMACheckCert) {
+                        mWaitOMACheckCert.wait(1000);
+                        Log.d("debug", "wait 1s for OMA check.");
+                    }
+                } catch (InterruptedException e) {
+                    Log.d("debug", "interruped.");
+                }
+            } while (seService == null);
+        }
+
+        Reader[] readers;
+        readers = seService.getReaders();
+        Reader reader = readers[3];
+        if (on) {
+            Log.d("PowerManagement", "readers[3].power_on_reader()");
+            reader.power_on_reader();
+        } else {
+            Log.d("PowerManagement", "readers[3].power_off_reader()");
+            reader.power_off_reader();
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}</code></pre></div>
+
+<h3>B) Get the method to set the value of the port</h3>
+<p><b>Description</b> – The below function is used to get the method to set the value of the port.</p>
+<div id="code"><pre><code class="java">private Method MTAB_SetUsbportSwitch= null;
+private void createMorphoTabletUsbMethods() {
+
+    Class&lt;? extends UsbManager&gt; usb = usbmanager.getClass();
+    Class[] cArg1 = { int.class, int.class };
+
+    try {
+        MTAB_SetUsbportSwitch = usb.getMethod("setUsbportSwitch", cArg1);
+
+    } catch (NoSuchMethodException | IllegalArgumentException e) {
+
+        e.printStackTrace();
+    }
+}</code></pre></div>
+
+
+<h3>C) Swith On/OFF devices</h3>
+<p><b>Description</b> – The below function is used to give power to different peripheral components of the device like USB, Fingerprint sensor, or Smart Card.</p>
+<div id="code"><pre><code class="java">public void powerOnOFF(String device, boolean power) {
+
+    int value = power ? 1 : 0;
+
+    switch (device) {
+    try {
+      //Object of class Method has method invoke(Object receiver, Object... args) ,
+      //this is the main function that we are using in our sample
+      /** The Integer 0 is used for giving power to USB Host component*/
+      /** The Integer 1 is used for giving power to Smart Card component*/
+      /** The Integer 2 is used for giving power to Fingerprint sensor component */
+      /** The Integer 3 is used for giving power to docking station port */
+      /** The Integer 4 is used for giving power to otg port */
+      MTAB_SetUsbportSwitch .invoke(usbmanager, 0, value);
+    } catch (IllegalArgumentException e) {
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      e.printStackTrace();
+    } catch (InvocationTargetException e) {
+      e.printStackTrace();
+    }
+  }
+  // test device..
+  if (powerType) {
+    showTaost("Power is enabled for " + devicesMap.get(device));
+  } else if (!powerType) {
+    showTaost("Power is disabled for " + devicesMap.get(device));
+  }
+}</code></pre></div>
+</div>
+
+<footer>
+  Copyright (C) 2019, IDEMIA, All rights reserved. Reproduction in whole or in part in any form or medium without the express written permission of IDEMIA is prohibited
+</footer>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_primary"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choisir un agent"
+        android:textColor="@color/rdc_blue"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:paddingBottom="8dp" />
+
+    <EditText
+        android:id="@+id/edit_search_employee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Rechercher nom ou matricule..."
+        android:background="@drawable/input_flat"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp" />
+
+    <ListView
+        android:id="@+id/list_employees"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@color/text_primary"
+        android:dividerHeight="1dp" />
+
+    <Button
+        android:id="@+id/btn_back_employee_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/button_outline_flat"
+        android:text="Retour"
+        android:textColor="@color/rdc_blue" />
+
+</LinearLayout>

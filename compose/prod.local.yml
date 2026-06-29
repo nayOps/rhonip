@@ -1,0 +1,12 @@
+# Test production en local — garde le port 8100 pour les tablettes Morpho (LAN)
+# Usage : voir compose/prod.yml
+
+services:
+  rh_server:
+    ports: !override
+      - "${RH_SERVER_PORT:-8100}:8000"
+    networks: !override
+      onip_network:
+        aliases:
+          - server
+          - rh_server

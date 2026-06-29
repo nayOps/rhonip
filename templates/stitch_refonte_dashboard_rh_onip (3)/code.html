@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rapport de Présence - Jean-Marc Vallet</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-secondary": "#ffffff",
+                "on-error-container": "#93000a",
+                "tertiary-fixed-dim": "#ffb785",
+                "on-secondary-container": "#fffbff",
+                "on-primary-container": "#94a8f5",
+                "inverse-surface": "#2d3133",
+                "on-surface-variant": "#444651",
+                "on-secondary-fixed-variant": "#0035bd",
+                "on-background": "#191c1e",
+                "surface-container-high": "#e6e8ea",
+                "on-surface": "#191c1e",
+                "tertiary-container": "#673100",
+                "inverse-on-surface": "#eff1f3",
+                "surface": "#f7f9fb",
+                "on-primary-fixed": "#00164f",
+                "tertiary-fixed": "#ffdcc6",
+                "on-primary": "#ffffff",
+                "surface-container-highest": "#e0e3e5",
+                "primary-fixed-dim": "#b6c4ff",
+                "on-secondary-fixed": "#001355",
+                "error": "#ba1a1a",
+                "secondary-fixed": "#dde1ff",
+                "primary-fixed": "#dce1ff",
+                "tertiary": "#461f00",
+                "surface-container-lowest": "#ffffff",
+                "outline-variant": "#c5c5d2",
+                "error-container": "#ffdad6",
+                "on-primary-fixed-variant": "#2d4287",
+                "surface-dim": "#d8dadc",
+                "primary-container": "#253b80",
+                "surface-variant": "#e0e3e5",
+                "on-tertiary-fixed-variant": "#703806",
+                "surface-tint": "#465aa1",
+                "surface-container": "#eceef0",
+                "on-tertiary": "#ffffff",
+                "secondary": "#264dd9",
+                "surface-bright": "#f7f9fb",
+                "on-tertiary-fixed": "#301400",
+                "outline": "#757682",
+                "on-tertiary-container": "#e89961",
+                "on-error": "#ffffff",
+                "primary": "#072369",
+                "surface-container-low": "#f2f4f6",
+                "secondary-container": "#4568f3",
+                "secondary-fixed-dim": "#b8c3ff",
+                "inverse-primary": "#b6c4ff",
+                "background": "#f7f9fb"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "section-margin": "2rem",
+                "gutter": "1rem",
+                "container-padding": "1rem",
+                "stack-space": "1.25rem"
+            },
+            "fontFamily": {
+                "body-md": ["Hanken Grotesk"],
+                "label-sm": ["Hanken Grotesk"],
+                "body-lg": ["Hanken Grotesk"],
+                "headline-lg": ["Hanken Grotesk"],
+                "label-bold": ["Hanken Grotesk"],
+                "headline-md": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "headline-lg": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Hanken Grotesk', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            .print-container { 
+                margin: 0 !important; 
+                padding: 0 !important;
+                box-shadow: none !important;
+                width: 100% !important;
+            }
+            body { background: white !important; }
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(226, 232, 240, 0.5);
+        }
+    </style>
+</head>
+<body class="text-on-background">
+<!-- SideNavBar -->
+<aside class="flex flex-col fixed left-0 top-0 h-screen py-6 px-4 z-40 w-64 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant dark:border-outline shadow-sm dark:shadow-none no-print">
+<div class="mb-10 px-2 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">badge</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">ONIP HR</h1>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Portail Administratif</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low font-label-bold text-label-bold transition-transform duration-150 scale-98" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Tableau de Bord
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low font-label-bold text-label-bold transition-transform duration-150 scale-98" href="#">
+<span class="material-symbols-outlined">notifications</span>
+                Notification
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low font-label-bold text-label-bold transition-transform duration-150 scale-98" href="#">
+<span class="material-symbols-outlined">assignment_late</span>
+                Action Requise
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container dark:bg-secondary dark:text-on-secondary rounded-lg font-label-bold text-label-bold transition-transform duration-150 scale-98" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">badge</span>
+                Employé
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low font-label-bold text-label-bold transition-transform duration-150 scale-98" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Paramètres
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-low font-label-bold text-label-bold transition-transform duration-150 scale-98" href="#">
+<span class="material-symbols-outlined">person</span>
+                Profil
+            </a>
+</nav>
+<div class="mt-auto p-4 bg-surface-container rounded-xl flex items-center gap-3">
+<img class="w-10 h-10 rounded-full border border-outline-variant object-cover" data-alt="A professional portrait of a senior HR administrator in a brightly lit modern office setting. The lighting is soft and corporate, with a clean white and blue aesthetic that matches the portal's branding. The background shows a hint of a digital workspace with layered interface elements." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuqwsUvs69yA95YJ_JrlwADaHz6wzj-jPkVgf7kYDQTmvMa8Jihe9O24Le_YjDbfTA06GThNaJeOjznzf8hVvOmWSTjAg-IMLH-Vg8qQjGRWB3OWa-XWyTX-BFP2rSpqiDT7JLKwEsFmGlphyuK51l7dThnOIXt5o7bLLFPcW6hsc5piCoatsCiNk6HFcZ-fVP_BNLzCI_ERbG_N3PJe6GLYUK8Qugh9GpVozsk8XhLzE_yt5SKGA0YJRhEWIXnWMJkDXw8tKj8pwE"/>
+<div class="overflow-hidden">
+<p class="font-label-bold text-label-bold text-on-surface truncate">Admin ONIP</p>
+<p class="text-[10px] text-on-surface-variant">Déconnexion</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<div class="ml-64 flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center px-gutter w-full sticky top-0 z-30 bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline h-16 no-print">
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">PayDay</span>
+<div class="h-6 w-[1px] bg-outline-variant"></div>
+<h2 class="font-body-md text-body-md text-on-surface-variant">Rapport de Présence - Jean-Marc Vallet</h2>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity" onclick="window.print()">
+<span class="material-symbols-outlined text-[20px]">print</span>
+<span class="font-label-bold text-label-bold">Imprimer le rapport</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors duration-200 text-on-surface-variant">
+<span class="material-symbols-outlined">language</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors duration-200 text-on-surface-variant">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 p-8 flex flex-col items-center">
+<!-- Document Container -->
+<div class="print-container w-full max-w-4xl bg-white shadow-sm border border-outline-variant rounded-xl p-12 mb-12 flex flex-col gap-10">
+<!-- 1. En-tête Document -->
+<div class="flex justify-between items-start border-b border-outline-variant pb-8">
+<div class="space-y-4">
+<div class="space-y-1">
+<span class="text-primary font-bold tracking-widest text-[10px] uppercase">Rapport de Présence</span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Jean-Marc Vallet</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">ID Agent: #7721-MV | Direction Générale</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex flex-col">
+<span class="text-label-sm font-label-sm text-outline uppercase">Période</span>
+<span class="font-body-lg text-body-lg text-on-surface">Mars 2024</span>
+</div>
+<div class="w-[1px] h-8 bg-outline-variant"></div>
+<div class="flex flex-col">
+<span class="text-label-sm font-label-sm text-outline uppercase">Généré le</span>
+<span class="font-body-lg text-body-lg text-on-surface">02 Avril 2024</span>
+</div>
+</div>
+</div>
+<div class="text-right flex flex-col items-end">
+<div class="w-16 h-16 bg-surface-container rounded-xl flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-primary text-[32px]">domain</span>
+</div>
+<p class="font-label-bold text-label-bold text-on-surface">ONIP - République</p>
+<p class="text-label-sm text-on-surface-variant">Portail Administratif RH</p>
+</div>
+</div>
+<!-- 2. KPI Summary - Bento Style -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="glass-card p-6 rounded-xl flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="text-label-bold text-label-bold text-on-surface-variant uppercase">Taux de présence</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-[32px] font-bold text-primary">95%</span>
+<span class="text-label-sm text-secondary font-bold">+2.4% vs Fév.</span>
+</div>
+</div>
+<div class="glass-card p-6 rounded-xl flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="text-label-bold text-label-bold text-on-surface-variant uppercase">Retards</span>
+<span class="material-symbols-outlined text-tertiary-container" style="font-variation-settings: 'FILL' 1;">schedule</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-[32px] font-bold text-primary">2</span>
+<span class="text-label-sm text-on-surface-variant">Actions requises</span>
+</div>
+</div>
+<div class="glass-card p-6 rounded-xl flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="text-label-bold text-label-bold text-on-surface-variant uppercase">Absence</span>
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">cancel</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-[32px] font-bold text-primary">1</span>
+<span class="text-label-sm text-error font-bold">Injustifiée</span>
+</div>
+</div>
+</div>
+<!-- 3. Tableau Détaillé -->
+<div class="space-y-4">
+<h3 class="font-headline-md text-headline-md text-on-surface">Détails des pointages journaliers</h3>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-y border-outline-variant">
+<th class="px-4 py-3 font-label-bold text-label-bold text-on-surface-variant uppercase">Date</th>
+<th class="px-4 py-3 font-label-bold text-label-bold text-on-surface-variant uppercase">Entrée</th>
+<th class="px-4 py-3 font-label-bold text-label-bold text-on-surface-variant uppercase">Sortie</th>
+<th class="px-4 py-3 font-label-bold text-label-bold text-on-surface-variant uppercase">Durée</th>
+<th class="px-4 py-3 font-label-bold text-label-bold text-on-surface-variant uppercase">Statut</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-4 py-4 font-body-md text-body-md text-on-surface">01 Mars 2024</td>
+<td class="px-4 py-4 font-body-md text-body-md">08:02</td>
+<td class="px-4 py-4 font-body-md text-body-md">17:15</td>
+<td class="px-4 py-4 font-body-md text-body-md">09h 13m</td>
+<td class="px-4 py-4">
+<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-[11px] font-bold uppercase">Présent</span>
+</td>
+</tr>
+<!-- Row 2 (Retard) -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-4 py-4 font-body-md text-body-md text-on-surface">02 Mars 2024</td>
+<td class="px-4 py-4 font-body-md text-body-md text-error">08:45</td>
+<td class="px-4 py-4 font-body-md text-body-md">17:00</td>
+<td class="px-4 py-4 font-body-md text-body-md">08h 15m</td>
+<td class="px-4 py-4">
+<span class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-[11px] font-bold uppercase">Retard</span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-4 py-4 font-body-md text-body-md text-on-surface">03 Mars 2024</td>
+<td class="px-4 py-4 font-body-md text-body-md">07:55</td>
+<td class="px-4 py-4 font-body-md text-body-md">17:30</td>
+<td class="px-4 py-4 font-body-md text-body-md">09h 35m</td>
+<td class="px-4 py-4">
+<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-[11px] font-bold uppercase">Présent</span>
+</td>
+</tr>
+<!-- Row 4 (Absence) -->
+<tr class="hover:bg-surface-container-lowest transition-colors bg-red-50/30">
+<td class="px-4 py-4 font-body-md text-body-md text-on-surface font-bold">04 Mars 2024</td>
+<td class="px-4 py-4 font-body-md text-body-md text-outline">--:--</td>
+<td class="px-4 py-4 font-body-md text-body-md text-outline">--:--</td>
+<td class="px-4 py-4 font-body-md text-body-md text-outline">00h 00m</td>
+<td class="px-4 py-4">
+<span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-[11px] font-bold uppercase">Absent</span>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-4 py-4 font-body-md text-body-md text-on-surface">05 Mars 2024</td>
+<td class="px-4 py-4 font-body-md text-body-md">08:00</td>
+<td class="px-4 py-4 font-body-md text-body-md">17:05</td>
+<td class="px-4 py-4 font-body-md text-body-md">09h 05m</td>
+<td class="px-4 py-4">
+<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-[11px] font-bold uppercase">Présent</span>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-4 py-4 font-body-md text-body-md text-on-surface">06 Mars 2024</td>
+<td class="px-4 py-4 font-body-md text-body-md">08:10</td>
+<td class="px-4 py-4 font-body-md text-body-md">17:15</td>
+<td class="px-4 py-4 font-body-md text-body-md">09h 05m</td>
+<td class="px-4 py-4">
+<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-[11px] font-bold uppercase">Présent</span>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="py-4 text-center">
+<button class="text-primary font-label-bold text-label-bold hover:underline no-print">Afficher les 25 jours restants</button>
+</div>
+</div>
+</div>
+<!-- 4. Notes RH & Signatures -->
+<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-12 pt-10 border-t border-dashed border-outline-variant">
+<div class="space-y-4">
+<h4 class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider">Observations RH</h4>
+<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant min-h-[120px]">
+<p class="font-body-md text-body-md text-on-surface italic">
+                                Retard du 02 Mars justifié par des problèmes de transport public. L'absence du 04 Mars reste en attente de justificatif médical. Performance globale satisfaisante avec une ponctualité exemplaire sur le reste du mois.
+                            </p>
+</div>
+</div>
+<div class="flex flex-col justify-end gap-16">
+<div class="flex justify-between items-end">
+<div class="text-center space-y-2 flex-1">
+<div class="h-[1px] w-full bg-outline-variant mb-2"></div>
+<p class="text-label-sm font-label-sm text-outline uppercase">Signature Agent</p>
+</div>
+<div class="w-12"></div>
+<div class="text-center space-y-2 flex-1">
+<div class="h-[1px] w-full bg-outline-variant mb-2"></div>
+<p class="text-label-sm font-label-sm text-outline uppercase">Signature RH / Direction</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Document -->
+<div class="mt-12 pt-6 border-t border-outline-variant flex justify-between items-center text-[10px] text-outline uppercase font-label-bold">
+<span>Document de référence : REF-RH-2024-00451</span>
+<span>Page 1 / 1</span>
+<span>Strictement Confidentiel</span>
+</div>
+</div>
+<!-- Print Prompt (Floating Mobile) -->
+<button class="fixed bottom-8 right-8 bg-secondary-container text-on-secondary-container p-4 rounded-full shadow-lg md:hidden no-print" onclick="window.print()">
+<span class="material-symbols-outlined">print</span>
+</button>
+</main>
+</div>
+<script>
+        // Micro-interaction for hover effects on table rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.classList.add('translate-x-1');
+                row.style.transition = 'all 0.2s ease';
+            });
+            row.addEventListener('mouseleave', () => {
+                row.classList.remove('translate-x-1');
+            });
+        });
+
+        // Theme check for dark mode (though we stay light by instruction)
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            // document.documentElement.classList.add('dark');
+        }
+    </script>
+</body></html>

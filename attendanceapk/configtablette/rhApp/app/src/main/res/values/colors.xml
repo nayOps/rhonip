@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Couleurs Tricolores Officielles RDC (Design System) -->
+    <color name="rdc_blue">#0095c9</color>
+    <color name="rdc_yellow">#fff24b</color>
+    <color name="rdc_red">#db3832</color>
+    <color name="rdc_blue_dark">#17418a</color>
+    <color name="rdc_blue_sky">#0f89cb</color>
+    
+    <!-- Couleurs principales ONIP (compatibilité) -->
+    <color name="onip_blue">#0095c9</color>
+    <color name="onip_blue_light">#0f89cb</color>
+    <color name="onip_blue_dark">#17418a</color>
+    <color name="onip_orange">#FF7712</color>
+    
+    <!-- Couleurs de base -->
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    
+    <!-- Couleurs de texte (Design System) -->
+    <color name="text_primary">#323230</color>
+    <color name="text_secondary">#405D64</color>
+    <color name="text_tertiary">#9ca3af</color>
+    
+    <!-- Couleurs de fond (Design System) -->
+    <color name="background_primary">#ffffff</color>
+    <color name="background_secondary">#F5F5F5</color>
+    <color name="background_tertiary">#E0E0E0</color>
+    <color name="background_blue">#0095c9</color>
+    
+    <!-- Couleurs de statut (Design System) -->
+    <color name="success">#65b32e</color>
+    <color name="warning">#ed7016</color>
+    <color name="error">#db3832</color>
+    <color name="info">#0095c9</color>
+    
+    <!-- Couleurs de boutons (Design System - Flat) -->
+    <color name="button_primary_bg">#0095c9</color>
+    <color name="button_primary_text">#ffffff</color>
+    <color name="button_secondary_bg">#F5F5F5</color>
+    <color name="button_secondary_text">#0095c9</color>
+    <color name="button_outline_bg">#ffffff</color>
+    <color name="button_outline_text">#405D64</color>
+    <color name="button_success_bg">#65b32e</color>
+    <color name="button_success_text">#ffffff</color>
+    <color name="button_accent_bg">#fff24b</color>
+    <color name="button_accent_text">#323230</color>
+    
+    <!-- Couleurs de bordure (Design System) -->
+    <color name="border_light">#E0E0E0</color>
+    <color name="border_medium">#405D64</color>
+    <color name="border_dark">#323230</color>
+    
+    <!-- Couleurs manquantes pour compatibilité -->
+    <color name="purple">#1e40af</color>
+    <color name="purple_light">#3b82f6</color>
+    <color name="ic_launcher_background">#1e40af</color>
+    
+    <!-- Couleurs pour caméra -->
+    <color name="blue">#2196F3</color>
+    <color name="green">#4CAF50</color>
+    <color name="orange">#FF9800</color>
+    <color name="background_dark">#121212</color>
+    <color name="background_purple">#1A1A2E</color>
+    <color name="glass_white">#40FFFFFF</color>
+    <color name="glass_border">#80FFFFFF</color>
+</resources>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Système de Design ONIP - Composants de Formulaire</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#e0e3e5",
+                    "primary-fixed": "#dce1ff",
+                    "surface-dim": "#d8dadc",
+                    "primary": "#072369",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "on-secondary-container": "#fffbff",
+                    "secondary-container": "#4568f3",
+                    "on-surface-variant": "#444651",
+                    "on-primary-fixed-variant": "#2d4287",
+                    "surface-variant": "#e0e3e5",
+                    "on-tertiary": "#ffffff",
+                    "background": "#f7f9fb",
+                    "outline": "#757682",
+                    "surface-tint": "#465aa1",
+                    "on-tertiary-container": "#e89961",
+                    "on-tertiary-fixed": "#301400",
+                    "on-secondary-fixed-variant": "#0035bd",
+                    "surface-container-high": "#e6e8ea",
+                    "on-tertiary-fixed-variant": "#703806",
+                    "on-secondary-fixed": "#001355",
+                    "on-primary-fixed": "#00164f",
+                    "surface-container-low": "#f2f4f6",
+                    "tertiary": "#461f00",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#673100",
+                    "inverse-on-surface": "#eff1f3",
+                    "surface-container": "#eceef0",
+                    "on-background": "#191c1e",
+                    "secondary-fixed": "#dde1ff",
+                    "on-secondary": "#ffffff",
+                    "surface-bright": "#f7f9fb",
+                    "secondary": "#264dd9",
+                    "tertiary-fixed-dim": "#ffb785",
+                    "inverse-surface": "#2d3133",
+                    "on-error": "#ffffff",
+                    "error": "#ba1a1a",
+                    "inverse-primary": "#b6c4ff",
+                    "primary-container": "#253b80",
+                    "outline-variant": "#c5c5d2",
+                    "secondary-fixed-dim": "#b8c3ff",
+                    "primary-fixed-dim": "#b6c4ff",
+                    "on-primary-container": "#94a8f5",
+                    "on-surface": "#191c1e",
+                    "surface": "#f7f9fb",
+                    "tertiary-fixed": "#ffdcc6",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "1rem",
+                    "section-margin": "2rem",
+                    "stack-space": "1.25rem",
+                    "container-padding": "1rem"
+            },
+            "fontFamily": {
+                    "body-md": ["Hanken Grotesk"],
+                    "label-sm": ["Hanken Grotesk"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "label-bold": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Hanken Grotesk', sans-serif; background-color: #f7f9fb; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e0e3e5; border-radius: 10px; }
+        
+        /* Glassmorphism subtle effect for headers */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+        }
+
+        .focus-ring {
+            transition: all 0.2s ease-in-out;
+        }
+        .focus-ring:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #264dd9;
+        }
+    </style>
+</head>
+<body class="text-on-background antialiased overflow-hidden">
+<!-- Sidebar (Shared Component Anchor) -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-primary dark:bg-primary-container shadow-md flex flex-col py-6 z-50">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-on-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-2xl">shield_person</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary leading-tight">ONIP Portal</h1>
+<p class="text-[10px] text-on-primary/60 uppercase tracking-widest font-bold">HR Management</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<div class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary mx-2 rounded-lg hover:bg-primary-fixed-dim/10 transition-colors cursor-pointer active:scale-95 duration-150">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary mx-2 rounded-lg hover:bg-primary-fixed-dim/10 transition-colors cursor-pointer active:scale-95 duration-150">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-body-md text-body-md">Employees</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary mx-2 rounded-lg hover:bg-primary-fixed-dim/10 transition-colors cursor-pointer active:scale-95 duration-150">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-body-md text-body-md">Attendance</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg mx-2 cursor-pointer active:scale-95 duration-150 shadow-sm">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</div>
+</nav>
+<div class="mt-auto px-6 pt-6 border-t border-on-primary/10">
+<div class="flex items-center gap-3 p-2 rounded-xl bg-on-primary/5">
+<div class="w-8 h-8 rounded-full overflow-hidden border border-on-primary/20">
+<img class="w-full h-full object-cover" data-alt="Corporate professional headshot of an HR administrator with a warm and focused expression, high-key lighting, minimalist business background, navy blue and soft white tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYNpAxkOOz_dThv6jbqSW6sBfl26bKm3KU3jmtwlxjULKc3RwEBBMKiECMoEemsHPZ6fhWvb-VCVA22eyFGwWgyjtZcWzdJ1MNP-xLQ9HfEPeEoISQgmhDLt6d4qEwBHMQkRHBgagPb25Zsy6s3BV-MKhQ49fp8daWoQYA0V6vkQO3UeGRT2pi7d7XfFl_qB77MB20HcuLTjHZfHpgjpyWuNAiaGm9akv2REnCUb9pE901pfMrQ0N8b42iBeJ9OzQzLiFSj2W4Fx0d"/>
+</div>
+<div class="flex-1">
+<p class="font-label-bold text-label-bold text-on-primary truncate">Admin HR</p>
+<p class="text-[10px] text-on-primary/60 truncate">Déconnexion</p>
+</div>
+<span class="material-symbols-outlined text-on-primary/40">logout</span>
+</div>
+</div>
+</aside>
+<!-- Top Navigation -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-surface border-b border-outline-variant flex justify-between items-center px-8 z-40 glass-header">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant transition-colors group-focus-within:text-secondary">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-lg font-body-md text-body-md focus:ring-2 focus:ring-secondary-container focus:border-secondary transition-all outline-none" placeholder="Rechercher des composants..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-16 h-screen overflow-y-auto custom-scrollbar bg-background">
+<div class="p-8 max-w-6xl mx-auto space-y-10">
+<!-- Header Section -->
+<section class="space-y-2">
+<div class="flex items-center gap-2 text-secondary font-label-bold uppercase tracking-wider">
+<span class="w-8 h-[1px] bg-secondary"></span>
+                    Système de Design ONIP
+                </div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Guide des Composants de Formulaire</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-3xl">Standards d'interface pour les formulaires de gestion RH. Ce guide définit l'apparence, les états et le comportement des champs de saisie pour garantir une expérience utilisateur cohérente et professionnelle.</p>
+</section>
+<!-- 1. Text Inputs Section -->
+<section class="space-y-6">
+<h3 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">text_fields</span>
+                    Champs de Saisie Texte
+                </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Default State -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm transition-all hover:shadow-md">
+<label class="block font-label-bold text-label-bold text-on-surface mb-1.5">Nom complet</label>
+<input class="w-full px-4 py-2.5 bg-white border border-outline-variant rounded-lg font-body-md text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none" placeholder="Ex: Jean Dupont" type="text"/>
+<p class="mt-2 text-label-sm text-on-surface-variant">État par défaut</p>
+</div>
+<!-- Focus State -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm transition-all hover:shadow-md border-secondary/20">
+<label class="block font-label-bold text-label-bold text-on-surface mb-1.5">Email professionnel</label>
+<input class="w-full px-4 py-2.5 bg-white border-2 border-secondary rounded-lg font-body-md text-body-md focus:ring-1 focus:ring-secondary transition-all outline-none" type="email" value="jean.dupont@onip.fr"/>
+<p class="mt-2 text-label-sm text-secondary font-medium">État focus (Actif)</p>
+</div>
+<!-- Error State -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm transition-all hover:shadow-md">
+<label class="block font-label-bold text-label-bold text-on-surface mb-1.5">Mot de passe</label>
+<div class="relative">
+<input class="w-full px-4 py-2.5 bg-white border border-error rounded-lg font-body-md text-body-md focus:ring-1 focus:ring-error transition-all outline-none pr-10" type="password" value="123"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-error text-xl">error</span>
+</div>
+<p class="mt-2 text-label-sm text-error flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">info</span>
+                            Le mot de passe est trop court
+                        </p>
+</div>
+<!-- Disabled State -->
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/20 shadow-sm opacity-80">
+<label class="block font-label-bold text-label-bold text-on-surface/50 mb-1.5">Identifiant Système</label>
+<input class="w-full px-4 py-2.5 bg-surface-container-highest border border-outline-variant/30 rounded-lg font-body-md text-body-md text-on-surface/40 cursor-not-allowed" disabled="" type="text" value="ONIP-ID-9920"/>
+<p class="mt-2 text-label-sm text-on-surface-variant/60">Champ désactivé (Lecture seule)</p>
+</div>
+<!-- Filled/Success State -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm transition-all hover:shadow-md">
+<label class="block font-label-bold text-label-bold text-on-surface mb-1.5">Numéro de Téléphone</label>
+<div class="relative">
+<input class="w-full px-4 py-2.5 bg-white border border-outline-variant rounded-lg font-body-md text-body-md border-secondary transition-all outline-none" type="text" value="+33 6 12 34 56 78"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary text-xl">check_circle</span>
+</div>
+<p class="mt-2 text-label-sm text-secondary font-medium">Validé avec succès</p>
+</div>
+</div>
+</section>
+<!-- 2. Selection Controls Section -->
+<section class="space-y-6">
+<h3 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">list_alt</span>
+                    Contrôles de Sélection
+                </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Custom Dropdown -->
+<div class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 shadow-sm">
+<h4 class="font-label-bold text-secondary uppercase mb-6 text-[11px] tracking-widest">Dropdown &amp; Sélecteur</h4>
+<div class="space-y-6">
+<div>
+<label class="block font-label-bold text-label-bold text-on-surface mb-1.5">Département</label>
+<div class="relative group">
+<select class="w-full appearance-none px-4 py-2.5 bg-white border border-outline-variant rounded-lg font-body-md text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none cursor-pointer">
+<option>Ressources Humaines</option>
+<option>Finance</option>
+<option>Informatique</option>
+<option>Marketing</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none transition-transform group-focus-within:rotate-180">expand_more</span>
+</div>
+</div>
+<div>
+<label class="block font-label-bold text-label-bold text-on-surface mb-1.5">Recherche collaborateur</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">person_search</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-white border border-outline-variant rounded-lg font-body-md text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary outline-none" placeholder="Chercher un nom..." type="text"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Date Picker Simulation -->
+<div class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 shadow-sm">
+<h4 class="font-label-bold text-secondary uppercase mb-6 text-[11px] tracking-widest">Calendrier &amp; Date</h4>
+<div>
+<label class="block font-label-bold text-label-bold text-on-surface mb-1.5">Date de recrutement</label>
+<div class="relative">
+<input class="w-full px-4 py-2.5 bg-white border border-outline-variant rounded-lg font-body-md text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary outline-none" type="date" value="2023-11-15"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">calendar_month</span>
+</div>
+</div>
+<div class="mt-6 flex gap-4">
+<div class="flex-1">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Heure de début</label>
+<input class="w-full px-3 py-2 bg-white border border-outline-variant rounded-lg font-body-md text-body-md outline-none" type="time" value="09:00"/>
+</div>
+<div class="flex-1">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Heure de fin</label>
+<input class="w-full px-3 py-2 bg-white border border-outline-variant rounded-lg font-body-md text-body-md outline-none" type="time" value="18:00"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. Boolean Controls -->
+<section class="space-y-6">
+<h3 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">check_box</span>
+                    Contrôles Booléens
+                </h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Checkboxes -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm">
+<label class="block font-label-bold text-on-surface mb-4">Avantages</label>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-5 h-5 rounded border-outline-variant text-secondary focus:ring-secondary-container transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary">Tickets Restaurant</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 rounded border-outline-variant text-secondary focus:ring-secondary-container transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary">Mutuelle Premium</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group opacity-50">
+<input class="w-5 h-5 rounded border-outline-variant text-secondary cursor-not-allowed" disabled="" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface">Option indisponible</span>
+</label>
+</div>
+</div>
+<!-- Radio Buttons -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm">
+<label class="block font-label-bold text-on-surface mb-4">Type de Contrat</label>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-5 h-5 border-outline-variant text-secondary focus:ring-secondary-container transition-all" name="contract" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary">CDI</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 border-outline-variant text-secondary focus:ring-secondary-container transition-all" name="contract" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary">CDD</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 border-outline-variant text-secondary focus:ring-secondary-container transition-all" name="contract" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary">Alternance</span>
+</label>
+</div>
+</div>
+<!-- Toggles/Switches -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm">
+<label class="block font-label-bold text-on-surface mb-4">Paramètres d'Alerte</label>
+<div class="space-y-5">
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="font-body-md text-body-md text-on-surface">Notifications Email</span>
+<div class="relative inline-flex h-6 w-11 items-center rounded-full bg-surface-container-highest transition-colors group-has-[:checked]:bg-secondary">
+<input checked="" class="peer sr-only" type="checkbox"/>
+<span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1 peer-checked:translate-x-6"></span>
+</div>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="font-body-md text-body-md text-on-surface">Mode Sombre</span>
+<div class="relative inline-flex h-6 w-11 items-center rounded-full bg-surface-container-highest transition-colors group-has-[:checked]:bg-secondary">
+<input class="peer sr-only" type="checkbox"/>
+<span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1 peer-checked:translate-x-6"></span>
+</div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. Validation & Layout Principles -->
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
+<!-- Validation & Feedback -->
+<div class="space-y-6">
+<h3 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">verified_user</span>
+                        Validation &amp; Feedback
+                    </h3>
+<div class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 shadow-sm space-y-4">
+<div class="p-4 bg-error-container text-on-error-container rounded-lg border border-error/20 flex gap-3">
+<span class="material-symbols-outlined">report</span>
+<div>
+<p class="font-label-bold">Erreur de soumission</p>
+<p class="text-label-sm opacity-90">Veuillez corriger les champs marqués en rouge avant de continuer.</p>
+</div>
+</div>
+<div class="p-4 bg-on-secondary-container bg-opacity-10 text-secondary rounded-lg border border-secondary/20 flex gap-3">
+<span class="material-symbols-outlined">check_circle</span>
+<div>
+<p class="font-label-bold">Profil mis à jour</p>
+<p class="text-label-sm opacity-90">Vos modifications ont été enregistrées avec succès dans la base RH.</p>
+</div>
+</div>
+<div class="pt-2">
+<label class="block font-label-bold text-on-surface mb-1">Siret de l'entreprise <span class="text-error">*</span></label>
+<input class="w-full px-4 py-2.5 bg-white border border-outline-variant rounded-lg font-body-md" placeholder="14 chiffres" type="text"/>
+<p class="mt-1 text-label-sm text-on-surface-variant italic">Ce champ est obligatoire pour la facturation.</p>
+</div>
+</div>
+</div>
+<!-- Layout Principles -->
+<div class="space-y-6">
+<h3 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">grid_view</span>
+                        Principes de Mise en Page
+                    </h3>
+<div class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 shadow-sm space-y-4">
+<div class="grid grid-cols-2 gap-4">
+<div class="p-3 border border-dashed border-outline-variant rounded-lg bg-surface text-center">
+<p class="text-[11px] font-bold text-secondary uppercase mb-1">Alignement Top</p>
+<p class="text-label-sm text-on-surface-variant">Lisibilité optimale pour les formulaires longs.</p>
+</div>
+<div class="p-3 border border-dashed border-outline-variant rounded-lg bg-surface text-center">
+<p class="text-[11px] font-bold text-secondary uppercase mb-1">Grille 8px</p>
+<p class="text-label-sm text-on-surface-variant">Espacement vertical constant de 1.25rem (20px).</p>
+</div>
+</div>
+<div class="p-4 bg-primary text-on-primary rounded-lg">
+<h5 class="font-label-bold mb-2">Structure de Grille Multi-colonnes</h5>
+<div class="grid grid-cols-12 gap-2 h-12">
+<div class="col-span-4 bg-on-primary/20 rounded"></div>
+<div class="col-span-4 bg-on-primary/20 rounded"></div>
+<div class="col-span-4 bg-on-primary/20 rounded"></div>
+<div class="col-span-6 bg-on-primary/10 rounded"></div>
+<div class="col-span-6 bg-on-primary/10 rounded"></div>
+</div>
+</div>
+<p class="text-label-sm text-on-surface-variant">
+                            Utilisez le système de grille fluide (12 colonnes) pour organiser les champs par importance relative. Les champs connexes doivent être regroupés visuellement.
+                        </p>
+</div>
+</div>
+</section>
+<!-- 5. Design Tokens -->
+<section class="space-y-6">
+<h3 class="font-headline-md text-headline-md text-primary">Tableau des Tokens de Design</h3>
+<div class="overflow-x-auto bg-surface-container-low rounded-xl border border-outline-variant/30 shadow-inner">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/30 bg-surface-container-high">
+<th class="p-4 font-label-bold text-secondary uppercase text-[11px]">Élément</th>
+<th class="p-4 font-label-bold text-secondary uppercase text-[11px]">Classe Tailwind</th>
+<th class="p-4 font-label-bold text-secondary uppercase text-[11px]">Valeur / Effet</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr>
+<td class="p-4 font-body-md text-on-surface">Bordure Focus</td>
+<td class="p-4 font-label-sm text-on-surface-variant"><code>focus:border-secondary</code></td>
+<td class="p-4"><div class="w-6 h-6 rounded border-2 border-secondary"></div></td>
+</tr>
+<tr>
+<td class="p-4 font-body-md text-on-surface">Rayon Arrondi</td>
+<td class="p-4 font-label-sm text-on-surface-variant"><code>rounded-lg</code></td>
+<td class="p-4 text-label-sm font-medium">8px (Standard ONIP)</td>
+</tr>
+<tr>
+<td class="p-4 font-body-md text-on-surface">Typographie Label</td>
+<td class="p-4 font-label-sm text-on-surface-variant"><code>font-label-bold</code></td>
+<td class="p-4 text-label-sm font-bold">Hanken Grotesk 700</td>
+</tr>
+<tr>
+<td class="p-4 font-body-md text-on-surface">Fond Erreur</td>
+<td class="p-4 font-label-sm text-on-surface-variant"><code>bg-error-container</code></td>
+<td class="p-4"><div class="w-12 h-4 rounded bg-error-container"></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
+<!-- Floating Action Button for Documentation (Contextual) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-secondary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-2xl">download</span>
+</button>
+<script>
+        // Micro-interactions and effects
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('focus', () => {
+                el.closest('.rounded-xl')?.classList.add('border-secondary/30', 'shadow-md');
+            });
+            el.addEventListener('blur', () => {
+                el.closest('.rounded-xl')?.classList.remove('border-secondary/30', 'shadow-md');
+            });
+        });
+
+        // Search highlight simulation
+        const searchInput = document.querySelector('header input');
+        searchInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            document.querySelectorAll('h3, h4').forEach(h => {
+                const parent = h.closest('section');
+                if (val && h.textContent.toLowerCase().includes(val)) {
+                    parent.classList.add('ring-2', 'ring-secondary-container', 'ring-offset-4');
+                } else {
+                    parent.classList.remove('ring-2', 'ring-secondary-container', 'ring-offset-4');
+                }
+            });
+        });
+    </script>
+</body></html>

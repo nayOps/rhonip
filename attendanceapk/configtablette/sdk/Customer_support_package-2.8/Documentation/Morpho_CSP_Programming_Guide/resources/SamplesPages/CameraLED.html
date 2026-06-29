@@ -1,0 +1,83 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <link rel="stylesheet" href="../css/styles/atelier-cave-light.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <title>Camera LED</title>
+</head>
+<body>
+  <div id="header_content">
+    <h2>MorphoTablet CSP Programming Guide</h2>
+    <h1>Understanding Camera LED's Sample Application</h1>
+    <!-- LINK TO SOURCE CODE -->
+    <p><a style="CURSOR: hand"href="../../../../Code_Samples/Main_Demo/camera_LED_demo">Click to View Source</a></p>
+  </div>
+
+<div id=topic_content>
+<img src="../img/MorphoTablet_2_Back_Right.png" style="width: 400px;height: 300px;">
+<h1>Functions</h1>
+<p>The device has two cameras, one 2.0 MP front camera, and one 13.0 MP rear camera. In order to use the camera, please call the following set of available functions. Sample uses Android library and custom methods.
+In order to use the "Turn on/off" feature of any camera LED, developers need to add the following permission to the manifest:</p>
+<div id="code"><pre><code class="java">&lt;uses-permission android:name="android.permission.CAMERA"&gt;</code></pre></div>
+
+
+<h2>I) Get the method to set the value of flash LEDs</h2>
+<p><b>Description</b> – The following API "Method" is used to invoke the method to set the value of flash LEDs.</p>
+<div id="code"><pre><code class="java">private Method MTAB_SetFlashValues= null;
+private void createMorphoTabletReflectionMethods() {
+    if (camera == null) {
+        camera = Camera.open();
+    }
+
+    Class&lt;? extends Camera.Parameters&gt; c = camera.getParameters()
+            .getClass();
+    Class[] cArg1 = { int.class, int.class };
+
+    try {
+        MTAB_SetFlashValues = c.getMethod("setFlashValue", cArg1);
+
+    } catch (NoSuchMethodException | IllegalArgumentException e) {
+
+        e.printStackTrace();
+    }
+}</code></pre></div>
+
+
+<h2>II) Set Led Brightness</h2>
+<p><b>Description</b> – Set the brightness of the flash LEDs.
+Parameters:</p>
+
+       <b>String</b> device - the target led ("led1" or "led2").</br>
+       <b>int</b> value - the target brightness value [0 ≤ value ≤ 225].</br>
+<div id="code"><pre><code class="java">public void setLedPower(String device, int value) {
+    parameters = camera.getParameters();
+
+    if (device.equals(led1)) {
+        valueFlash2 = value;
+    } else {
+        valueFlash1 = value;
+    }
+    try {
+        MTAB_SetFlashValues.invoke(parameters,valueFlash1, valueFlash2);
+    } catch (IllegalAccessException | InvocationTargetException e) {
+        e.printStackTrace();
+    }
+    try {
+        MTAB_SetFlashTorch.invoke(parameters,true);
+    } catch (IllegalAccessException | InvocationTargetException e) {
+        e.printStackTrace();
+    }
+    camera.setParameters(parameters);
+}</code></pre></div>
+</div>
+
+<footer>
+  Copyright (C) 2019, IDEMIA, All rights reserved. Reproduction in whole or in part in any form or medium without the express written permission of IDEMIA is prohibited
+</footer>
+</body>

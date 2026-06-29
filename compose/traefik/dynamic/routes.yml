@@ -1,0 +1,26 @@
+http:
+  routers:
+    rh-local:
+      rule: Host(`rh.onip.gouv.local`) || Host(`rh.onip.localhost`) || Host(`rh.onip.gouv.lan`) || Host(`192.168.10.104`)
+      entryPoints:
+        - web
+      service: rh-local
+      priority: 10
+
+    register-local:
+      rule: Host(`localhost`) || Host(`register.onip.gouv.local`) || Host(`register.onip.localhost`)
+      entryPoints:
+        - web
+      service: register-local
+      priority: 1
+
+  services:
+    rh-local:
+      loadBalancer:
+        servers:
+          - url: http://rh_server:8000
+
+    register-local:
+      loadBalancer:
+        servers:
+          - url: http://fgp_nginx:80

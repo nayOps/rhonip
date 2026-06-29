@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.ONIPBiometric" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/onip_blue</item>
+        <item name="colorPrimaryDark">@color/onip_blue_dark</item>
+        <item name="colorAccent">@color/onip_yellow</item>
+        <item name="android:statusBarColor">@color/onip_blue_dark</item>
+        <item name="android:navigationBarColor">@color/onip_blue_dark</item>
+        <item name="android:windowBackground">@color/background_secondary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+    </style>
+
+    <style name="Theme.ONIPBiometric.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+</resources>

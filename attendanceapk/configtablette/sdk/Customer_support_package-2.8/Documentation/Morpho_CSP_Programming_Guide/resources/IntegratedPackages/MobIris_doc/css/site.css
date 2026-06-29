@@ -1,0 +1,479 @@
+html, body.topBarDisabled {
+    color: #333;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    font-size: 15px;
+    -webkit-font-variant-ligatures: common-ligatures;
+    font-variant-ligatures: common-ligatures;
+}
+
+body {
+    tab-size: 4;
+    font-family: 'Lato', "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+tt, code, kbd, pre, samp, .prettyprint {
+    font-family: 'Inconsolata', Menlo, Monaco, Consolas, "Courier New", monospace;
+    font-size: 1em;
+}
+
+blockquote p:last-child, blockquote ul:last-child, blockquote ol:last-child {
+    margin-bottom: 15px;
+}
+
+a[href] {
+    color: #333;
+    border-bottom: solid 1px #bbb;
+}
+
+a[href]:hover {
+    color: #333;
+    text-decoration: none;
+    border-bottom-color: #333;
+}
+
+h1 {
+    font-size: 2.25em;
+}
+
+h2 {
+    font-size: 1.75em;
+}
+
+.table {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.table > thead > tr > th, .table > tbody > tr > td {
+    border-top: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.table > thead > tr > th {
+    font-weight: 900;
+}
+
+.table td:first-child i {
+    display: block;
+    font-style: normal;
+    color: #aaa;
+    font-weight: 300;
+    min-width: 120px;
+}
+
+blockquote {
+    font-weight: 300;
+    font-size: inherit;
+}
+
+.prettyprint {
+    background-color: #2b2f3e;
+    border: 0;
+}
+
+#leftColumn {
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: fixed;
+    z-index: 30;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 230px;
+    padding: 0;
+    background-color: #eee;
+}
+
+#leftColumn a {
+    color: #555;
+    border-bottom: 0;
+}
+
+#leftColumn .glyphicon {
+    padding-right: 10px;
+}
+
+#leftColumn .tocify-subheader {
+    font-weight: 500;
+}
+
+#leftColumn .nav.nav-list .nav.nav-list a {
+    padding-left: 25px;
+    font-weight: 400;
+    color: #555;
+}
+
+#leftColumn .nav.nav-list .nav.nav-list .nav.nav-list a {
+    padding-left: 35px;
+    font-weight: 300;
+    color: #555;
+}
+
+#leftColumn .nav.nav-list .nav.nav-list .nav.nav-list  .nav.nav-list a {
+    padding-left: 45px;
+    font-weight: 250;
+    color: #999;
+}
+
+.container {
+    width: 100%;
+    padding: 0;
+    position: relative;
+    z-index: 10;
+    min-height: 100%;
+    padding-bottom: 1px;
+    width: inherit;
+    margin-left: 230px;
+}
+
+.well {
+    background-color: transparent;
+    border: 0;
+    padding: 0;
+}
+
+.nav > li > a:hover {
+    background-color: transparent;
+}
+
+.nav > li > a {
+    padding: 8px 15px;
+    font-weight: bold;
+}
+
+.nav-header {
+    margin: 40px 15px 15px;
+    color: #aaa;
+}
+
+#leftColumn #toc .nav > li.active > a {
+    background-color: #71788E;
+    color: white;
+}
+
+#leftColumn hr {
+    border-top: 0;
+    border-bottom: 0;
+}
+
+body > hr {
+    display: none;
+}
+
+.row {
+    margin: 0;
+}
+
+table {
+    display: block;
+}
+
+p {
+    margin: 15px 0;
+}
+
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+img {
+    max-width: 100%;
+}
+
+#bodyColumn {
+    width: 100% !important;
+    margin: 0 0 120px !important;
+    position: relative;
+    z-index: 30;
+    padding: 0;
+}
+
+#bodyColumn h1 {
+    font-weight: 900;
+    margin: 2.5em 0 1.5em;
+}
+
+#bodyColumn h1:after {
+    content: '';
+    display: block;
+    padding-bottom: 0.5em;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.075);
+}
+
+#bodyColumn h2 {
+    font-weight: 900;
+    margin: 2.5em 0 1.5em;
+}
+
+#bodyColumn h3, #bodyColumn h4, #bodyColumn h5, #bodyColumn h6 {
+    font-size: 0.95em;
+    text-transform: uppercase;
+    line-height: 1;
+    margin: 4em 0 2em;
+    font-weight: 600;
+    color: #bbb;
+}
+
+#bodyColumn > *, .api .source > pre {
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+#bodyColumn > p,
+#bodyColumn > ul,
+#bodyColumn > ol {
+    font-weight: 300;
+}
+
+#bodyColumn > p a,
+#bodyColumn > ul a,
+#bodyColumn > ol a {
+    font-weight: normal;
+}
+
+ul.footer {
+    text-align: center;
+    font-size: 0.8em;
+    margin: 0 0 20px;
+    padding: 0;
+}
+
+ul.footer > li {
+    display: block;
+}
+
+ul.footer h2 {
+    font-weight: bold;
+}
+
+#bodyColumn > ul, #bodyColumn > ol {
+    padding-left: 45px;
+}
+
+.api .source {
+    padding: 0 !important;
+}
+
+.api pre {
+    border-radius: 0;
+}
+
+@media (min-width: 900px) {
+    .api #rightColumn {
+        display: block;
+        width: 50%;
+        background-color: #2b2f3e;
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+    }
+
+    .api.closed #rightColumn {
+        display: none;
+    }
+}
+
+@media (min-width: 900px) {
+    .api #rightColumnToggler {
+        display: block;
+        top: 0;
+        right: 0;
+        position: fixed;
+        color: #fff;
+        z-index: 100;
+        width: 50px;
+        height: 40px;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0, 0, 24, 24"><path fill="#959CAD" d="M15.933,7.467 C16.133,7.267 16.4,7.267 16.533,7.467 C16.733,7.6 16.733,7.867 16.533,8.067 L12.6,12 L16.533,15.933 C16.733,16.067 16.733,16.333 16.533,16.533 C16.4,16.733 16.133,16.733 15.933,16.533 L12,12.6 L8.067,16.533 C7.933,16.733 7.667,16.733 7.467,16.533 C7.267,16.4 7.267,16.133 7.467,15.933 L11.4,12 L7.467,8.067 C7.267,7.933 7.267,7.667 7.467,7.467 C7.6,7.267 7.867,7.267 8.067,7.467 L12,11.4 L15.933,7.467 z"/></svg>');
+        background-size: 36px 36px;
+        background-repeat: no-repeat;
+        background-position: center;
+        cursor: pointer;
+    }
+
+    .api.closed #rightColumnToggler {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="36" viewBox="0, 0, 18, 36"><path fill="#959CAD" d="M0.001,18 C0.001,17.73 0.111,17.488 0.283,17.31 L0.28,17.307 L16.28,0.307 L16.281,0.307 C16.465,0.12 16.718,0 17.001,0 C17.554,0 18.001,0.447 18.001,1 C18.001,1.27 17.891,1.512 17.719,1.69 L17.722,1.693 L2.391,18 L17.721,34.307 L17.719,34.309 C17.891,34.487 18.001,34.73 18.001,35 C18.001,35.553 17.554,36 17.001,36 C16.718,36 16.465,35.88 16.283,35.692 L16.28,35.694 L0.28,18.694 L0.282,18.692 C0.109,18.512 0,18.269 0,18 z"/></svg>');
+        background-size: 9px 18px;
+    }
+}
+
+@media (min-width: 900px) {
+    .api.open .api-body > h1,
+    .api.open .api-body > h2,
+    .api.open .api-body > h3,
+    .api.open .api-body > h4,
+    .api.open .api-body > h5,
+    .api.open .api-body > h6,
+    .api.open .api-body > p,
+    .api.open .api-body > table,
+    .api.open .api-body > ul,
+    .api.open .api-body > ol,
+    .api.open .api-body > dl,
+    .api.open .api-body > a,
+    .api.open ul.footer {
+        margin-right: 50%;
+        width: 50%;
+        display: block;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+}
+
+.api-body > .clear {
+    clear: both;
+}
+
+.api-body pre, .api-body blockquote {
+    background-color: #2b2f3e;
+    color: #fff;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    margin: 0;
+    clear: right;
+    border: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.api-body pre, .api-body blockquote {
+    display: none;
+}
+
+@media (min-width: 900px) {
+    .api-body pre, .api-body blockquote {
+        display: block;
+        width: 50%;
+        float: right;
+    }
+
+    .api.closed .api-body pre, .api.closed .api-body blockquote {
+        display: none;
+    }
+}
+
+#bodyColumn.api-body blockquote {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.api-body blockquote > p {
+    background-color: #262c39;
+    padding: 13px 30px;
+    color: #ccc;
+    border-top: 1px solid #3a3e4d;
+    border-bottom: 1px solid #3a3e4d;
+}
+
+.api-body pre > p, .api-body blockquote > p {
+    margin: 0;
+}
+
+#bodyColumn tt, #bodyColumn code {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 2px;
+    border-radius: 3px;
+    word-break: break-word;
+}
+
+a.externalLink[href^=https], a.externalLink[href^=http] {
+    background: none;
+    padding: 0;
+}
+
+p.warning, p.notice {
+    padding-top: 1em;
+    padding-bottom: 1em;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+    line-height: 1.6;
+    margin-left: -30px;
+    margin-right: -30px;
+    padding-left: 30px;
+    padding-right: 30px;
+    font-weight: normal !important;
+}
+
+p.warning {
+    background-color: #EACFD5;
+}
+
+p.notice {
+    background-color: #CBE2EF;
+}
+
+p.warning:before, p.notice:before {
+    position: relative;
+    top: 2px;
+    padding-right: 5px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+}
+
+p.warning:before {
+    content: "\e101";
+}
+
+p.notice:before {
+    content: "\e086";
+}
+
+@font-face {
+    font-family: 'Inconsolata';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Inconsolata'), url(../fonts/Inconsolata.woff) format('woff');
+}
+@font-face {
+    font-family: 'Inconsolata';
+    font-style: normal;
+    font-weight: 700;
+    src: local('Inconsolata Bold'), local('Inconsolata-Bold'), url(../fonts/Inconsolata-Bold.woff) format('woff');
+}
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 300;
+    src: local('Lato Light'), local('Lato-Light'), url(../fonts/Lato-Light.woff) format('woff');
+}
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Lato Regular'), local('Lato-Regular'), url(../fonts/Lato-Regular.woff) format('woff');
+}
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 700;
+    src: local('Lato Bold'), local('Lato-Bold'), url(../fonts/Lato-Bold.woff) format('woff');
+}
+@font-face {
+    font-family: 'Lato';
+    font-style: italic;
+    font-weight: 300;
+    src: local('Lato Light Italic'), local('Lato-LightItalic'), url(../fonts/Lato-LightItalic.woff) format('woff');
+}
+@font-face {
+    font-family: 'Lato';
+    font-style: italic;
+    font-weight: 400;
+    src: local('Lato Italic'), local('Lato-Italic'), url(../fonts/Lato-Italic.woff) format('woff');
+}
+@font-face {
+    font-family: 'Lato';
+    font-style: italic;
+    font-weight: 700;
+    src: local('Lato Bold Italic'), local('Lato-BoldItalic'), url(../fonts/Lato-BoldItalic.woff) format('woff');
+}

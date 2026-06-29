@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  validate-compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Valider docker-compose (dev)
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
+
+      - name: Valider docker-compose (prod local)
+        run: |
+          cp .env.example .env
+          docker compose \
+            -f docker-compose.yml \
+            -f compose/prod.yml \
+            -f compose/prod.local.yml \
+            --profile rh config --quiet
+
+      - name: Valider docker-compose (prod VPS)
+        run: |
+          cp .env.prod.example .env
+          docker compose \
+            -f docker-compose.yml \
+            -f compose/prod.yml \
+            -f compose/prod.vps.yml \
+            --profile rh config --quiet
+
+  build-rh:
+    runs-on: ubuntu-latest
+    needs: validate-compose
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image RH
+        run: docker build -f rh/docker/backend/Dockerfile -t onip-rh:test ./rh

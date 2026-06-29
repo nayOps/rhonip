@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="css/styles/atelier-cave-light.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <title>Prerequisites</title>
+  </head>
+  <body>
+    <div id="header_content">
+    <h2>MorphoTablet Customization Package Guide</h2>
+    <!-- LINK TO SOURCE CODE -->
+    <h1>Prerequisites</h1>
+    </div>
+</br>
+    <table>
+      <tr>
+        <td><b>Operating System</b></td>
+        <td>Linux Ubuntu 14.04 (64 bit)</td>
+      </tr>
+      <tr>
+        <td><b>JRE</b></td>
+        <td>JRE 7 and higher</td>
+      </tr>
+    </table>
+
+    <p>Run the following command lines:</p>
+<div id="code"><pre><code class="bash">sudo apt-get update
+sudo apt-get install libc6-i386 libstdc++6:i386 openjdk-7-jre lib32z1 android-tools-adb android-tools-fastboot zip
+mkdir ~/.android -p
+echo 0x225D > ~/.android/adb_usb.ini
+</code></pre></div>
+
+    <p>Note : You can also launch InstallNeededPackages script to install packages automatically.<p>
+
+  <footer>
+  Copyright (C) 2019, IDEMIA, All rights reserved. Reproduction in whole or in part in any form or medium without the express written permission of IDEMIA is prohibited
+</footer>
+</body>
+</html>

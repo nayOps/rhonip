@@ -1,0 +1,57 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="css/styles/atelier-cave-light.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <title>Purpose</title>
+</head>
+<body>
+  <div id="header_content">
+    <h2>MorphoTablet Customization Package Guide</h2>
+    <!-- LINK TO SOURCE CODE -->
+    <h1>Import customization package into MorphoTablet™ 2(i)</h1>
+  </div>
+
+  <body>
+
+    <p>
+      To install the <b>MorphoTablet customization package</b>, please follow the same process as firmware update.</br>
+      In case of factory reset, integrator applications are restored to the initial version present in integrator partition (integrator partition is not erased by a factory reset).
+	  <br>
+	  <br>
+	  <br>
+	  Two possibilities are available to import the customization package: either from your system file environment (Windows / Linux) or directly from your SD card.
+	  
+    </p>
+    <h2>Recovery mode menu</h2>
+    <p>
+      To start recovery mode, press "volume up (+)" button while the tablet is restarting.<br> Then use "volume up (+) / down (-)" buttons to select and "power" to validate.
+	  <br><br>
+	  When the recovery menu shows up on MorphoTablet, follow those steps to start the update:
+    </p>
+
+    <li style="margin-left:30px;">1. Connect MorphoTablet to your host machine (Windows / Linux PC)</li>
+	<li style="margin-left:30px;">2. On MorphoTablet, in recovery menu, select "English" then "apply update from ADB"</li>
+    <li style="margin-left:30px;">3. From host machine, run following ADB command line :
+		<div id=codebash>
+			<pre><code class="bash">$ adb sideload mycustpack_update.zip</code></pre>
+		</div> 
+	</li>
+
+      <h2>Android menu</h2>
+
+      <li style="margin-left:30px;">1. Copy customization package in tablet root folder, or SD card root folder. Package filename must end with "update.zip", to be reconnized by Android.</li>
+      <li style="margin-left:30px;">2. From MorphoTablet, scroll down the "Settings" menu and click on 'About Tablet'</li>
+      <li style="margin-left:30px;">3. Select "System updates" menu</li>
+      <li style="margin-left:30px;">4. Insert into the tablet your SD card that contains the ready to flash customization package then validate</li>
+
+      <footer>
+        Copyright (C) 2019, IDEMIA, All rights reserved. Reproduction in whole or in part in any form or medium without the express written permission of IDEMIA is prohibited
+      </footer>
+      </body>
+    </html>

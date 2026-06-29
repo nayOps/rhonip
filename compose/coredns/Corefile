@@ -1,0 +1,14 @@
+# DNS local ONIP — résout rh.onip.gouv.local pour tout le réseau
+# Les postes doivent utiliser ce serveur comme DNS (via DHCP du routeur).
+
+. {
+    hosts /etc/coredns/hosts {
+        ttl 60
+        reload 5s
+        fallthrough
+    }
+    forward . 8.8.8.8 8.8.4.4
+    cache 120
+    errors
+    log
+}

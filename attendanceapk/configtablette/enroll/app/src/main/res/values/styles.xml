@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ButtonPrimary" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_primary_flat</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:textColor">@color/button_primary_text</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="ButtonAccent" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_accent_flat</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:textColor">@color/button_accent_text</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:minHeight">60dp</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+
+    <style name="ButtonSecondary" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_secondary_flat</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:textColor">@color/button_secondary_text</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+
+    <style name="ButtonOutline" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_outline_flat</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:textColor">@color/button_outline_text</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+
+    <style name="ButtonOutlineOnDark" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_outline_on_dark</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:textColor">@color/text_on_dark</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:minHeight">56dp</item>
+    </style>
+
+    <style name="OnipBrandTitle">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/onip_blue</item>
+        <item name="android:letterSpacing">0.04</item>
+    </style>
+
+    <style name="OnipScreenTitle">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_on_dark</item>
+    </style>
+
+    <style name="OnipSubtitle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="OnipSubtitleOnDark">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/text_muted_on_dark</item>
+    </style>
+
+    <style name="Heading1">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/onip_blue</item>
+    </style>
+
+    <style name="Heading2">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/onip_blue</item>
+    </style>
+
+    <style name="Heading3">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/onip_blue</item>
+    </style>
+
+    <style name="BodyLarge">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="Body">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="BodySmall">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="ProgressBarFlat" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_bar_flat</item>
+        <item name="android:minHeight">8dp</item>
+        <item name="android:maxHeight">8dp</item>
+    </style>
+</resources>

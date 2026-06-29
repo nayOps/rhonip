@@ -1,0 +1,49 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <link rel="stylesheet" href="../css/styles/atelier-cave-light.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <title>Tri-Color LED Sample</title>
+</head>
+<body>
+  <div id="header_content">
+  <h2>MorphoTablet CSP Programming Guide</h2>
+  <h1>Understanding Tri-Color LED Sample Application</h1>
+  <!-- LINK TO SOURCE CODE -->
+  <p><a style="CURSOR: hand"href="../../../../Code_Samples/Main_Demo/tricolor_led_demo">Click to View Source</a></p>
+  </div>
+<div id=topic_content>
+
+  <h1>Functions</h1>
+  <p>The device has a Tri-Color LED (notification LED). In order to set this LED color, call the available function.<br>
+    <div style="margin-left:10px; padding:4px; border:4px solid #e0e0e0; display:inline-block;">
+    <div style="padding:3px; background-color:#e0e0e0;">
+    <strong> Note: </strong>   Charging Battery Led color can also be bypassed (refer to 'override' parameter).
+    </div>
+    </div>
+  </p>
+  <h2>Switch the Tri-Color LED On</h2>
+  <p>
+    <b>Description</b> – Set the LED color.
+  </p>
+  <div id="code"><pre><code class="java">void setColor(int c, boolean override)
+    {
+        if (override)   c = c & 0xFEFFFFFF;
+        //Toast.makeText(getApplicationContext(), "Set Color " + c, Toast.LENGTH_SHORT).show();
+        notification.ledARGB = c;
+        notificationManager.cancel(1);
+        notificationManager.notify(1, notification);
+    }
+}</code></pre></div>
+</div>
+<footer>
+  Copyright (C) 2019, IDEMIA, All rights reserved. Reproduction in whole or in part in any form or medium without the express written permission of IDEMIA is prohibited
+</footer>
+</body>
+</html>

@@ -1,0 +1,36 @@
+#!/bin/bash
+
+. /etc/lsb-release
+
+if [ "$DISTRIB_ID" != "Ubuntu" ]
+    then
+        echo -e "This is not ubuntu !\n Try on an Ubuntu 14.04 or 16.04\n\n"
+        exit 1
+fi
+
+if [[ "$DISTRIB_RELEASE" == *"14.04"* ]]
+then
+    echo -e "Ubuntu version : $DISTRIB_RELEASE\n"
+elif [[ "$DISTRIB_RELEASE" == *"16.04"* ]]
+then
+    echo -e "Ubuntu version : $DISTRIB_RELEASE\n"
+else
+    echo -e "Wrong Ubuntu version !\n Try on an Ubuntu 14.04 or 16.04\n\n"
+    exit 1
+fi
+
+java_version=$(java -version 2>&1 | awk -F '"' '{print $2}' | awk -F '_' '{print $1}' | awk -F '.' '{print $1"."$2}' | head -n 1)
+
+if [[ "$java_version" > "1.6" ]]; then
+    echo -e "java version is $java_version . No needs to install it"
+    
+    echo -e "This will install necessary packages to create a Customization partition"
+    sudo apt-get install gcc-multilib lib32z1 lib32stdc++6 libstdc++6:i386 zip
+else
+    
+    echo -e "This will install necessary packages to create a Customization partition"
+    echo -e "java version is not up to date. Needs to install it"
+    sudo apt-get install gcc-multilib lib32z1 lib32stdc++6 libstdc++6:i386 zip default-jre
+fi
+
+exit 0

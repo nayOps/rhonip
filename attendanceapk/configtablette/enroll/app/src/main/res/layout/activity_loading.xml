@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_secondary"
+    android:gravity="center">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:background="@drawable/tricolor_bar_horizontal" />
+
+    <LinearLayout
+        android:id="@+id/layout_loading_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp">
+
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:src="@drawable/ic_onip_logo"
+            android:contentDescription="Logo ONIP"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            style="@style/OnipBrandTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ONIP RH"
+            android:textAlignment="center"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            style="@style/OnipSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_subtitle"
+            android:textAlignment="center"
+            android:layout_marginBottom="32dp" />
+
+        <TextView
+            android:id="@+id/txt_loading_status"
+            style="@style/Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Initialisation..."
+            android:textAlignment="center"
+            android:layout_marginBottom="24dp" />
+
+        <ProgressBar
+            android:id="@+id/progress_loading"
+            style="@style/ProgressBarFlat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="0"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp" />
+
+        <Button
+            android:id="@+id/btn_open_config_loading"
+            style="@style/ButtonOutline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Configurer IP / port" />
+
+        <LinearLayout
+            android:id="@+id/layout_config_ip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/onip_card"
+            android:padding="24dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/Heading3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Configuration Backend"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/edit_backend_ip_loading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:hint="IP du backend (ex: 192.168.1.72)"
+                android:inputType="text"
+                android:background="@drawable/input_flat"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/edit_backend_port_loading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:hint="Port (ex: 8100)"
+                android:inputType="number"
+                android:background="@drawable/input_flat"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/btn_retry_loading"
+                style="@style/ButtonPrimary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Relancer le chargement" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

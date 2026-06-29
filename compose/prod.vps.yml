@@ -1,0 +1,23 @@
+# Spécifique VPS — Traefik cpnpr partagé, pas de port exposé sur l'hôte
+# Usage : voir compose/prod.yml
+
+services:
+  keycloak:
+    container_name: onip_keycloak
+    # start-dev : Keycloak embarqué (MVP). Migrer vers start + KC_DB pour prod durable.
+    command: start-dev
+    ports: !override []
+
+  rh_server:
+    ports: !override []
+    networks: !override
+      onip_network:
+        aliases:
+          - server
+          - rh_server
+      proxy: {}
+
+networks:
+  proxy:
+    external: true
+    name: proxy

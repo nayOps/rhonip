@@ -1,0 +1,42 @@
+# Overrides production communs (VPS et test local)
+#
+# VPS :
+#   docker compose -f docker-compose.yml -f compose/prod.yml -f compose/prod.vps.yml --profile rh up -d --build
+#
+# Test local (tablettes LAN, port 8100) :
+#   docker compose -f docker-compose.yml -f compose/prod.yml -f compose/prod.local.yml --profile rh up -d --build
+
+x-rh-prod-env: &rh-prod-env
+  DEBUG: "0"
+  RH_DEBUG: "0"
+  ALLOWED_HOSTS: ${RH_ALLOWED_HOSTS}
+  CSRF_TRUSTED_ORIGINS: ${RH_CSRF_TRUSTED_ORIGINS}
+  KEYCLOAK_BASE_URL: ${KEYCLOAK_BASE_URL}
+  PASSWORD_RESET_REDIRECT_URL: ${PASSWORD_RESET_REDIRECT_URL}
+  CORS_ORIGIN_WHITELIST: ${CORS_ORIGIN_WHITELIST}
+
+services:
+  onip_postgres:
+    ports: !override []
+
+  onip_redis:
+    ports: !override []
+
+  rh_server:
+    container_name: onip_rh_server
+    environment:
+      <<: *rh-prod-env
+    volumes: !override
+      - fgp_media:/app/media
+      - rh_media_volume:/app/backend/media
+      - rh_static_volume:/app/backend/static
+      - ../agents:/app/agents:ro
+      - ../datas:/app/datas:ro
+
+  rh_worker:
+    container_name: onip_rh_worker
+    environment:
+      <<: *rh-prod-env
+    volumes: !override
+      - rh_static_volume:/app/backend/static
+      - rh_media_volume:/app/backend/media

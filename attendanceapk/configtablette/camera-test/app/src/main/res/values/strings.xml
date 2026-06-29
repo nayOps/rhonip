@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Camera Test</string>
+    <string name="camera_title">Test Caméra MorphoTablet</string>
+    <string name="btn_capture">Capturer</string>
+    <string name="btn_switch">Changer Caméra</string>
+    <string name="status_initializing">Initialisation de la caméra...</string>
+    <string name="status_ready">Caméra prête</string>
+    <string name="status_capturing">Capture en cours...</string>
+    <string name="photo_saved">Photo sauvegardée</string>
+    <string name="error_camera">Erreur caméra</string>
+</resources>

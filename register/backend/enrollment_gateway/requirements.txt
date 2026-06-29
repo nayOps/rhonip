@@ -1,0 +1,56 @@
+# Django et extensions
+Django==4.2.7
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+django-extensions==3.2.3
+django-filter==23.3
+django-environ==0.11.2
+dj-database-url==2.2.0
+
+# Base de données
+psycopg2-binary==2.9.7
+django-dbbackup==3.3.0
+
+# Cache et sessions
+redis==5.0.1
+django-redis==5.4.0
+
+# Sécurité et authentification
+djangorestframework-simplejwt==5.3.0
+cryptography==41.0.7
+PyJWT==2.8.0
+
+# Validation et sérialisation
+marshmallow==3.20.1
+jsonschema==4.19.2
+
+# API et documentation
+drf-spectacular==0.26.5
+# Version compatible Python 3.11
+swagger-ui-bundle==1.1.0
+
+# Utilitaires
+Pillow==10.1.0
+python-decouple==3.8
+celery==5.3.4
+django-celery-beat==2.5.0
+
+# HTTP et intégration
+requests==2.31.0
+httpx==0.25.2
+
+# Monitoring et logging
+sentry-sdk==1.38.0
+structlog==23.2.0
+
+# Tests
+pytest==7.4.3
+pytest-django==4.7.0
+factory-boy==3.3.0
+coverage==7.3.2
+
+# Développement
+black==23.11.0
+flake8==6.1.0
+isort==5.12.0
+pre-commit==3.5.0

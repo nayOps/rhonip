@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ONIP Biometric</string>
+    
+    <!-- Main Activity -->
+    <string name="main_title">Système Biométrique ONIP</string>
+    <string name="btn_enrollment">Enregistrement Employé</string>
+    <string name="btn_attendance">Pointage</string>
+    
+    <!-- Employee Enrollment -->
+    <string name="enrollment_title">Enregistrement Employé</string>
+    <string name="enrollment_employee_id">ID Employé (NIN)</string>
+    <string name="enrollment_photo_step">Étape 1/5 : Capture Photo</string>
+    <string name="enrollment_fingerprint_step">Étape %1$d/5 : %2$s</string>
+    <string name="enrollment_capture_photo">Capturer Photo</string>
+    <string name="enrollment_capture_fingerprint">Capturer Empreinte</string>
+    <string name="enrollment_next">Suivant</string>
+    <string name="enrollment_previous">Précédent</string>
+    <string name="enrollment_submit">Envoyer</string>
+    <string name="enrollment_success">Employé enregistré avec succès !</string>
+    <string name="enrollment_error">Erreur d\'enregistrement</string>
+    
+    <!-- Attendance -->
+    <string name="attendance_title">Pointage</string>
+    <string name="attendance_instruction">Placez votre doigt sur le capteur</string>
+    <string name="attendance_verifying">Vérification en cours...</string>
+    <string name="attendance_success">Bienvenue %1$s !\nPointage enregistré.</string>
+    <string name="attendance_error">Empreinte non reconnue</string>
+    
+    <!-- Fingerprint Names -->
+    <string name="finger_left_index">Index Gauche</string>
+    <string name="finger_right_index">Index Droit</string>
+    <string name="finger_left_thumb">Pouce Gauche</string>
+    <string name="finger_right_thumb">Pouce Droit</string>
+    
+    <!-- Common -->
+    <string name="loading">Chargement...</string>
+    <string name="error">Erreur</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Annuler</string>
+    <string name="retry">Réessayer</string>
+    
+    <!-- Errors -->
+    <string name="error_camera">Erreur de caméra</string>
+    <string name="error_fingerprint">Erreur du capteur d\'empreintes</string>
+    <string name="error_network">Erreur réseau</string>
+    <string name="error_device_not_found">Périphérique biométrique non trouvé</string>
+</resources>
+

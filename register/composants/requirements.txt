@@ -1,0 +1,30 @@
+# Dépendances pour lecteurs biométriques
+# Installation: pip install -r requirements.txt
+
+# USB Communication
+pyusb>=1.2.1
+hidapi>=0.14.0
+
+# Serial Communication
+pyserial>=3.5
+
+# Computer Vision (pour iris)
+opencv-python>=4.8.0
+numpy>=1.24.0
+pillow>=10.0.0
+
+# Image processing pour iris
+scikit-image>=0.21.0
+scipy>=1.11.0
+
+# GUI
+tkinter  # Généralement inclus avec Python
+PyQt5>=5.15.9  # Alternative GUI plus moderne
+
+# Database pour stocker les templates
+sqlalchemy>=2.0.0
+
+# Utilitaires
+tqdm>=4.66.0
+colorama>=0.4.6
+

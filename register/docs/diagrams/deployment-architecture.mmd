@@ -1,0 +1,193 @@
+graph TB
+    subgraph "Load Balancer Layer"
+        LB[Nginx Load Balancer<br/>SSL Termination<br/>Rate Limiting]
+    end
+    
+    subgraph "Application Layer"
+        subgraph "Frontend Cluster"
+            FE1[Next.js Instance 1<br/>Port: 3000]
+            FE2[Next.js Instance 2<br/>Port: 3000]
+            FE3[Next.js Instance 3<br/>Port: 3000]
+        end
+        
+        subgraph "Backend Cluster"
+            EG1[Enrollment Gateway 1<br/>Port: 8001]
+            EG2[Enrollment Gateway 2<br/>Port: 8001]
+            
+            FC1[FGP Core Service 1<br/>Port: 8000]
+            FC2[FGP Core Service 2<br/>Port: 8000]
+            FC3[FGP Core Service 3<br/>Port: 8000]
+            
+            ES1[Extensions Service 1<br/>Port: 8002]
+            ES2[Extensions Service 2<br/>Port: 8002]
+            
+            AS1[ABIS Service 1<br/>Port: 8003]
+            AS2[ABIS Service 2<br/>Port: 8003]
+        end
+    end
+    
+    subgraph "Data Layer"
+        subgraph "Database Cluster"
+            PG_MASTER[(PostgreSQL Master<br/>Write Operations)]
+            PG_SLAVE1[(PostgreSQL Slave 1<br/>Read Operations)]
+            PG_SLAVE2[(PostgreSQL Slave 2<br/>Read Operations)]
+        end
+        
+        subgraph "Cache Cluster"
+            REDIS_MASTER[(Redis Master<br/>Primary Cache)]
+            REDIS_SLAVE1[(Redis Slave 1<br/>Replica)]
+            REDIS_SLAVE2[(Redis Slave 2<br/>Replica)]
+        end
+        
+        subgraph "Storage Cluster"
+            S3_PRIMARY[(MinIO Primary<br/>Documents + Biométrie)]
+            S3_BACKUP[(MinIO Backup<br/>Replication)]
+        end
+    end
+    
+    subgraph "Monitoring Layer"
+        PM[Prometheus<br/>Metrics Collection]
+        GF[Grafana<br/>Visualization]
+        ELK[ELK Stack<br/>Log Aggregation]
+        ALERT[AlertManager<br/>Notifications]
+    end
+    
+    subgraph "External Systems"
+        CENI[CENI API<br/>Système électoral]
+        MENPS[MENPS API<br/>Ministère Éducation]
+        HCR[HCR API<br/>Réfugiés]
+        PNC[PNC API<br/>Police]
+        FARDC[FARDC API<br/>Armée]
+    end
+    
+    subgraph "Security Layer"
+        WAF[Web Application Firewall<br/>DDoS Protection]
+        PKI[PKI ONIP<br/>Certificats + Signatures]
+        HSM[Hardware Security Module<br/>Clés biométriques]
+    end
+    
+    %% Load Balancer connections
+    WAF --> LB
+    LB --> FE1
+    LB --> FE2
+    LB --> FE3
+    
+    %% Frontend to Backend
+    FE1 --> EG1
+    FE1 --> EG2
+    FE2 --> EG1
+    FE2 --> EG2
+    FE3 --> EG1
+    FE3 --> EG2
+    
+    %% Backend interconnections
+    EG1 --> FC1
+    EG1 --> FC2
+    EG1 --> FC3
+    EG2 --> FC1
+    EG2 --> FC2
+    EG2 --> FC3
+    
+    EG1 --> ES1
+    EG1 --> ES2
+    EG2 --> ES1
+    EG2 --> ES2
+    
+    EG1 --> AS1
+    EG1 --> AS2
+    EG2 --> AS1
+    EG2 --> AS2
+    
+    %% Database connections
+    FC1 --> PG_MASTER
+    FC2 --> PG_MASTER
+    FC3 --> PG_MASTER
+    
+    FC1 --> PG_SLAVE1
+    FC2 --> PG_SLAVE1
+    FC3 --> PG_SLAVE1
+    
+    ES1 --> PG_SLAVE2
+    ES2 --> PG_SLAVE2
+    
+    %% Cache connections
+    FC1 --> REDIS_MASTER
+    FC2 --> REDIS_MASTER
+    FC3 --> REDIS_MASTER
+    ES1 --> REDIS_MASTER
+    ES2 --> REDIS_MASTER
+    
+    %% Storage connections
+    AS1 --> S3_PRIMARY
+    AS2 --> S3_PRIMARY
+    EG1 --> S3_PRIMARY
+    EG2 --> S3_PRIMARY
+    
+    %% Monitoring connections
+    PM --> FC1
+    PM --> FC2
+    PM --> FC3
+    PM --> ES1
+    PM --> ES2
+    PM --> AS1
+    PM --> AS2
+    PM --> PG_MASTER
+    PM --> REDIS_MASTER
+    
+    FC1 --> ELK
+    FC2 --> ELK
+    FC3 --> ELK
+    ES1 --> ELK
+    ES2 --> ELK
+    AS1 --> ELK
+    AS2 --> ELK
+    
+    PM --> GF
+    PM --> ALERT
+    
+    %% External integrations
+    EG1 -.-> CENI
+    EG2 -.-> CENI
+    ES1 -.-> MENPS
+    ES2 -.-> MENPS
+    ES1 -.-> HCR
+    ES2 -.-> HCR
+    ES1 -.-> PNC
+    ES2 -.-> PNC
+    ES1 -.-> FARDC
+    ES2 -.-> FARDC
+    
+    %% Security connections
+    PKI -.-> EG1
+    PKI -.-> EG2
+    HSM -.-> AS1
+    HSM -.-> AS2
+    
+    %% Replication
+    PG_MASTER -.-> PG_SLAVE1
+    PG_MASTER -.-> PG_SLAVE2
+    REDIS_MASTER -.-> REDIS_SLAVE1
+    REDIS_MASTER -.-> REDIS_SLAVE2
+    S3_PRIMARY -.-> S3_BACKUP
+    
+    %% Styling
+    classDef loadbalancer fill:#e1f5fe,stroke:#01579b,stroke-width:3px
+    classDef frontend fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef backend fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef database fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef cache fill:#fff8e1,stroke:#ff8f00,stroke-width:2px
+    classDef storage fill:#f1f8e9,stroke:#33691e,stroke-width:2px
+    classDef monitoring fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef external fill:#e0f2f1,stroke:#00695c,stroke-width:2px
+    classDef security fill:#ffebee,stroke:#c62828,stroke-width:2px
+    
+    class LB loadbalancer
+    class FE1,FE2,FE3 frontend
+    class EG1,EG2,FC1,FC2,FC3,ES1,ES2,AS1,AS2 backend
+    class PG_MASTER,PG_SLAVE1,PG_SLAVE2 database
+    class REDIS_MASTER,REDIS_SLAVE1,REDIS_SLAVE2 cache
+    class S3_PRIMARY,S3_BACKUP storage
+    class PM,GF,ELK,ALERT monitoring
+    class CENI,MENPS,HCR,PNC,FARDC external
+    class WAF,PKI,HSM security
+

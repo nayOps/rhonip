@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme -->
+    <style name="Theme.ONIPBiometric" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">#2563EB</item>
+        <item name="colorPrimaryDark">#1E40AF</item>
+        <item name="colorAccent">#3B82F6</item>
+        
+        <!-- Status bar color -->
+        <item name="android:statusBarColor">#1E40AF</item>
+        
+        <!-- Customize your theme here -->
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+    
+    <!-- NoActionBar theme for WebView activity -->
+    <style name="Theme.ONIPBiometric.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+    </style>
+</resources>
+

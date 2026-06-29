@@ -1,0 +1,32 @@
+# Route Traefik ONIP — à installer dans le Traefik cpnpr (Présidence)
+# Cible : /home/adn/cpnpr/docker/traefik/config/dynamic/onip-rh.yml
+#
+# Installation :
+#   ./deploy/vps/install-traefik-route.sh
+#
+# Prérequis :
+#   - DNS rh.onip.gouv.cd → IP du VPS
+#   - Conteneur onip_rh_server joignant le réseau Docker "proxy"
+#   - Variable TRAEFIK_LETS_ENCRYPT_RESOLVER définie dans cpnpr (.env)
+
+http:
+
+  routers:
+
+    onip-rh:
+      rule: Host(`rh.onip.gouv.cd`)
+      entryPoints:
+        - websecure
+      middlewares:
+        - redirect-to-secure
+      service: onip-rh-service
+      priority: 100
+      tls:
+        certResolver: {{ env "TRAEFIK_LETS_ENCRYPT_RESOLVER" }}
+
+  services:
+
+    onip-rh-service:
+      loadBalancer:
+        servers:
+          - url: "http://onip_rh_server:8000"

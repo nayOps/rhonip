@@ -1,0 +1,38 @@
+@startuml
+== Initialization ==
+App -> MobIris : IrisInitialize()
+
+alt Multiprotect (MorphoTablet2)
+	MobIris -> MobIris : Init license from multiprotect
+
+else License file available in LicenseFilePath
+
+	MobIris -> MobIris : Init license from file
+
+else License file unavailable
+
+	MobIris -> LKMS :Generate license
+	LKMS -> MobIris :License file
+
+end
+MobIris -> App
+== Preview ==
+App -> MobIris : IrisStartPreview()
+MobIris -> MobIris : Open camera / video file in replay mode\nPreviewCallback is called with frame in params
+MobIris -> App
+== Acquisition ==
+App -> MobIris : IrisAcquisition()
+alt No template pushed and output format is Kind7
+MobIris -> MobIris : Mobiris looks for iris and will return kind 7 of them
+else No template pushed and output format is templale/image
+MobIris -> MobIris : Mobiris looks for iris and will return template and image of them
+else Templates pushed
+MobIris -> MobIris : Mobiris looks for iris  which match one of the templates and will return template id and matching score
+end
+MobIris -> App
+== End ==
+App -> MobIris : IrisFreeResults()
+MobIris -> App
+App -> MobIris : IrisFinalize()
+MobIris -> App
+@enduml

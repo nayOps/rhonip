@@ -1,0 +1,260 @@
+# Services FGP / register — profil: register
+# Chemins relatifs à register/ (project_directory).
+
+x-register-db-env: &register-db-env
+  DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@onip_postgres:5432/${POSTGRES_DB}
+
+services:
+  fgp_core:
+    profiles: [register]
+    build:
+      context: ./backend/fgp_core
+      dockerfile: Dockerfile
+    container_name: fgp_core_service
+    env_file:
+      - ../.env
+    environment:
+      <<: *register-db-env
+      DEBUG: "0"
+      SECRET_KEY: ${FGP_SECRET_KEY:-fgp_secret_key_2025_very_secure}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@onip_redis:6379/0
+      ALLOWED_HOSTS: localhost,127.0.0.1,fgp_core_service,fgp-core,fgp_core,fgp_core:8000
+      GUICHET_INTERNAL_API_KEY: ${GUICHET_INTERNAL_API_KEY:-fgp_guichet_internal_dev}
+      CORS_ALLOWED_ORIGINS: http://localhost:${FGP_FRONTEND_PORT:-3000},http://127.0.0.1:${FGP_FRONTEND_PORT:-3000}
+    ports:
+      - "${FGP_CORE_PORT:-8000}:8000"
+    volumes:
+      - ./backend/fgp_core:/app
+      - fgp_media:/app/media
+      - fgp_static:/app/static
+    depends_on:
+      onip_postgres:
+        condition: service_healthy
+      onip_redis:
+        condition: service_healthy
+      rh_server:
+        condition: service_started
+        required: false
+    networks:
+      onip_network:
+        aliases:
+          - fgp-core
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/health/', timeout=5)\""]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    command: >
+      sh -c "mkdir -p /app/logs &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  enrollment_gateway:
+    profiles: [register]
+    build:
+      context: ./backend/enrollment_gateway
+      dockerfile: Dockerfile
+    container_name: fgp_enrollment_gateway
+    env_file:
+      - ../.env
+    environment:
+      <<: *register-db-env
+      DEBUG: "0"
+      SECRET_KEY: ${FGP_ENROLLMENT_SECRET_KEY:-fgp_enrollment_secret_2025}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@onip_redis:6379/1
+      FGP_CORE_URL: http://fgp-core:8000
+      RH_SERVICE_URL: http://server:8000
+      ALLOWED_HOSTS: localhost,127.0.0.1,fgp_enrollment_gateway,enrollment_gateway,enrollment-gateway
+      GUICHET_INTERNAL_API_KEY: ${GUICHET_INTERNAL_API_KEY:-fgp_guichet_internal_dev}
+      CORS_ALLOWED_ORIGINS: http://localhost:${FGP_FRONTEND_PORT:-3000},http://127.0.0.1:${FGP_FRONTEND_PORT:-3000}
+    ports:
+      - "${ENROLLMENT_GATEWAY_PORT:-8001}:8000"
+    volumes:
+      - ./backend/enrollment_gateway:/app
+      - fgp_media:/app/media
+    depends_on:
+      onip_postgres:
+        condition: service_healthy
+      onip_redis:
+        condition: service_healthy
+      rh_server:
+        condition: service_started
+        required: false
+      fgp_core:
+        condition: service_healthy
+    networks:
+      - onip_network
+    restart: unless-stopped
+    command: >
+      sh -c "mkdir -p /app/logs &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  enrollment_worker:
+    profiles: [register]
+    build:
+      context: ./backend/enrollment_gateway
+      dockerfile: Dockerfile
+    container_name: fgp_enrollment_worker
+    env_file:
+      - ../.env
+    environment:
+      <<: *register-db-env
+      DEBUG: "0"
+      SECRET_KEY: ${FGP_ENROLLMENT_SECRET_KEY:-fgp_enrollment_secret_2025}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@onip_redis:6379/1
+      FGP_CORE_URL: http://fgp-core:8000
+      RH_SERVICE_URL: http://server:8000
+      ALLOWED_HOSTS: localhost,127.0.0.1,fgp_enrollment_gateway
+      GUICHET_INTERNAL_API_KEY: ${GUICHET_INTERNAL_API_KEY:-fgp_guichet_internal_dev}
+    volumes:
+      - ./backend/enrollment_gateway:/app
+      - fgp_media:/app/media
+    depends_on:
+      onip_postgres:
+        condition: service_healthy
+      onip_redis:
+        condition: service_healthy
+      fgp_core:
+        condition: service_healthy
+    networks:
+      - onip_network
+    restart: unless-stopped
+    command: celery -A enrollment_gateway worker -l info
+
+  fingerprint_service:
+    profiles: [register]
+    build:
+      context: ./backend/fingerprint_service
+      dockerfile: Dockerfile
+    container_name: fgp_fingerprint_service
+    env_file:
+      - ../.env
+    environment:
+      DEBUG: "1"
+      DJANGO_SECRET_KEY: ${FGP_FINGERPRINT_SECRET_KEY:-fgp_fingerprint_secret_2025}
+      ALLOWED_HOSTS: localhost,127.0.0.1,fingerprint_service
+      CORS_ALLOWED_ORIGINS: http://localhost:${FGP_FRONTEND_PORT:-3000},http://127.0.0.1:${FGP_FRONTEND_PORT:-3000}
+      DEVICE_BRIDGE_URL: http://host.docker.internal:8765
+      DEVICE_BRIDGE_TIMEOUT: "60"
+    ports:
+      - "${FINGERPRINT_SERVICE_PORT:-8010}:8010"
+    volumes:
+      - ./backend/fingerprint_service:/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - onip_network
+    restart: unless-stopped
+
+  biometric_service:
+    profiles: [dev-biometric]
+    build:
+      context: ./backend/biometric_service
+      dockerfile: Dockerfile
+    container_name: fgp_biometric_service
+    env_file:
+      - ../.env
+    environment:
+      DEBUG: "1"
+      DJANGO_SECRET_KEY: ${FGP_BIOMETRIC_SECRET_KEY:-fgp_biometric_secret_2025}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: onip_postgres
+      POSTGRES_PORT: "5432"
+      ALLOWED_HOSTS: localhost,127.0.0.1,biometric_service
+      IRIS_CAMERA_INDEX: "2"
+      IRIS_SAVE_IMAGES: "True"
+    ports:
+      - "${BIOMETRIC_SERVICE_PORT:-8003}:8003"
+    volumes:
+      - ./backend/biometric_service:/app
+      - fgp_biometric_data:/app/media
+    devices:
+      - /dev/video0:/dev/video0
+      - /dev/video1:/dev/video1
+      - /dev/video2:/dev/video2
+      - /dev/video3:/dev/video3
+    privileged: true
+    depends_on:
+      onip_postgres:
+        condition: service_healthy
+      onip_redis:
+        condition: service_healthy
+    networks:
+      - onip_network
+    restart: unless-stopped
+
+  frontend:
+    profiles: [register]
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fgp_frontend
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:${ENROLLMENT_GATEWAY_PORT:-8001}
+      NEXT_PUBLIC_FGP_CORE_URL: http://localhost:${FGP_CORE_PORT:-8000}
+      NEXT_PUBLIC_BIOMETRIC_URL: http://localhost:${BIOMETRIC_SERVICE_PORT:-8003}
+      NEXT_PUBLIC_FINGERPRINT_URL: http://localhost:${FINGERPRINT_SERVICE_PORT:-8010}
+      NEXT_PUBLIC_DEVICE_BRIDGE_URL: http://127.0.0.1:8765
+      DEVICE_BRIDGE_INTERNAL_URL: http://host.docker.internal:8765
+      NEXT_PUBLIC_USE_DEVICE_BRIDGE_DIRECT: "true"
+      NEXT_PUBLIC_RH_API_URL: ${NEXT_PUBLIC_RH_API_URL:-http://${SERVER_LAN_IP:-localhost}:${RH_SERVER_PORT:-8100}}
+      NEXT_PUBLIC_GUICHET_INTERNAL_API_KEY: ${GUICHET_INTERNAL_API_KEY:-fgp_guichet_internal_dev}
+      RH_INTERNAL_API_URL: http://server:8000
+      RH_FALLBACK_API_URL: http://host.docker.internal:${RH_SERVER_PORT:-8100}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${FGP_FRONTEND_PORT:-3000}:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      enrollment_gateway:
+        condition: service_started
+      fgp_core:
+        condition: service_started
+      fingerprint_service:
+        condition: service_started
+      rh_server:
+        condition: service_started
+        required: false
+    networks:
+      - onip_network
+    restart: unless-stopped
+    command: npm run dev
+
+  fgp_nginx:
+    profiles: [register]
+    image: nginx:alpine
+    container_name: fgp_nginx
+    # Port 80/443 exposés via Traefik (profil traefik) — pas de binding direct sur l'hôte
+    expose:
+      - "80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - fgp_media:/var/www/media
+      - fgp_static:/var/www/static
+    depends_on:
+      - frontend
+      - enrollment_gateway
+      - fgp_core
+      - fingerprint_service
+    networks:
+      - onip_network
+    restart: unless-stopped
+
+volumes:
+  fgp_media:
+    driver: local
+  fgp_static:
+    driver: local
+  fgp_biometric_data:
+    driver: local

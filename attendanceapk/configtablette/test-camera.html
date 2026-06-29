@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Caméra - MorphoTablet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #00ff88;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #00ff88;
+            color: #1a1a2e;
+        }
+
+        .btn-danger {
+            background: #ff4444;
+            color: white;
+        }
+
+        .btn-success {
+            background: #44ff44;
+            color: #1a1a2e;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        video, canvas, img {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 3px solid #00ff88;
+        }
+
+        .log {
+            background: #0f3460;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #1a1a2e;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .info-box {
+            background: #16213e;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎥 Test Caméra MorphoTablet</h1>
+
+        <div class="info-box">
+            <h3>📱 Informations</h3>
+            <p id="userAgent"></p>
+            <p id="platform"></p>
+            <p id="screenSize"></p>
+        </div>
+
+        <!-- Boutons de contrôle -->
+        <button class="btn btn-primary" onclick="testCamera()">
+            📷 TESTER LA CAMÉRA
+        </button>
+
+        <button class="btn btn-success hidden" id="btnCapture" onclick="capturePhoto()">
+            📸 CAPTURER LA PHOTO
+        </button>
+
+        <button class="btn btn-danger hidden" id="btnStop" onclick="stopCamera()">
+            ❌ ARRÊTER LA CAMÉRA
+        </button>
+
+        <!-- Éléments vidéo/photo -->
+        <video id="video" autoplay playsinline class="hidden"></video>
+        <canvas id="canvas" class="hidden"></canvas>
+        <img id="photo" class="hidden">
+
+        <!-- Console de logs -->
+        <div class="log">
+            <h3>📋 Console de Debug</h3>
+            <div id="logContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        let stream = null;
+        let videoElement = document.getElementById('video');
+        let canvasElement = document.getElementById('canvas');
+        let photoElement = document.getElementById('photo');
+
+        // Afficher les infos du système
+        function displaySystemInfo() {
+            log('🔍 Chargement des informations système...');
+            document.getElementById('userAgent').textContent = 'Navigateur: ' + navigator.userAgent;
+            document.getElementById('platform').textContent = 'Plateforme: ' + navigator.platform;
+            document.getElementById('screenSize').textContent = 'Écran: ' + window.screen.width + 'x' + window.screen.height;
+            log('✅ Informations système chargées');
+        }
+
+        // Fonction de log
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            document.getElementById('logContainer').appendChild(logEntry);
+            
+            // Scroll to bottom
+            const logContainer = document.getElementById('logContainer');
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Console aussi
+            console.log(message);
+        }
+
+        // Test de la caméra
+        async function testCamera() {
+            log('🎬 Démarrage du test caméra...');
+            
+            // Vérifier si getUserMedia est supporté
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                log('❌ ERREUR: getUserMedia non supporté sur ce navigateur');
+                alert('Votre navigateur ne supporte pas l\'accès à la caméra!');
+                return;
+            }
+
+            log('✅ getUserMedia est disponible');
+
+            try {
+                log('📹 Demande d\'accès à la caméra...');
+                
+                const constraints = {
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user'
+                    }
+                };
+
+                log('🔧 Contraintes: ' + JSON.stringify(constraints));
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                log('✅ Accès caméra accordé!');
+                log('📊 Stream: ' + stream.id);
+
+                videoElement.srcObject = stream;
+                
+                // Attendre que la vidéo soit prête
+                videoElement.onloadedmetadata = function() {
+                    log('✅ Métadonnées vidéo chargées');
+                    log('📐 Résolution: ' + videoElement.videoWidth + 'x' + videoElement.videoHeight);
+                };
+
+                // Afficher les éléments
+                videoElement.classList.remove('hidden');
+                document.getElementById('btnCapture').classList.remove('hidden');
+                document.getElementById('btnStop').classList.remove('hidden');
+
+                log('🎥 Caméra active! Vidéo affichée.');
+
+            } catch (error) {
+                log('❌ ERREUR CAMÉRA: ' + error.name);
+                log('📝 Message: ' + error.message);
+                log('🔍 Stack: ' + (error.stack || 'N/A'));
+                
+                alert('Erreur caméra:\n' + error.name + '\n' + error.message + '\n\nVérifiez les permissions!');
+            }
+        }
+
+        // Capturer une photo
+        function capturePhoto() {
+            log('📸 Capture de photo...');
+
+            if (!stream) {
+                log('❌ Aucun stream vidéo actif');
+                return;
+            }
+
+            const context = canvasElement.getContext('2d');
+            canvasElement.width = videoElement.videoWidth;
+            canvasElement.height = videoElement.videoHeight;
+            
+            log('📐 Canvas: ' + canvasElement.width + 'x' + canvasElement.height);
+            
+            context.drawImage(videoElement, 0, 0);
+            
+            const imageData = canvasElement.toDataURL('image/jpeg', 0.8);
+            log('💾 Image capturée: ' + imageData.length + ' caractères');
+            
+            photoElement.src = imageData;
+            photoElement.classList.remove('hidden');
+            
+            log('✅ Photo affichée!');
+            
+            // Sauvegarder dans localStorage
+            try {
+                localStorage.setItem('morpho_test_photo', imageData);
+                log('💾 Photo sauvegardée dans localStorage');
+            } catch (e) {
+                log('⚠️ Impossible de sauvegarder: ' + e.message);
+            }
+        }
+
+        // Arrêter la caméra
+        function stopCamera() {
+            log('🛑 Arrêt de la caméra...');
+            
+            if (stream) {
+                stream.getTracks().forEach(track => {
+                    track.stop();
+                    log('🔌 Track arrêté: ' + track.kind);
+                });
+                stream = null;
+            }
+
+            videoElement.classList.add('hidden');
+            document.getElementById('btnCapture').classList.add('hidden');
+            document.getElementById('btnStop').classList.add('hidden');
+            
+            log('✅ Caméra arrêtée');
+        }
+
+        // Lister les appareils média disponibles
+        async function listDevices() {
+            log('🔍 Énumération des appareils média...');
+            
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                
+                log('📱 Nombre d\'appareils: ' + devices.length);
+                
+                devices.forEach((device, index) => {
+                    log(`  ${index + 1}. ${device.kind}: ${device.label || '(sans nom)'}`);
+                });
+                
+                const cameras = devices.filter(d => d.kind === 'videoinput');
+                log('📷 Caméras détectées: ' + cameras.length);
+                
+            } catch (error) {
+                log('❌ Erreur énumération: ' + error.message);
+            }
+        }
+
+        // Initialisation
+        window.onload = function() {
+            log('🚀 Application chargée');
+            displaySystemInfo();
+            listDevices();
+            
+            // Test de support
+            log('🧪 Tests de compatibilité:');
+            log('  - navigator.mediaDevices: ' + (!!navigator.mediaDevices));
+            log('  - getUserMedia: ' + (!!navigator.mediaDevices?.getUserMedia));
+            log('  - localStorage: ' + (typeof(Storage) !== "undefined"));
+            
+            log('');
+            log('👆 Cliquez sur "TESTER LA CAMÉRA" pour commencer');
+        };
+
+        // Gestion des erreurs globales
+        window.onerror = function(msg, url, line, col, error) {
+            log('🚨 ERREUR GLOBALE:');
+            log('  Message: ' + msg);
+            log('  Ligne: ' + line);
+            log('  Colonne: ' + col);
+            if (error) {
+                log('  Stack: ' + error.stack);
+            }
+        };
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+

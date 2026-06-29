@@ -1,0 +1,106 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Prerequisites</title>
+  </head>
+  <body>
+    <div id="header_content">
+    <h2>MorphoTablet CSP Programming Guide</h2>
+    <!-- LINK TO SOURCE CODE -->
+    <h1>Prerequisites</h1>
+    </div>
+	
+    <h2>MorphoTablet environment</h2>
+    <table>
+      <tr>
+        <td><b>Operating System</b></td>
+        <td>Android Lollipop</br>
+          Android v5.0 (ARM v7a 32-bit Platform)</td>
+      </tr>
+      <tr>
+        <td><b>License Manager (MultiProtect)</b></td>
+        <td>Morpho License Manager v4.7.3 or higher     
+        <br><b>(required for Iris sensor)</b></td>
+      </tr>
+      <tr>
+        <td><b>License Service (MultiProtect)</b></td>
+        <td>Morpho License Protection Service v4.7.3 or higher
+        <br><b>(required for Iris sensor)</b></td>
+      </tr>
+    </table>
+    <br><br>
+
+    <h2>Android studio environment</h2>
+
+    <table>
+      <tr>
+        <td><b>Operating System</b></td>
+        <td>Windows XP(32 bit)</br>
+          Windows 7 (32-bit or 64-bit)</br>
+          Windows 10 (32-bit or 64-bit)</br>
+          Linux Ubuntu 14.04 LTS</td>
+      </tr>
+      <tr>
+        <td><b>Android studio</b></td>
+        <td>Android studio 2.0 or higher</td>
+      </tr>
+      <tr>
+        <td><b>Android SDK</b></td>
+        <td>Android SDK v21</td>
+      </tr>
+      <tr>
+        <td><b>Android Build Tools</b></td>
+        <td>Android Build Tools v21.1.2 or higher</td>
+      </tr>
+      <tr>
+        <td><b>JDK</b></td>
+        <td>JDK 7 and higher</td>
+      </tr>
+      <tr>
+        <td><b>JRE</b></td>
+        <td>JRE 7 and higher</td>
+      </tr>   
+      <tr>
+        <td><b>CMake</b></td>
+        <td>CMake 3.6.x or higher <b>(required for Iris sensor feature)</b></td>
+      </tr>
+      <tr>
+        <td><b>LLDB</b></td>
+        <td>LLDB 3.1.x or higher <b>(required for Iris sensor feature)</b></td>
+      </tr>
+      <tr>
+        <td><b>NDK</b></td>
+        <td>NDK 17.1.x or higher <b>(required for Iris sensor feature)</b></td>
+      </tr>  
+    </table>
+	<br><br>
+	<h2>Android Debug Bridge (ADB) Setup</h2>
+	
+	
+	To allow your PC to communicate with the tablet, you first need to enable the Android Debug Bridge following those instructions: <a target="_blank" href="https://developer.android.com/studio/command-line/adb.html#Enabling">https://developer.android.com/studio/command-line/adb.html#Enabling</a>.
+	
+	<br><br>
+	
+	On Windows, you will typically have to install an extra driver 
+	to be able to communicate with the MorphoTablet through ADB.<br>
+	As a workaround to a software bug, you first have to enable the MTP mode on your MorphoTablet to make it expose the USB device expected by the driver.<br>
+	When the tablet is connected, slide down the status bar to access USB options, and enable MTP.<br><br>
+	Then you can install the ADB driver that is available for Windows 7 and Windows 10 in the <a style="CURSOR: hand"href="../../../ADB_Drivers">ADB_Drivers directory</a>.<br>
+	On other Windows versions, you might see a security warning that you can ignore during driver installation.
+	<br><br>
+	
+	<div style="margin-left:10px; padding:4px; border:4px solid #e0e0e0; display:inline-block;">
+	<div style="padding:3px; background-color:#e0e0e0;">
+	<b>Note:</b> If ADB is not detecting the tablet, please try to create a file "adb_usb.ini" in your ".android" directory (~/.android on Linux, C:\Users\YOUR_LOGIN\.android on Windows) with a single line mentioning the USB vendor ID of the tablet: 0x225D.
+	On Linux, you will need to restart the adb daemon.
+	</div>
+	</div>
+	
+  <footer>
+  Copyright (C) 2019, IDEMIA, All rights reserved. Reproduction in whole or in part in any form or medium without the express written permission of IDEMIA is prohibited
+</footer>
+</body>
+</html>

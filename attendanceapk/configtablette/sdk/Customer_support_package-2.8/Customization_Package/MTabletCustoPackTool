@@ -1,0 +1,383 @@
+#!/bin/bash
+
+# Platform key : to sign reference APK. All apk signed with same key than reference APK will be considered by Firmware as platform signed.
+# Release key : to sign customization package
+# Integrator key : to sign ext4 partition using dm-verity
+
+set -e
+#set -x
+ME="$ $0"
+CPPATH=$(cd $(dirname $0); pwd)
+CPDATA=$CPPATH/bin
+BIN=$CPDATA/bin
+TMPDIR=$PWD/tmp_Morpho
+
+ExitInt()
+{
+	  echo "Unknown error !"
+}
+trap ExitInt EXIT
+
+CleanExit()
+{
+	trap - EXIT
+	exit 0
+}
+
+Debug()
+{
+	echo
+	echo $@
+	echo
+	$@
+}
+
+Error()
+{ 
+    rm -rf $TMPDIR;
+	echo -e "ERROR : $@ !" >&2 
+    echo -e "Use --help for more information." >&2 
+    trap - EXIT
+	exit 1 
+} 
+
+InitTmpDir()
+{
+	rm -rf $TMPDIR;mkdir $TMPDIR
+}
+
+Usage()
+{ 
+    echo "$ME OPTIONS"
+    echo
+    echo "OPTIONS:"
+    echo "-k, --generate-key-set KEYNAME                                    generate a customization package key set named KEYNAME, as well associated Android Studio keystore"
+    echo "-s, --system-sign-apk KEYNAME INAPKFILE OUTAPKFILE                provide system right to INAPKFILE using KEYNAME keyset"
+    echo "-e, --export-unsigned-public-key KEYNAME OUTFILE                  export OUTFILE to provide KEYNAME public key to Mtablet manufacturer for signature"
+    echo "-i, --import-signed-public-key KEYNAME INFILE                     import INFILE from Mtablet manufacturer to use as KEYNAME public signed key"
+    echo "-p, --generate-customization-package KEYNAME OUTZIP [OPTIONS2]    generate a ready to flash customization package OUTZIP using KEYNAME key set"
+    echo "-h, --help                                                        display this help"
+    echo ""
+    echo "OPTIONS2:" 
+    echo "-a, --alternative-key-set ALTKEYNAME                              generate a customization package allowing further update by KEYNAME or ALTKEYNAME signed customization packages" 
+    echo "-v, --customization-package-version VERSION                       sets customization package version (0-4294967295, 0 by default)"
+    echo "-d, --downgrade-policy POLICY                                     after flashing generated customization package, next update will be impacted by downgrade POLICY, see below"
+    echo "-x, --key-check-disable                                           after flashing generated customization package, any integrator key will be accepted"
+    echo
+    echo "POLICY:"
+    echo "DOWNGRADE_ALLOWED                                                 no restriction after flashing customization package (by default)"
+    echo "NO_VERSION_DOWNGRADE                                              once flashed, customization package will refuse inferior version updates"
+    echo "NO_DATE_DOWNGRADE                                                 once flashed, customization package will refuse inferior generation date updates" 
+    echo "NO_DATE_NOR_VERSION_DOWNGRADE                                     enable both NO_VERSION_DOWNGRADE and NO_DATE_DOWNGRADE"
+    echo
+    echo "Usual process:"
+    echo
+    echo "- Generating customer own keys:" 
+    echo "     $ME --generate-key-set mycompany1" 
+    echo
+    echo "- Signing customer public keys:"
+    echo "     $ME --export-unsigned-public-key mycompany1 mycompany1.bin"
+    echo ""
+    echo "     Note:"
+    echo "     ------------------------------------------------------------"
+    echo "     Please provide \"mycompany1.bin\" to MorphoTablet™ manufacturer"
+    echo "     and get \"mycompany1_signed.bin\" back before proceeding ..."
+    echo "     ------------------------------------------------------------"
+    echo ""
+    echo "     $ME --import-signed-public-key mycompany1 mycompany1_signed.bin"
+    echo
+    echo "- Generating customer customization pack:"
+    echo "     $ME --generate-customization-package mycompany1 mycustpack_update.zip"
+    echo
+} 
+
+CheckArgumentNumber()
+{
+	nb=$1
+	shift
+	[ $# -gt $nb ] && Error "Too many arguments (Tip : argument can't contain spaces)"
+	[ $# -lt $nb ] && Error "Missing arguments"
+	true
+}
+
+IsKeySigned()
+{
+	[ -f $1/integratorkey.pub.sign ]
+}
+
+IsKeyValid()
+{
+	tmp1()
+	{
+		[ -f $1/$2 ] || Error "Invalid key $1 : missing $1/$2 file"
+	}
+	tmp1 $1 integratorkey
+	tmp1 $1 integratorkey.pub
+	#tmp1 $1 keystore.img
+	#tmp1 $1 mypub.der
+	tmp1 $1 platform.pk8
+	tmp1 $1 platform.x509.pem
+	tmp1 $1 releasekey.pk8
+	tmp1 $1 releasekey.x509.pem
+	IsKeySigned $1 || echo "WARNING : this key set has not been signed by Morpho."
+}
+
+Generate_key_store()
+{
+	KEYSTOREPASS=$(dd if=/dev/urandom bs=4096 count=1 2>/dev/null | sha256sum | tr -d "-")
+	InitTmpDir
+	openssl rsa -inform DER -in $1/platform.pk8 -outform PEM -out $TMPDIR/platform.priv.pem 2>/dev/null
+	openssl pkcs12 -export -in $1/platform.x509.pem -inkey $TMPDIR/platform.priv.pem -out $TMPDIR/platform.pk12 -name $1 -passout pass:$KEYSTOREPASS
+	keytool -importkeystore -destkeystore $1/Android_studio_keystore.jks -srckeystore $TMPDIR/platform.pk12 -srcstoretype PKCS12 -alias $1 -deststorepass $KEYSTOREPASS -srcstorepass $KEYSTOREPASS 2>/dev/null
+	echo "Added key : alias = $1, keypass = $KEYSTOREPASS , keystorepass = $KEYSTOREPASS" > $1/Android_studio_keystore.txt
+	rm -rf $TMPDIR
+}
+
+Generate_key_set()
+{
+	CheckArgumentNumber 1 $@
+	[ -e $1 ] && Error "$1 directory already exists, cowardly refusing to overwrite existing keys.\nPlease note that keys are needed to flash customization packages, please save them in a secure place"
+	echo "Generating keys ..."
+	mkdir $1
+	$BIN/generate_verity_key $1/integratorkey
+	#openssl rsa -in $1/integratorkey -inform PEM -pubout -outform DER -out $1/mypub.der > /dev/null 2>&1
+	#java -Xmx512M -jar $BIN/KeystoreSigner.jar $1/integratorkey $1/keystore.img $1/mypub.der
+
+	echo -e "\n" | $BIN/make_key $1/platform '/C=FR/ST=mystate/L=mylocation/O=mycompany/OU=Android/CN=Android/emailAddress=myaddress@mydomain.com' > /dev/null 2>&1
+	echo -e "\n" | $BIN/make_key $1/releasekey '/C=FR/ST=mystate/L=mylocation/O=mycompany/OU=Android/CN=Android/emailAddress=myaddress@mydomain.com' > /dev/null 2>&1
+	Generate_key_store $1
+	echo "Done."
+	echo
+	echo "WARNING : keys have been generated in $1 directory."
+	echo "          Please save them now in a secure place."
+	echo
+	IsKeyValid $1
+}
+
+System_sign_apk()
+{
+	CheckArgumentNumber 3 $@
+	IsKeyValid $1
+	[ -f $2 ] || Error "Input file $2 not found"
+	echo Signing $2 to $3 ...
+	rm -f $2.unaligned $3
+	java -jar $BIN/signapk.jar $1/platform.x509.pem $1/platform.pk8 $2 $2.unaligned
+	$BIN/zipalign 4 $2.unaligned $3
+	rm $2.unaligned
+}
+
+Export_unsigned_public_key()
+{
+	CheckArgumentNumber 2 $@
+	IsKeyValid $1 > /dev/null
+	rm -f $2
+	zip -q -j $2 $1/integratorkey.pub
+}
+
+Import_signed_public_key()
+{
+	InitTmpDir
+	CheckArgumentNumber 2 $@
+	IsKeyValid $1 > /dev/null
+	IsKeySigned $1 && Error "Key $1 is already signed ! (integratorkey.pub.sign present)"
+	unzip -q $2 -d $TMPDIR
+	diff $TMPDIR/integratorkey.pub $1/integratorkey.pub || Error "$2 doesn't match $1 key"
+	cp $TMPDIR/integratorkey.pub.sign $1/
+	rm -rf $TMPDIR
+}
+
+ProcessAPK()
+{
+	local ROOTDIR=$1
+	local DIR=$(dirname $2)
+	local APK=$(basename $2)
+	local LIB=$DIR/lib
+	local armdir
+	[ ! $ROOTDIR = $DIR ] && [ $(find $DIR -iname "*apk" | wc -l) -gt 1 ] && Error "Can't have many APKs in subdirectory $DIR. Either create another subdirectory or use $ROOTDIR."
+	TMPDIR=$DIR/tmpMorpho
+	rm -rf $TMPDIR
+	mkdir -p $TMPDIR 
+	unzip -q $2 -d $TMPDIR
+
+	local libdir="$(find $TMPDIR -name armeabi-v7a)"
+	[ -z "$libdir" ] && libdir="$(find $TMPDIR -name armeabi)"
+
+	for armdir in $libdir; do
+		[ -d $LIB ] && echo "Warning : each apk should be placed in a separate folder, for example integration/$(basename $ROOTDIR)/${APK%.apk}/$APK"
+		mkdir -p $LIB
+		for file in $armdir/*.so; do
+			[ -e $LIB/$(basename $file) ] && Error "$APK library is going to overwrite another apk library. Please place each apk in a separate folder, for example integration/$(basename $ROOTDIR)/${APK%.apk}/$APK"
+			cp $file $LIB
+		done
+	done
+	rm -rf $TMPDIR
+}
+
+FindApk()
+{
+	local file
+	[ Z$2 = Zyes ] && find $1 -name lib | xargs rm -rf
+	for file in $(find $1 -iname "*apk"); do
+		ProcessAPK $1 $file
+	done
+}
+
+GetVeritySize()
+{
+	echo $(( $($BIN/build_verity_tree -s $1) + $($BIN/build_verity_metadata.py -s $1) ))
+}
+
+Generate_customization_package()
+{
+	local KEY=$1
+	local ALTKEY=
+	local KEYPOLICY=KEY_CHANGE_IPUB_EQUAL_IPUBA
+	local DOWNGRADEPOLICY=DOWNGRADE_ALLOWED
+	local VERSION=0
+	local OUTZIP=$2
+	local CLEANLIB=yes
+	[ -z $KEY ] && Error "Missing argument : key name"
+	IsKeyValid $KEY > /dev/null
+	IsKeySigned $KEY || Error "Key $KEY has not been signed by Morpho !"
+	[ -z $OUTZIP ] && Error "Missing argument : out zip file"
+	shift 2
+
+	while [ ! -z $1 ]; do
+    	case $1 in 
+		    -a|--alternative-key-set) 			[ -z $2 ] && Error "Missing alternative-key-set value"; ALTKEY=$2; shift 2;;
+			-v|--customization-package-version) [ -z $2 ] && Error "Missing customization-package-version"; VERSION=$2; shift 2;;
+			-d|--downgrade-policy) 				[ -z $2 ] && Error "Missing downgrade-policy"; DOWNGRADEPOLICY=$2; shift 2;;
+			-x|--key-check-disable)				KEYPOLICY=KEY_CHANGE_ALWAYS_ALLOWED; shift 1;;
+			-n|--no-clean-lib)					CLEANLIB=no; shift 1;;
+        	*) 									Error "Bad argument $1";;
+    	esac
+	done
+
+	if [ ! -z $ALTKEY ]; then
+		IsKeyValid $ALTKEY > /dev/null
+		IsKeySigned $ALTKEY || Error "Key $ALTKEY has not been signed by Morpho !"
+	fi
+
+	if [ ! -z $VERSION ]; then
+		( [[ $VERSION = +([0-9]) ]] && [ $VERSION -ge 0 ] && [ $VERSION -le 4294967295 ] ) || Error "customization-package-version must be between 0 and 4294967295"
+	fi
+
+	[ Z$DOWNGRADEPOLICY = ZDOWNGRADE_ALLOWED ] || [ Z$DOWNGRADEPOLICY = ZNO_VERSION_DOWNGRADE ] || [ Z$DOWNGRADEPOLICY = ZNO_DATE_DOWNGRADE ] || [ Z$DOWNGRADEPOLICY = ZNO_DATE_NOR_VERSION_DOWNGRADE ] || Error "Invalid \"$DOWNGRADEPOLICY\" downgrade-policy"
+
+	MB=$((1024*1024))
+	INTEGRATION_PART_PATH=$CPPATH/integration/
+	INTEGRATION_PART_SIZE=$((500*$MB))
+	INTEGRATION_CFG_BLOCK_SIZE=$MB
+	INTEGRATION_CFG_BLOCKS_SIZE=$((2*$MB))
+	INTEGRATION_DATA_SIZE=$(($INTEGRATION_PART_SIZE-$INTEGRATION_CFG_BLOCKS_SIZE))
+	RSA_PUBLIC_KEY_LENGTH=524
+	RECOVERY_PUBLIC_KEY_FILE_FIXED_LENGTH=2048
+	RSANUMBYTES=256
+	BLOCK_SIZE=4096
+	DUMPKEY_JAR=$BIN/dumpkey.jar
+
+	echo -ne '[#                         ] Step 0/10\r'
+	InitTmpDir
+	cp $KEY/releasekey.x509.pem $TMPDIR/releasekey.x509.pem
+	[ -z $ALTKEY ] || cp $ALTKEY/releasekey.x509.pem $TMPDIR/releasekeyB.x509.pem
+	rm -f $CPPATH/integration/etc/security/otacerts.zip
+	mkdir -p $CPPATH/integration/etc/security
+	zip -q -j $CPPATH/integration/etc/security/otacerts.zip $TMPDIR/*
+
+	echo -ne '[##                        ] Step 1/10\r'
+	mkdir -p $INTEGRATION_PART_PATH/app $INTEGRATION_PART_PATH/priv-app $INTEGRATION_PART_PATH/ref-app 
+	System_sign_apk $KEY $CPDATA/refsignature.apk $INTEGRATION_PART_PATH/ref-app/refsignature.apk > /dev/null
+	System_sign_apk $KEY $CPDATA/preinstall.apk $INTEGRATION_PART_PATH/priv-app/preinstall.apk > /dev/null
+
+	echo -ne '[###                       ] Step 2/10\r'
+	FindApk $INTEGRATION_PART_PATH/priv-app $CLEANLIB
+	FindApk $INTEGRATION_PART_PATH/app $CLEANLIB
+
+	ext4_max_size=$(($INTEGRATION_DATA_SIZE-$(GetVeritySize $INTEGRATION_DATA_SIZE)))
+	estimated_ext4_size=$(($(du -bd0 $INTEGRATION_PART_PATH  | cut -f 1)*12/10+5000000))
+	[ $estimated_ext4_size -gt $ext4_max_size ] && estimated_ext4_size=$ext4_max_size # Partition seems too big, but let's try anyway
+
+	echo -ne '[#####                     ] Step 3/10\r'
+	InitTmpDir
+	$BIN/make_ext4fs -J -T -1 -S $CPDATA/file_contexts -l $estimated_ext4_size -a integration $TMPDIR/integration.img $INTEGRATION_PART_PATH > /dev/null
+
+	echo -ne '[######                    ] Step 4/10\r'
+	resize2fs -M $TMPDIR/integration.img 2>/dev/null 1>/dev/null
+	estimated_ext4_size=$(stat -c %s $TMPDIR/integration.img)
+
+	echo -ne '[#######                   ] Step 5/10\r'
+	$BIN/build_verity_tree -A aee087a5be3b982978c923f566a94613496b417f2af592639bc80d141e34dfe7 $TMPDIR/integration.img $TMPDIR/verity.img > $TMPDIR/root-salt.txt 2>/dev/null
+
+	echo -ne '[########                  ] Step 6/10\r'
+	$BIN/build_verity_metadata.py $estimated_ext4_size $TMPDIR/verity_metadata.img $(cat $TMPDIR/root-salt.txt) /dev/block/bootdevice/by-name/integration $BIN/verity_signer $KEY/integratorkey > /dev/null
+
+	cat $TMPDIR/verity_metadata.img >> $TMPDIR/integration.img
+	cat $TMPDIR/verity.img >> $TMPDIR/integration.img
+
+	mv $TMPDIR/integration.img $TMPDIR/integration_no_sparse.img
+
+	java -jar $DUMPKEY_JAR $KEY/releasekey.x509.pem > $TMPDIR/recovery_key
+
+	if [ -z $ALTKEY ]; then 
+		echo -ne '[##########                ] Step 7/10\r'
+		$BIN/blockconfig $TMPDIR/icb1 $KEY/integratorkey.pub $KEY/integratorkey.pub.sign $VERSION $DOWNGRADEPOLICY $KEYPOLICY $TMPDIR/recovery_key $TMPDIR/verity_metadata.img $(basename $KEY)
+	else
+		java -jar $DUMPKEY_JAR $ALTKEY/releasekey.x509.pem > $TMPDIR/recovery_keyB
+		echo -ne '[##########                ] Step 7/10\r'
+		$BIN/blockconfig $TMPDIR/icb1 $KEY/integratorkey.pub $KEY/integratorkey.pub.sign $VERSION $DOWNGRADEPOLICY $KEYPOLICY $TMPDIR/recovery_key $TMPDIR/verity_metadata.img $(basename $KEY) \
+			$ALTKEY/integratorkey.pub $ALTKEY/integratorkey.pub.sign $TMPDIR/recovery_keyB $(basename $ALTKEY)
+	fi
+
+	openssl dgst -sha256 -sign $KEY/integratorkey -out $TMPDIR/icb2 $TMPDIR/icb1
+	cat $TMPDIR/icb1 $TMPDIR/icb2 > $TMPDIR/icb
+	rm $TMPDIR/icb1 $TMPDIR/icb2
+
+	echo -ne '[###########               ] Step 8/10\r'
+	rm -rf $TMPDIR/integration_update
+	mkdir -p $TMPDIR/integration_update
+	mv $TMPDIR/integration_no_sparse.img $TMPDIR/integration_update/integration.img
+	cp $TMPDIR/icb $TMPDIR/integration_update/cfg
+	tmp=$PWD	
+	cd $TMPDIR/integration_update
+	rm -f ../update_integration_unsigned.zip
+	zip -rq ../update_integration_unsigned.zip *
+	cd $tmp
+	echo -ne '[#############             ] Step 9/10\r'
+	java -jar $BIN/signapk.jar -w $KEY/releasekey.x509.pem $KEY/releasekey.pk8 $TMPDIR/update_integration_unsigned.zip $OUTZIP
+	rm -rf $TMPDIR
+	echo -ne '[##########################] Step 10/10\r'
+	echo "Customization package size use : $(($estimated_ext4_size/1024/1024))MB/$(($ext4_max_size/1024/1024))MB ($(($estimated_ext4_size*100/$ext4_max_size))%)"
+}
+
+ParseCommand()
+{
+    case "$1" in 
+        -k|--generate-key-set)
+			shift 1
+		 	Generate_key_set $@;;
+		-s|--system-sign-apk)
+			shift 1
+			System_sign_apk $@;;
+		-e|--export-unsigned-public-key)
+			shift 1
+			Export_unsigned_public_key $@;;
+		-i|--import-signed-public-key)
+			shift 1
+			Import_signed_public_key $@;;
+		-p|--generate-customization-package)
+			shift 1
+			Generate_customization_package $@;;
+        -h|--help)
+			Usage && CleanExit;
+			;;
+        *) 
+			[ -z $1 ] && Usage && CleanExit;			
+			Error "Bad argument $1";
+			break;;  
+    esac
+	echo Done
+}
+
+ParseCommand $@
+CleanExit
+

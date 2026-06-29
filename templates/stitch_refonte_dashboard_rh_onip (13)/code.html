@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ONIP Agent Dashboard</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Design System Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-primary": "#ffffff",
+                "on-primary-fixed": "#00164f",
+                "on-primary-container": "#94a8f5",
+                "primary-fixed-dim": "#b6c4ff",
+                "surface": "#f7f9fb",
+                "on-secondary-fixed-variant": "#0035bd",
+                "secondary": "#264dd9",
+                "on-tertiary": "#ffffff",
+                "error": "#ba1a1a",
+                "on-tertiary-container": "#e89961",
+                "tertiary-fixed-dim": "#ffb785",
+                "on-primary-fixed-variant": "#2d4287",
+                "outline-variant": "#c5c5d2",
+                "primary-container": "#253b80",
+                "outline": "#757682",
+                "surface-variant": "#e0e3e5",
+                "secondary-fixed-dim": "#b8c3ff",
+                "on-surface": "#191c1e",
+                "on-error-container": "#93000a",
+                "on-surface-variant": "#444651",
+                "tertiary-container": "#673100",
+                "background": "#f7f9fb",
+                "surface-dim": "#d8dadc",
+                "on-secondary": "#ffffff",
+                "inverse-primary": "#b6c4ff",
+                "on-tertiary-fixed": "#301400",
+                "secondary-fixed": "#dde1ff",
+                "surface-container-high": "#e6e8ea",
+                "primary": "#072369",
+                "inverse-surface": "#2d3133",
+                "surface-container": "#eceef0",
+                "surface-tint": "#465aa1",
+                "surface-bright": "#f7f9fb",
+                "on-secondary-fixed": "#001355",
+                "surface-container-highest": "#e0e3e5",
+                "error-container": "#ffdad6",
+                "surface-container-lowest": "#ffffff",
+                "on-background": "#191c1e",
+                "on-secondary-container": "#fffbff",
+                "inverse-on-surface": "#eff1f3",
+                "on-tertiary-fixed-variant": "#703806",
+                "surface-container-low": "#f2f4f6",
+                "tertiary": "#461f00",
+                "secondary-container": "#4568f3",
+                "on-error": "#ffffff",
+                "primary-fixed": "#dce1ff",
+                "tertiary-fixed": "#ffdcc6"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline-md": ["Hanken Grotesk"],
+                "body-lg": ["Hanken Grotesk"],
+                "label-bold": ["Hanken Grotesk"],
+                "headline-lg": ["Hanken Grotesk"],
+                "body-md": ["Hanken Grotesk"],
+                "label-sm": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                "headline-lg": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .flat-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-radius: 0.5rem;
+        }
+        body {
+            background-color: #f7f9fb;
+            font-family: 'Hanken Grotesk', sans-serif;
+        }
+    </style>
+</head>
+<body class="text-on-surface">
+<!-- SideNavBar (Authority: JSON) -->
+<aside class="bg-primary dark:bg-primary-container h-screen w-64 fixed left-0 top-0 shadow-md flex flex-col h-full py-6">
+<div class="px-6 mb-10">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">ONIP Portal</h1>
+<p class="text-on-primary/60 font-label-sm text-label-sm">HR Management</p>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Active: Dashboard -->
+<div class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg mx-2 cursor-pointer active:scale-95 duration-150 transition-colors">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-fixed-dim/10 mx-2 cursor-pointer active:scale-95 duration-150 transition-colors">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-body-md text-body-md">Employees</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-fixed-dim/10 mx-2 cursor-pointer active:scale-95 duration-150 transition-colors">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-body-md text-body-md">Attendance</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary hover:bg-primary-fixed-dim/10 mx-2 cursor-pointer active:scale-95 duration-150 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</div>
+</nav>
+<div class="px-6 mt-auto">
+<div class="p-4 rounded-lg bg-primary-container/50 border border-on-primary/10">
+<p class="text-on-primary font-label-bold text-label-bold mb-1">System Status</p>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-green-400"></div>
+<span class="text-on-primary/70 font-label-sm text-label-sm">All systems online</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar (Authority: JSON) -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-surface dark:bg-surface-container border-b border-outline-variant dark:border-outline z-10">
+<div class="flex justify-between items-center px-6 h-full w-full">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md focus-within:ring-2 focus-within:ring-secondary-container rounded-lg overflow-hidden transition-all">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border-none pl-10 pr-4 py-2 font-body-md text-body-md focus:ring-0" placeholder="Search tasks, documents, or employees..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full transition-all relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full transition-all">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+<div class="h-8 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-3 pl-2">
+<div class="text-right">
+<p class="font-label-bold text-label-bold text-on-surface leading-none">HR Administrator</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">ID: 482910</p>
+</div>
+<img class="w-10 h-10 rounded-full border-2 border-primary/10 object-cover" data-alt="A professional headshot of a middle-aged HR administrator with a warm and capable expression, wearing a navy blue blazer. The background is a brightly lit, modern corporate office with soft architectural lines and glass partitions, maintaining a clean light-mode aesthetic with high-key lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnnEme_9khdkNyrJ3yvga6y13LtKymKusjdsTyQN-naOxT3FkXXEwGLciWMLAfVTFQIZXqxCui9UHod7DlHRDuogubnhDAyHRVdYY70PZ9gV8blQuU8CIkF-ljArsoc9lzeDxXMHVNx0y5iX-yBhNG9lawuzppEhy5nMojDb9GxOw-ZDe4j_xc91zAvgBQd0mN7WQNcqRjG_ICGtJvujwgORyv9eIdmsYOSEQZtAnErvqY_VYN9Cu20D7T9_QfHTovGxYKkknjUYSZ"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-64 pt-16 p-8 min-h-screen">
+<!-- Welcome Header -->
+<section class="mb-10">
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-1">Good Morning, Agent</h2>
+<p class="text-on-surface-variant font-body-lg text-body-lg">Here's an overview of your workforce operations today.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 bg-surface-container-high text-on-surface font-label-bold text-label-bold rounded-lg border border-outline-variant hover:bg-surface-dim transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">download</span> Export Report
+                    </button>
+<button class="px-4 py-2 bg-secondary text-on-secondary font-label-bold text-label-bold rounded-lg hover:shadow-lg active:scale-95 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span> New Action
+                    </button>
+</div>
+</div>
+</section>
+<!-- Metrics Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-10">
+<!-- Metric 1 -->
+<div class="flat-card p-6 flex flex-col">
+<div class="flex items-center justify-between mb-4">
+<div class="w-10 h-10 rounded-lg bg-primary-fixed-dim/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">pending_actions</span>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full">+12% vs last week</span>
+</div>
+<p class="text-on-surface-variant font-label-bold text-label-bold uppercase tracking-wider">Pending Tasks</p>
+<h3 class="text-headline-lg font-headline-lg text-on-surface">24</h3>
+</div>
+<!-- Metric 2 -->
+<div class="flat-card p-6 flex flex-col">
+<div class="flex items-center justify-between mb-4">
+<div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-700">
+<span class="material-symbols-outlined">how_to_reg</span>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-1 bg-green-50 text-green-700 rounded-full">Stable</span>
+</div>
+<p class="text-on-surface-variant font-label-bold text-label-bold uppercase tracking-wider">Presence Rate</p>
+<h3 class="text-headline-lg font-headline-lg text-on-surface">94.2%</h3>
+</div>
+<!-- Metric 3 -->
+<div class="flat-card p-6 flex flex-col">
+<div class="flex items-center justify-between mb-4">
+<div class="w-10 h-10 rounded-lg bg-secondary-fixed text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined">group</span>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-1 bg-secondary-fixed-dim/30 text-secondary rounded-full">Active Now</span>
+</div>
+<p class="text-on-surface-variant font-label-bold text-label-bold uppercase tracking-wider">Onboarded Agents</p>
+<h3 class="text-headline-lg font-headline-lg text-on-surface">1,248</h3>
+</div>
+<!-- Metric 4 -->
+<div class="flat-card p-6 flex flex-col">
+<div class="flex items-center justify-between mb-4">
+<div class="w-10 h-10 rounded-lg bg-error-container text-error flex items-center justify-center">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-1 bg-error-container text-error rounded-full">Critical</span>
+</div>
+<p class="text-on-surface-variant font-label-bold text-label-bold uppercase tracking-wider">Open Disputes</p>
+<h3 class="text-headline-lg font-headline-lg text-on-surface">07</h3>
+</div>
+</section>
+<!-- Main Dashboard Grid -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Official Communications (Left Column) -->
+<div class="col-span-12 lg:col-span-8 space-y-gutter">
+<div class="flat-card p-8 relative overflow-hidden h-[400px]">
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+<!-- Subtle mesh gradient fallback or pattern -->
+<div class="w-full h-full bg-gradient-to-br from-primary to-secondary"></div>
+</div>
+<div class="relative z-10 h-full flex flex-col">
+<div class="flex justify-between items-start mb-6">
+<div>
+<span class="bg-primary text-on-primary px-3 py-1 rounded-full font-label-bold text-label-bold mb-4 inline-block">Official Announcement</span>
+<h3 class="font-headline-lg text-headline-lg text-on-surface leading-tight">New Workforce Regulation <br/>Update for Q3 2024</h3>
+</div>
+<span class="material-symbols-outlined text-outline text-4xl">campaign</span>
+</div>
+<p class="text-on-surface-variant font-body-lg text-body-lg max-w-2xl mb-8">
+                            All Regional Administrators must review the updated compliance guidelines regarding agent rotation and mandatory rest periods. These changes take effect on the first Monday of the coming month.
+                        </p>
+<div class="mt-auto flex items-center gap-4">
+<button class="bg-primary text-on-primary px-6 py-3 rounded-lg font-label-bold text-label-bold hover:bg-primary-container transition-colors">
+                                Read Full Document
+                            </button>
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-2 hover:underline">
+                                Archive <span class="material-symbols-outlined text-[16px]">archive</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Training & Docs Bento -->
+<div class="grid grid-cols-2 gap-gutter">
+<!-- Training Status -->
+<div class="flat-card p-6">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-headline-md text-headline-md text-on-surface">Training Status</h4>
+<span class="material-symbols-outlined text-outline">school</span>
+</div>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-1">
+<span class="text-on-surface-variant">Security Protocol V2</span>
+<span class="text-on-surface font-bold">85%</span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary" style="width: 85%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-1">
+<span class="text-on-surface-variant">GDPR Compliance</span>
+<span class="text-on-surface font-bold">42%</span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-container" style="width: 42%"></div>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-2 border border-outline-variant rounded-lg text-primary font-label-bold text-label-bold hover:bg-surface-container-low transition-colors">
+                            Continue Learning
+                        </button>
+</div>
+<!-- Recent Documents -->
+<div class="flat-card p-6">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-headline-md text-headline-md text-on-surface">Recent Documents</h4>
+<span class="material-symbols-outlined text-outline">description</span>
+</div>
+<ul class="space-y-3">
+<li class="flex items-center gap-3 group cursor-pointer">
+<div class="p-2 bg-red-50 text-error rounded group-hover:bg-red-100 transition-colors">
+<span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+</div>
+<div class="flex-1 overflow-hidden">
+<p class="font-body-md text-body-md text-on-surface truncate">Q2_Expenditure_Report.pdf</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Added 2h ago</p>
+</div>
+</li>
+<li class="flex items-center gap-3 group cursor-pointer">
+<div class="p-2 bg-blue-50 text-secondary rounded group-hover:bg-blue-100 transition-colors">
+<span class="material-symbols-outlined text-[20px]">article</span>
+</div>
+<div class="flex-1 overflow-hidden">
+<p class="font-body-md text-body-md text-on-surface truncate">Policy_Review_Final.docx</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Added yesterday</p>
+</div>
+</li>
+</ul>
+<button class="w-full mt-6 text-center text-primary font-label-bold text-label-bold hover:underline">
+                            View All Assets
+                        </button>
+</div>
+</div>
+</div>
+<!-- Notifications Center (Right Column) -->
+<div class="col-span-12 lg:col-span-4 h-full">
+<div class="flat-card h-full flex flex-col bg-surface-container-lowest">
+<div class="p-6 border-b border-outline-variant flex justify-between items-center bg-white sticky top-0 z-10 rounded-t-lg">
+<h4 class="font-headline-md text-headline-md text-on-surface">Notification Center</h4>
+<span class="text-secondary font-label-bold text-label-bold cursor-pointer hover:underline">Mark all read</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+<!-- Notification Item: Urgent -->
+<div class="p-4 bg-error-container/10 border-l-4 border-error rounded-r-lg hover:bg-error-container/20 transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-error text-on-error font-label-bold text-label-bold px-2 py-0.5 rounded uppercase tracking-tighter">Urgent</span>
+<span class="text-on-surface-variant font-label-sm text-label-sm">10m ago</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface font-semibold mb-1">Unusual Activity Detected</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed">Multiple failed login attempts from Sector 4 regional portal. Security review required.</p>
+</div>
+<!-- Notification Item: Info -->
+<div class="p-4 bg-white border border-outline-variant rounded-lg hover:border-secondary transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">info</span>
+<span class="text-secondary font-label-bold text-label-bold">Update</span>
+</div>
+<span class="text-on-surface-variant font-label-sm text-label-sm">2h ago</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface font-semibold mb-1">Payroll Processing Complete</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed">Agent disbursement cycle for the current week has been finalized and locked.</p>
+</div>
+<!-- Notification Item: Info -->
+<div class="p-4 bg-white border border-outline-variant rounded-lg hover:border-secondary transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant text-[18px]">verified_user</span>
+<span class="text-on-tertiary-fixed-variant font-label-bold text-label-bold">System</span>
+</div>
+<span class="text-on-surface-variant font-label-sm text-label-sm">5h ago</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface font-semibold mb-1">Backup Successful</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed">The daily cloud synchronization of workforce records was completed without errors.</p>
+</div>
+<!-- Notification Item: Info -->
+<div class="p-4 bg-white border border-outline-variant rounded-lg hover:border-secondary transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">person_add</span>
+<span class="text-on-surface-variant font-label-bold text-label-bold">HR</span>
+</div>
+<span class="text-on-surface-variant font-label-sm text-label-sm">Yesterday</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface font-semibold mb-1">New Agent Assigned</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed">Michael Chen (ID: 9021) has been assigned to your supervision roster.</p>
+</div>
+</div>
+<div class="p-4 bg-surface-container-low text-center">
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-2 mx-auto hover:gap-3 transition-all">
+                            Browse All Notifications <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple micro-interaction for active states
+        document.querySelectorAll('nav div').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('nav div').forEach(i => {
+                    i.classList.remove('bg-secondary-container', 'text-on-secondary-container');
+                    i.classList.add('text-on-primary/80', 'hover:text-on-primary');
+                });
+                this.classList.add('bg-secondary-container', 'text-on-secondary-container');
+                this.classList.remove('text-on-primary/80', 'hover:text-on-primary');
+            });
+        });
+
+        // Search bar focus effect
+        const searchInput = document.querySelector('input[type="text"]');
+        const searchIcon = searchInput.previousElementSibling;
+        searchInput.addEventListener('focus', () => {
+            searchIcon.classList.add('text-secondary');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchIcon.classList.remove('text-secondary');
+        });
+    </script>
+</body></html>

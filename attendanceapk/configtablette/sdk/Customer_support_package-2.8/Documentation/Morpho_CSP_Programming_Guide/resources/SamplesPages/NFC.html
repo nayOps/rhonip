@@ -1,0 +1,243 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <link rel="stylesheet" href="../css/styles/atelier-cave-light.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <title>NFC</title>
+</head>
+  <body>
+    <div id="header_content">
+    <h2>MorphoTablet CSP Programming Guide</h2>
+    <h1>Understanding NFC Sample Application</h1>
+    <!-- LINK TO SOURCE CODE -->
+    <p><a style="CURSOR: hand"href="../../../../Code_Samples/Main_Demo/nfc_demo">Click to View Source</a></p>
+    </div>
+
+  <div id=topic_content>
+<img src="../img/MorphoTablet_2_Contactless_card_Front.png" style="width: 400px;height: 300px;">
+<p>Near Field Communication (NFC) is a set of standards for smartphones and similar devices to create a radio
+   communication with each others by making them touch or getting them close.</br>
+  NFC standards cover communications protocols and data exchange formats.
+  They are based on existing radio-frequency identification (RFID) standards including ISO/IEC 14443 and FeliCa.
+  The standards include ISO/IEC 18092 and those defined by the NFC Forum.</br>
+
+  <h2>Functions</h2>
+<p>
+  NfcAdaptor is the Android-based class implementing NFC operations.
+  To enable any NFC operation, you first have to add the following permissions to the manifest file:
+</p>
+<div id="code"><pre><code class="java">&lt;uses-feature android:name="android.hardware.nfc" android:required="true"&gt;
+&lt;uses-permission android:name="android.permission.NFC"&gt;
+</code></pre></div>
+<h2>I) Read Operation</h2>
+<h3>A) Initialization</h3>
+
+<p><b>Description</b> – This method is used to instanciate an object of type NfcAdaptor and create a PendingIntent</p>
+<div id="code"><pre><code class="java">// Helper to get the default NFC Adapter.
+mAdapter = NfcAdapter.getDefaultAdapter(this);</code></pre></div>
+<div id="code"><pre><code class="java">PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
+                                    getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);</code></pre></div>
+
+
+<h3>B) New Intent</h3>
+<p><b>Description</b> – onNewIntent will be automatically called once a new record is detected. Developers can fetch and parse records as follows:</p>
+<div id="code"><pre><code class="java">@Override
+public void onNewIntent(Intent intent) {
+    String action = intent.getAction();
+    if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
+            || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
+            || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+
+        displayDetectedRecords(getNdefMessages(intent));
+    }
+}</code></pre></div>
+<div id="code"><pre><code class="java">/** Get NDEF message from intent */
+private NdefMessage[] getNdefMessages(Intent intent) {
+    NdefMessage[] ndefMsgs = null;
+    String action = intent.getAction();
+    if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
+            || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+        Parcelable[] rawNdefMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+        if (rawNdefMsgs != null) {
+            ndefMsgs = new NdefMessage[rawNdefMsgs.length];
+            java.lang.System.arraycopy(rawNdefMsgs, 0, ndefMsgs, 0, rawNdefMsgs.length);
+        } else {
+            // Unknown tag type
+            Parcelable tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+
+            byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
+            byte[] payload = Utils.dumpTagData(tag).getBytes();
+
+            NdefRecord ndefRecord = new NdefRecord(NdefRecord.TNF_UNKNOWN, new byte[0], id, payload);
+            NdefMessage ndefMsg = new NdefMessage(new NdefRecord[] { ndefRecord });
+            ndefMsgs = new NdefMessage[] { ndefMsg };
+        }
+    } else {
+        Log.e(TAG, "Unknown intent.");
+        finish();
+    }
+    return ndefMsgs;
+}</code></pre></div>
+<div id="code"><pre><code class="java">/**
+    * Display data that read by application
+    */
+    public void displayDetectedRecords(NdefMessage[] ndefMsgs) {
+    if (ndefMsgs == null || ndefMsgs.length == 0) {
+        return;
+    }
+    
+    textView.setVisibility(View.GONE);
+    // Parse the first message in the list
+    // Build views for all of the sub records
+    Date now = new Date();
+    List&lt;ParsedNdefRecord&gt; records = NdefMessageParser.parse(ndefMsgs[0]);
+    final int size = records.size();
+    for (int i = 0; i &lt; size; i++) {
+        TextView timeView = new TextView(this);
+        timeView.setText(TIME_FORMAT.format(now));  
+        timeView.setPadding(0, 10, 10, 0);            
+        mContent.addView(timeView, 0);
+        ParsedNdefRecord record = records.get(i);
+        mContent.addView(record.getParsedView(this), 1 + i);
+        View separator=new View(this);
+        separator.setBackgroundColor(Color.GRAY);
+        separator.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 1));
+        mContent.addView(separator,1 + i);
+    }
+    
+}</code></pre></div>
+
+
+<h2>II) Write  Operation</h2>
+<h3>A) Initialization</h3>
+<p><b>Description</b> – This method is used to create an object of the class NfcAdaptor</p>
+<div id="code"><pre><code class="java">/** Initialize the NFC */
+private void nfcInit(){
+    mAdapter = NfcAdapter.getDefaultAdapter(this);
+    
+    // Intent filters for writing to a tag
+    IntentFilter tagDetected = new IntentFilter();
+    tagDetected.addAction(NfcAdapter.ACTION_TAG_DISCOVERED);
+    tagDetected.addCategory(Intent.CATEGORY_DEFAULT);
+    writeTagFilters = new IntentFilter[] { tagDetected };
+}</code></pre></div>
+
+
+<h3>B) Create Text Record</h3>
+<p><b>Description</b> – To create a NdefRecord from a string before the write operation</p>
+<div id="code"><pre><code class="java">/** Creating a text record */
+private NdefMessage createTextRecord(String text) throws UnsupportedEncodingException {
+    String lang       = "en";
+    byte[] textBytes  = text.getBytes();
+    byte[] langBytes  = lang.getBytes("US-ASCII");
+    int    langLength = langBytes.length;
+    int    textLength = textBytes.length;
+    byte[] payload    = new byte[1 + langLength + textLength];
+
+    // set status byte (see NDEF spec for actual bits)
+    payload[0] = (byte) langLength;
+
+    // copy langbytes and textbytes into payload
+    System.arraycopy(langBytes, 0, payload, 1,              langLength);
+    System.arraycopy(textBytes, 0, payload, 1 + langLength, textLength);
+
+    // Creating RTD_TEXT
+    NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_WELL_KNOWN,  NdefRecord.RTD_TEXT,  new byte[0], payload);
+
+    return new NdefMessage(new NdefRecord[] { recordNFC });
+}</code></pre></div>
+
+
+<h3>C) Create Uri Record</h3>
+<p><b>Description</b> – To create a NdefRecord from a string before the write operation</p>
+<div id="code"><pre><code class="java">/** Creating a URI record */
+private NdefMessage createUriRecord(String uriText) throws UnsupportedEncodingException {
+    
+        byte[] uriField = uriText.getBytes(Charset.forName("US-ASCII"));  
+        byte[] payload = new byte[uriField.length + 1];       //add 1 for the URI Prefix  
+        payload[0] =UriRecord.getPrefixByte(spUriPrefixSelector.getSelectedItem().toString());
+    //prefixes http://www. to the URI
+    
+        System.arraycopy(uriField, 0, payload, 1, uriField.length); //appends URI to payload  
+    NdefRecord rtdUriRecord = new NdefRecord(NdefRecord.TNF_WELL_KNOWN,
+            NdefRecord.RTD_URI, new byte[0], payload);
+        
+    return new NdefMessage(new NdefRecord[] { rtdUriRecord });
+}</code></pre></div>
+
+
+<h3>D) New Intent</h3>
+<p><b>Description</b> – onNewIntent will be automatically called before write operation is performed.</p>
+<div id="code"><pre><code class="java">@Override
+protected void onNewIntent(Intent intent){	 
+        // Tag writing mode
+    if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())) {
+        tagToBeWritten = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG); 
+        if(tagToBeWritten!=null)
+            Toast.makeText(this, "Detected " + tagToBeWritten.toString(), Toast.LENGTH_LONG ).show();
+        else {
+            Toast.makeText(this, "TAG is null , Check your card.", Toast.LENGTH_LONG ).show();
+        }
+    }
+}</code></pre></div>
+
+
+<h3>E) Write</h3>
+<p><b>Description</b> – Through write operation, data can be written on NFC. </br> </br>
+  Parameters:</br>
+  <b>NdefRecord</b> record - A NdefRecord is created by either createTextRecord(String text) or createUriRecord(String uriText).</br>
+  <b>Tag</b> tag - tag set by onNewIntent method (tagToBeWritten ).</br>
+</p>
+<div id="code"><pre><code class="java">/** Used to write Record on tag */
+private boolean write(NdefMessage message, Tag tag) {
+    int size = message.toByteArray().length;
+        try {
+            Ndef ndef = Ndef.get(tag);
+            if (ndef != null) {
+                ndef.connect();
+                if (!ndef.isWritable()) {
+                    Log.e(TAG, " Is not Writable");
+                    return false;
+                }
+                if (ndef.getMaxSize() &lt; size) {
+                    Log.e(TAG, " Not have enough size on card.");
+                    return false;
+                }
+                ndef.writeNdefMessage(message);
+                return true;
+            } else {
+                NdefFormatable format = NdefFormatable.get(tag);
+                if (format != null) {
+                    try {
+                        format.connect();
+                        format.format(message); 
+                        
+                        return true;
+                    } catch (IOException e) {
+                        Log.e(TAG,e.toString());
+                        return false;
+                    }
+                } else {
+                    Log.e(TAG," NdefFormatable is null.");
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG,e.toString());
+            return false;
+        }
+
+}</code></pre></div>
+
+</div>
+<footer>
+  Copyright (C) 2019, IDEMIA, All rights reserved. Reproduction in whole or in part in any form or medium without the express written permission of IDEMIA is prohibited
+</footer>
+</body>
+</html>

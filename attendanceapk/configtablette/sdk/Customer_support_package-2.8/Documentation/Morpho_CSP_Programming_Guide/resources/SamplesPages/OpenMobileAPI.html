@@ -1,0 +1,170 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <link rel="stylesheet" href="../css/styles/atelier-cave-light.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <title>ExternalMassStorage</title>
+</head>
+
+<body>
+  <div id="header_content">
+    <h2>MorphoTablet CSP Programming Guide</h2>
+    <h1>Understanding Open Mobile API Sample Application</h1>
+    <!-- LINK TO SOURCE CODE -->
+    <p><a style="CURSOR: hand"href="../../../../Code_Samples/Main_Demo/oma_demo">Click to View Source</a></p>
+  </div>
+  <h1>Functions</h1>
+  <p>
+
+  </p>
+
+  <div id=topic_content>
+    <h2>I) Initialization</h2>
+    <p>
+      <b>Description</b> – To establish an Open Mobile API communication, you will have to follow those steps :
+    </p>
+<ul>1 - Implement a SEServiceCallback</ul>
+<p>Readers names are : </br>
+- SAM</br>
+- SMARTCARD</br>
+- SIM1</br>
+- SIM2</br>
+</p>
+<p>
+  <b>Example </b>- The following code will be used for the SAM reader
+</p>
+<div id="code"><pre><code class="java">/** Used to connect to OMA service. */
+public class SEServiceCallback implements SEService.CallBack {
+    @Override
+    public void serviceConnected(SEService seService) {
+        //List All the readers
+        Reader[] readers = seService.getReaders();
+        for (Reader reader : readers) {
+            if (reader.getName().equals("SAM")) {
+                //Initialization of SAM Reader if card is present
+                if (reader.isSecureElementPresent()) {
+                    samReader = reader;
+                }
+            } 
+        }
+    }
+}</code></pre></div>
+  <ul>2 - Instanciate the SEServiceCallback to initialize the reader.</ul>
+    <div id="code"><pre><code class="java">/** Init to OMA service. */
+public void initOpenMobileAPI(View view) {
+    updateConsole("*******  Initialisation Open Mobile API  *******");
+    if(!transmitTaskPool.isShutdown()) {
+        transmitTaskPool.shutdown();
+    }
+    transmitTaskPool = Executors.newFixedThreadPool(10);
+    currentReader = null;
+    SEServiceCallback callback = new SEServiceCallback();
+    try {
+        new SEService(getApplicationContext(), callback);
+    } catch (SecurityException e) {
+        Log.d(TAG,"Binding not allowed, uses-permission org.simalliance.openmobileapi.SMARTCARD?");
+    } catch (Exception e) {
+        Log.d(TAG,"Exception: " + e.getMessage());
+    }
+}</code></pre></div>
+
+    <h2>II) Direct Transmit</h2>
+    <p>
+      <b>Description</b> – Only available on SAM and ACS reader, use the following method on a Reader Object to perform the transmission.
+      <br></br><br>Parameters:</br>
+      <b>byte[]</b> apdu - apdu to be sent to the card.</br>
+      <br>return value:</br>
+      <b>byte[]</b> response - response from the card.</br>
+    </p>
+<div id="code"><pre><code class="java">response = samReader.ApduTransmit(apdu);</code></pre></div>
+
+    <p><b>Example</b> - Transmit an APDU from EditText</p>
+      <div id="code"><pre><code class="java">/** Transmit an APDU directly to the reader
+ * Only available on ACS And SAM Readers */
+private String directTransmit(String apdu){
+    String message = "";
+    if (apdu.isEmpty()) {
+        message += ("No APDU to send");
+    }else {
+        try {
+            byte[] res = currentReader.ApduTransmit(Utils.toByteArray(apdu));
+            if (res == null) {
+                restartUi();
+                //Power of Sam/Smart card reader
+                currentReader.power_off_reader();
+                currentReader.hardWare_Reset();
+            } else {
+                message += ("Send to " + currentReader.getName() + " : " + apdu);
+                message += ("\nReceive from " + currentReader.getName() + " : " + Utils.toHexString(res));
+            }
+        }catch(IOException e){
+            message += ("\nCan't transmit apduField");
+        }
+    }
+    return message;
+}</code></pre></div>
+
+<h2>III) OMA Transmit</h2>
+<p>
+<b>Description</b> – More information can be found in OpenMobileApi Documentation.
+
+<ul>1 - Open a session on a reader object </ul>
+<div id="code"><pre><code class="java">session = currentReader.openSession();</code></pre></div>
+<ul>2 - Open a channel with the created session using AID</ul>
+<div id="code"><pre><code class="java">channel = session.openLogicalChannel(AID);</code></pre></div>
+<ul>3 - Transmit a command with the created channel </ul>
+<div id="code"><pre><code class="java">channel.transmit(CMD);</code></pre></div>
+<p>
+<b>Example</b> - Communication with Open Mobile API.</br>
+    <b>Note</b> – The AID should match the smartcard applet.
+
+</p>
+<div id="code"><pre><code class="java">private String transmitToSim(){
+    String message = "";
+    try {
+        //Opening session for the card
+        mSession = currentReader.openSession();
+    } catch (IllegalStateException|IOException e) {
+        message +=(""+e.getMessage());
+    }
+    //Getting the ATR of the card (Reset Card)
+    byte[] ATR = mSession.getATR();
+    message +=("ATR : "+Utils.toHexString(ATR));
+    try {
+        // Choose the applet to communicate with
+        // The AID should be modified to match the applet in the card */
+        message +=("\nChoose an AID corresponding to the applet of the card");
+        message +=("\nlogical mChannel with AID :"+Utils.toHexString(AID));
+        mChannel = mSession.openLogicalChannel(AID);
+    } catch (Exception e) {
+        message +=("\n"+e.getMessage());
+
+    }
+    if (mChannel != null) {
+        //Send a command to the applet
+        //This need to match the applet command
+        message +=("\nChoose The CMD of the applet");
+        message +=("\ntransmitting CMD : "+Utils.toHexString(CMD));
+        try {
+            mChannel.transmit(CMD);
+        } catch (IOException e) {
+            message +=("\n"+e.getMessage());
+        }
+    }
+    mSession.closeChannels();
+    mSession.close();
+    return message;
+}</code></pre></div>
+
+        </div>
+        <footer>
+          Copyright (C) 2019, IDEMIA, All rights reserved. Reproduction in whole or in part in any form or medium without the express written permission of IDEMIA is prohibited
+        </footer>
+      </body>
+      </html>

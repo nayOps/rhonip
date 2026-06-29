@@ -1,0 +1,89 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <link rel="stylesheet" href="../css/styles/atelier-cave-light.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <title>Microphone</title>
+</head>
+<body>
+
+  <div id="header_content">
+  <h2>MorphoTablet CSP Programming Guide</h2>
+  <h1>Understanding Microphone Sample Application</h1>
+  <!-- LINK TO SOURCE CODE -->
+  <p><a style="CURSOR: hand"href="../../../../Code_Samples/Main_Demo/microphone_demo">Click to View Source</a></p>
+  </div>
+
+<div id=topic_content>
+<div id=topic_content>
+  <p>Microphone sample demonstrates a set of basic use cases: audio recording and playback.
+  Sample are based on the standard Android library. Developers first have to add the following permission to the manifest file:
+  </p>
+<div id="code"><pre><code class="java">&lt;uses-permission android:name="android.permission.RECORD_AUDIO"&gt;
+</code></pre></div>
+
+  <h2>I) Initialization</h2>
+  <p><b>Description</b> – This method is used to create an object of MediaPlayer class.</p>
+<div id="code"><pre><code class="java">/** To initialize player */
+public void initPlayer() {
+    mPlayer = new MediaPlayer();
+    mPlayer.setOnCompletionListener(new OnCompletionListener() {
+
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            mPlayButton.setText("Start playing");
+            mStartPlaying = !mStartPlaying;
+            isPlaying = false;
+            updateDisplay("Stopped", 0.0);
+            onPlay(false);
+        }
+    });
+}</code></pre></div>
+
+
+<h2>II) Start Playing</h2>
+<p><b>Description</b> – Start playing from an audio source
+<div id="code"><pre><code class="java">// setting selected location to play
+mPlayer.setDataSource(selected_location);
+mPlayer.prepare();
+mPlayer.start();
+</code></pre></div>
+
+
+<h2>III) Stop Playing</h2>
+<p><b>Description</b> – Stop playing, releasing all resources attached to MediaPlayer object.</p>
+<div id="code"><pre><code class="java">if(mPlayer!=null){
+    mPlayer.reset();
+    mPlayer.release();
+    mPlayer = null;
+}</code></pre></div>
+
+
+<h2>IV) Start Recording</h2>
+<p><b>Description</b> – Start recording the voice.</p>
+    <div id="code"><pre><code class="java">mSensor.start(mRecordedFileLocation);
+setActivityLed(true);
+mHandler.postDelayed(mPollTask, POLL_INTERVAL);
+imgAudio.setVisibility(View.VISIBLE);</code></pre></div>
+
+
+<h2>V) Stop Recording</h2>
+<p><b>Description</b> – Stop recording the voice.</p>
+<div id="code"><pre><code class="java">mSensor.stop();  //Stopping the recording
+
+//Remove handler call back
+mHandler.removeCallbacks(mPollTask);
+mSensor.stop(); //Stopping the recording</code></pre></div>
+
+  </div>
+<footer>
+  Copyright (C) 2019, IDEMIA, All rights reserved. Reproduction in whole or in part in any form or medium without the express written permission of IDEMIA is prohibited
+</footer>
+</body>
+</html>

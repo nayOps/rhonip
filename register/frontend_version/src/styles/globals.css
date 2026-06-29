@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base app styles */
+html, body, #__next {
+  height: 100%;
+}
+
+body {
+  @apply bg-gray-50 text-gray-900 antialiased;
+}
+
+.app-shell {
+  @apply min-h-screen grid grid-cols-[260px_1fr] lg:grid-cols-[280px_1fr];
+}
+
+.sidebar {
+  @apply bg-white border-r border-gray-200 md:sticky md:top-0 md:h-screen;
+}
+
+.sidebar .brand {
+  @apply flex items-center gap-3 px-4 py-4 border-b border-gray-100;
+}
+
+.sidebar nav a {
+  @apply flex items-center gap-3 px-4 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition;
+}
+
+.sidebar nav a.active {
+  @apply bg-secondary-50 text-secondary-700;
+}
+
+.header {
+  @apply sticky top-0 z-20 bg-white/70 backdrop-blur border-b border-gray-200;
+}
+
+.header .inner {
+  @apply max-w-7xl mx-auto px-4 py-3 flex items-center justify-between;
+}
+
+.content {
+  @apply w-full animate-slide-up;
+}
+
+

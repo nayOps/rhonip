@@ -1,0 +1,42 @@
+# Reverse proxy + DNS local — profil: traefik
+# Accès RH sans config sur les postes agents :
+#   1) DNS du routeur → IP du serveur (voir ci-dessous)
+#   2) http://rh.onip.gouv.local/login/
+#
+# Usage:
+#   docker compose --profile rh --profile traefik up -d
+
+services:
+  coredns:
+    profiles: [traefik]
+    image: coredns/coredns:1.11.1
+    container_name: onip_coredns
+    command: -conf /etc/coredns/Corefile
+    ports:
+      - "${COREDNS_PORT:-53}:53/udp"
+      - "${COREDNS_PORT:-53}:53/tcp"
+    volumes:
+      - ./coredns:/etc/coredns:ro
+    networks:
+      - onip_network
+    restart: unless-stopped
+
+  traefik:
+    profiles: [traefik]
+    image: traefik:v3.2
+    container_name: onip_traefik
+    command:
+      - --log.level=INFO
+      - --api.insecure=true
+      - --api.dashboard=true
+      - --providers.file.directory=/etc/traefik/dynamic
+      - --providers.file.watch=true
+      - --entrypoints.web.address=:80
+    ports:
+      - "${TRAEFIK_HTTP_PORT:-80}:80"
+      - "${TRAEFIK_DASHBOARD_PORT:-8088}:8080"
+    volumes:
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro
+    networks:
+      - onip_network
+    restart: unless-stopped

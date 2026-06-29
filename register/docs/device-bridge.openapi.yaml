@@ -1,0 +1,176 @@
+openapi: 3.0.3
+info:
+  title: FGP Device Bridge API
+  description: API locale (poste guichet Windows) pour les périphériques FGP
+  version: 0.1.0
+servers:
+  - url: http://127.0.0.1:8765
+paths:
+  /health:
+    get:
+      summary: État global et par module
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /api/v1/devices/fingerprint/open:
+    post:
+      summary: Ouvre le lecteur d'empreintes
+      responses:
+        '200':
+          description: Device ouvert
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceOperationResponse'
+  /api/v1/devices/fingerprint/close:
+    post:
+      summary: Ferme le lecteur
+      responses:
+        '200':
+          description: Device fermé
+  /api/v1/devices/fingerprint/capture:
+    post:
+      summary: Capture empreintes (mode FAP60 ou mock)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FingerprintCaptureRequest'
+      responses:
+        '200':
+          description: Capture réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FingerprintCaptureResponse'
+  /api/v1/devices/iris/status:
+    get:
+      summary: Statut Iris Device Server (port 50218)
+      responses:
+        '200':
+          description: OK
+  /api/v1/devices/iris/preview/live:
+    get:
+      summary: Preview live œil gauche/droit (BMP base64)
+      responses:
+        '200':
+          description: OK
+  /api/v1/devices/iris/capture:
+    post:
+      summary: Capture iris (JD5 / Iris Device Server HTTP)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eye:
+                  type: string
+                  enum: [left, right, both]
+                timeout_seconds:
+                  type: integer
+      responses:
+        '200':
+          description: Capture réussie
+  /api/v1/devices/iris/stop:
+    post:
+      summary: Arrête la capture en cours
+  /api/v1/devices/iris/close:
+    post:
+      summary: Ferme le device iris
+  /api/v1/devices/iris/probe:
+    post:
+      summary: Diagnostic module iris
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        version:
+          type: string
+        modules:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ModuleHealth'
+    ModuleHealth:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded, down, unknown]
+        message:
+          type: string
+        mode:
+          type: string
+    DeviceOperationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        printer_id:
+          type: integer
+    FingerprintCaptureRequest:
+      type: object
+      properties:
+        finger_position:
+          type: string
+          description: Doigt unique (ex. right_index) pour capture unitaire
+        capture_type:
+          type: string
+          description: left_four, right_four, both_thumbs, single, roll
+          default: left_four
+        missing_fingers:
+          type: integer
+          default: 0
+        timeout_ms:
+          type: integer
+          default: 30000
+        template_format:
+          type: integer
+          description: Format ISO/ANSI (ex. 4 = ISO-19794-2:2005)
+          default: 4
+    FingerprintCaptureResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        templates:
+          type: array
+          items:
+            $ref: '#/components/schemas/FingerTemplate'
+        previews:
+          type: array
+          items:
+            $ref: '#/components/schemas/FingerPreview'
+    FingerTemplate:
+      type: object
+      properties:
+        position:
+          type: string
+        format_id:
+          type: integer
+        data_base64:
+          type: string
+        quality:
+          type: integer
+    FingerPreview:
+      type: object
+      properties:
+        position:
+          type: string
+        image_base64:
+          type: string
+        mime:
+          type: string

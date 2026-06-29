@@ -1,0 +1,6 @@
+# Sauvegardes — seul onip_rh_production.sql est versionné (repo privé)
+onip_rh_2*.sql
+*.sql.gz
+*.tar
+*.tar.gz
+!onip_rh_production.sql

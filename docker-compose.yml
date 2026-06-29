@@ -1,0 +1,29 @@
+name: onip
+
+# Stack unifiee ONIP — register (FGP) + rh (Payday SGRH)
+# Base PostgreSQL et Redis partages entre les deux projets.
+#
+# --- Developpement (LAN) ---
+#   cp .env.example .env
+#   docker compose --profile rh up -d
+#   docker compose --profile register --profile rh up -d
+#   docker compose --profile rh --profile traefik up -d   # http://rh.onip.gouv.local
+#
+# --- Test production local (tablettes, port 8100) ---
+#   ./deploy/vps/up-local-prod-test.sh
+#
+# --- Production VPS (Traefik cpnpr, HTTPS rh.onip.gouv.cd) ---
+#   cp .env.prod.example .env && ./deploy/env-gen.sh .env.prod.example .env
+#   ./deploy/vps/bootstrap.sh
+#
+# Voir deploy/vps/ pour GitHub → VPS.
+
+include:
+  - path: compose/base.yml
+  - path: compose/traefik.yml
+  - path: compose/register.yml
+    project_directory: register
+  - path: compose/rh.yml
+    project_directory: rh
+  - path: compose/monitoring.yml
+    project_directory: register

@@ -1,0 +1,130 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <link rel="stylesheet" href="../css/styles/atelier-cave-light.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <title>ExternalMassStorage</title>
+</head>
+
+<body>
+  <div id="header_content">
+  <h2>MorphoTablet CSP Programming Guide</h2>
+  <h1>Understanding External Mass Storage Sample Application</h1>
+  <!-- LINK TO SOURCE CODE -->
+  <p><a style="CURSOR: hand"href="../../../../Code_Samples/Main_Demo/storage_demo">Click to View Source</a></p>
+  </div>
+
+<div id=topic_content>
+
+
+
+<h1>Functions</h1>
+<p>The sample provides basic operations for reading and writing to the external storage. Developers shall use this sample to read or write text files stored on an external storage. Sample uses android library.
+
+In order to use any network "get/scan" feature developers have to add the three following permissions in the manifest file:</p>
+<div id="code"><pre><code class="java">&lt;uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"&gt;
+&lt;uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"&gt;
+&lt;uses-permission android:name="android.permission.ACCESS_ALL_EXTERNAL_STORAGE"&gt;
+</code></pre></div>
+<p>USB pen drive must be mounted at <b>/storage/uicc0</b> location to use TOP USB host.</br>
+USB pen drive must be mounted at <b>/storage/uicc1</b> location to use USB host in the docking station.</br>
+USB pen drive must be mounted at <b>/storage/usbotg</b> location to use OTG USB host.</br>
+<b>/storage/sdcard0</b> is the SD card mountpoint.</br>
+<b>/storage/sdcard1</b> is the internal SD card mountpoint.</br>
+</p>
+
+
+<h2>I) Initialization</h2>
+<p><b>Description</b> – Instantiate the following strings that are used to access to external storage
+<div id="code"><pre><code class="java">private static final String USB_TOP = 				"/storage/uicc0";
+private static final String USB_CRADLE = 			"/storage/uicc1";
+private static final String USB_OTG = 				"/storage/usbotg";
+private static final String USB_SDCARD = 			"/storage/sdcard1";
+private static final String USB_SDCARD_INTERNAL = 	        "/storage/sdcard0";</code></pre></div>
+</p>
+
+
+<h2>II) Check storage availability</h2>
+<p>
+  <b>Description</b> - This method checks if the mounted storage location is available. Since internal SD card is already mounted, this method is not used to check its availability.
+</p>
+<div id="code"><pre><code class="java">private boolean isUSBAvailable() {
+    File usb = new File(storagePath);
+    String state = "";
+    if (android.os.Build.VERSION.SDK_INT &gt;= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        state = Environment.getExternalStorageState(usb);
+    }
+    if (storagePath.equals(USB_SDCARD_INTERNAL)) {
+        state = Environment.MEDIA_MOUNTED;
+    }
+
+    return Environment.MEDIA_MOUNTED.equals(state);
+}</code></pre></div>
+
+
+<h2>III) Create file</h2>
+<p>
+  <b>Description</b> - Create a file on the mounted storage location and write content to it.
+</p>
+<div id="code"><pre><code class="java">private boolean createFileAndWrite(String boyd){
+    File createdFile=new File(storagePath,STORAGE_FILE_NAME);
+    try{
+
+        FileWriter writer = new FileWriter(createdFile);
+        boyd=boyd.trim();
+        writer.write(boyd);
+        writer.flush();
+        writer.close();
+
+        return true;
+
+    }catch(IOException e){
+        Log.e(this.getClass().toString(), "createFileAndWrite", e);
+        return false;
+    }
+
+}</code></pre></div>
+
+
+<h2>IV) Read File from external storage</h2>
+<p><b>Description</b> - Return the content of the created file. Return "file not found" if the mounted storage location is not available or if the file does not exist.</p>
+<div id="code"><pre><code class="java">private String readFileFormUsb() {
+    File createdFile = new File(storagePath, STORAGE_FILE_NAME);
+    if (isUSBAvailable()) {
+        try {
+            StringBuilder fileContent = new StringBuilder("");
+            byte[] buffer = new byte[1024];
+            FileInputStream fis = new FileInputStream(createdFile);
+            while (fis.read(buffer) != -1) {
+                fileContent.append(new String(buffer));
+            }
+            fis.close();
+            return fileContent.toString().trim();
+
+        } catch (FileNotFoundException e) {
+            showToast("File Not Found...");
+            Log.e(TAG, "readFileFormUsb", e);
+        } catch (IOException e) {
+            Log.e(TAG, "readFileFormUsb", e);
+            e.printStackTrace();
+            showToast("Storage not mounted or not ready to use.");
+        }
+        return "";
+    } else {
+        Log.e(TAG,"Storage not mounted in system.");
+        showToast("Storage not mounted in system. Please check storage availability");
+        return "";
+    }
+}</code></pre></div>
+</div>
+<footer>
+  Copyright (C) 2019, IDEMIA, All rights reserved. Reproduction in whole or in part in any form or medium without the express written permission of IDEMIA is prohibited
+</footer>
+</body>
+</html>

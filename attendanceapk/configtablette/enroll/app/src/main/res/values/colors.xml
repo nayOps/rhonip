@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Charte graphique ONIP RH (onip-brand.css) -->
+    <color name="onip_blue">#0f2744</color>
+    <color name="onip_blue_mid">#132f52</color>
+    <color name="onip_blue_dark">#0a1e36</color>
+    <color name="onip_blue_light">#1e3a5f</color>
+    <color name="onip_yellow">#fff24b</color>
+    <color name="onip_red">#db3832</color>
+
+    <!-- Alias tricolore / legacy -->
+    <color name="rdc_blue">#0f2744</color>
+    <color name="rdc_yellow">#fff24b</color>
+    <color name="rdc_red">#db3832</color>
+    <color name="rdc_blue_dark">#0a1e36</color>
+    <color name="rdc_blue_sky">#132f52</color>
+
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- Textes (onip-forms.css) -->
+    <color name="text_primary">#111827</color>
+    <color name="text_secondary">#4b5563</color>
+    <color name="text_tertiary">#6b7280</color>
+    <color name="text_on_dark">#ffffff</color>
+    <color name="text_muted_on_dark">#b8cfe8</color>
+
+    <!-- Fonds -->
+    <color name="background_primary">#ffffff</color>
+    <color name="background_secondary">#f9fafb</color>
+    <color name="background_tertiary">#f3f4f6</color>
+    <color name="background_blue">#0f2744</color>
+
+    <!-- Statuts -->
+    <color name="success">#16a34a</color>
+    <color name="warning">#ed7016</color>
+    <color name="error">#db3832</color>
+    <color name="info">#0f2744</color>
+
+    <!-- Boutons -->
+    <color name="button_primary_bg">#0f2744</color>
+    <color name="button_primary_text">#ffffff</color>
+    <color name="button_secondary_bg">#132f52</color>
+    <color name="button_secondary_text">#ffffff</color>
+    <color name="button_outline_bg">#ffffff</color>
+    <color name="button_outline_text">#0f2744</color>
+    <color name="button_accent_bg">#fff24b</color>
+    <color name="button_accent_text">#0f2744</color>
+    <color name="button_success_bg">#16a34a</color>
+    <color name="button_success_text">#ffffff</color>
+
+    <!-- Bordures -->
+    <color name="border_light">#e5e7eb</color>
+    <color name="border_medium">#4b5563</color>
+    <color name="border_dark">#0f2744</color>
+
+    <!-- Launcher -->
+    <color name="ic_launcher_background">#0f2744</color>
+
+    <!-- Compatibilité anciens écrans -->
+    <color name="onip_orange">#ed7016</color>
+    <color name="purple">#0f2744</color>
+    <color name="purple_light">#132f52</color>
+    <color name="blue">#0f2744</color>
+    <color name="green">#16a34a</color>
+    <color name="orange">#ed7016</color>
+    <color name="background_dark">#0a1e36</color>
+    <color name="background_purple">#0f2744</color>
+    <color name="glass_white">#f9fafb</color>
+    <color name="glass_border">#e5e7eb</color>
+</resources>

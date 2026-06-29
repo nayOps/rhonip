@@ -1,0 +1,99 @@
+graph TB
+    subgraph "Frontend Layer"
+        FE[Next.js Frontend<br/>Port: 3000<br/>Interface d'enrôlement]
+    end
+    
+    subgraph "API Gateway Layer"
+        NGINX[Nginx Reverse Proxy<br/>Port: 80/443<br/>Load Balancer + SSL]
+    end
+    
+    subgraph "Microservices Layer"
+        EG[Enrollment Gateway<br/>Port: 8001<br/>API d'ingestion]
+        FC[FGP Core Service<br/>Port: 8000<br/>27 variables obligatoires]
+        ES[Extensions Service<br/>Port: 8002<br/>Variables par strate]
+        AS[ABIS Service<br/>Port: 8003<br/>Déduplication biométrique]
+    end
+    
+    subgraph "Data Layer"
+        PG[(PostgreSQL<br/>Port: 5432<br/>Base de données principale)]
+        RD[(Redis<br/>Port: 6379<br/>Cache + Sessions)]
+        S3[(MinIO/S3<br/>Stockage fichiers<br/>Documents + Biométrie)]
+    end
+    
+    subgraph "Monitoring Layer"
+        PM[Prometheus<br/>Port: 9090<br/>Collecte métriques]
+        GF[Grafana<br/>Port: 3001<br/>Visualisation]
+        ELK[ELK Stack<br/>Logs centralisés]
+    end
+    
+    subgraph "External Systems"
+        CENI[CENI<br/>Système électoral]
+        MENPS[MENPS<br/>Ministère Éducation]
+        HCR[HCR<br/>Réfugiés]
+        PNC[PNC<br/>Police]
+        FARDC[FARDC<br/>Armée]
+    end
+    
+    %% Frontend connections
+    FE --> NGINX
+    
+    %% API Gateway connections
+    NGINX --> EG
+    NGINX --> FC
+    NGINX --> ES
+    NGINX --> AS
+    
+    %% Microservices interconnections
+    EG --> FC
+    EG --> ES
+    EG --> AS
+    
+    %% Data connections
+    FC --> PG
+    ES --> PG
+    AS --> PG
+    
+    FC --> RD
+    ES --> RD
+    AS --> RD
+    
+    EG --> S3
+    AS --> S3
+    
+    %% Monitoring connections
+    PM --> FC
+    PM --> ES
+    PM --> EG
+    PM --> AS
+    PM --> PG
+    PM --> RD
+    
+    FC --> ELK
+    ES --> ELK
+    EG --> ELK
+    AS --> ELK
+    
+    PM --> GF
+    
+    %% External integrations
+    EG -.-> CENI
+    EG -.-> MENPS
+    EG -.-> HCR
+    ES -.-> PNC
+    ES -.-> FARDC
+    
+    %% Styling
+    classDef frontend fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef gateway fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef microservice fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef database fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef monitoring fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef external fill:#f1f8e9,stroke:#33691e,stroke-width:2px
+    
+    class FE frontend
+    class NGINX gateway
+    class EG,FC,ES,AS microservice
+    class PG,RD,S3 database
+    class PM,GF,ELK monitoring
+    class CENI,MENPS,HCR,PNC,FARDC external
+

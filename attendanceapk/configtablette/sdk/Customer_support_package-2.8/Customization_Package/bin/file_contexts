@@ -1,0 +1,4 @@
+#############################
+# integration files
+#
+/integration(/.*)?		u:object_r:system_file:s0

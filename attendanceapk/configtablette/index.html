@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MorphoTablet - Test Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .mode-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .mode-btn {
+            padding: 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1em;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .camera-section {
+            margin: 20px 0;
+        }
+
+        video, canvas {
+            width: 100%;
+            border-radius: 10px;
+            border: 3px solid #667eea;
+        }
+
+        .captured-photo {
+            width: 100%;
+            border-radius: 10px;
+            border: 3px solid #28a745;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .fingerprint-zone {
+            background: #f8f9fa;
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .fingerprint-icon {
+            font-size: 80px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .status-bar {
+            background: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 MorphoTablet 2</h1>
+            <p>Système Biométrique - Test Direct</p>
+        </div>
+
+        <div class="card">
+            <div class="status-bar">
+                <span id="statusText">✅ Système prêt</span>
+            </div>
+
+            <div class="mode-selector">
+                <button class="mode-btn active" onclick="setMode('checkin')" id="btnCheckin">
+                    📥 Entrée
+                </button>
+                <button class="mode-btn" onclick="setMode('checkout')" id="btnCheckout">
+                    📤 Sortie
+                </button>
+                <button class="mode-btn" onclick="setMode('enroll')" id="btnEnroll">
+                    👤 Enregistrement
+                </button>
+            </div>
+
+            <div class="input-group">
+                <label for="employeeId">ID Employé</label>
+                <input type="number" id="employeeId" placeholder="Entrez l'ID de l'employé">
+            </div>
+
+            <!-- Camera Section -->
+            <div class="camera-section">
+                <button class="btn btn-primary" onclick="startCamera()" id="btnStartCamera">
+                    📷 Démarrer la Caméra
+                </button>
+                
+                <div id="videoContainer" class="hidden" style="margin-top: 20px;">
+                    <video id="video" autoplay playsinline></video>
+                    <div class="grid-2" style="margin-top: 10px;">
+                        <button class="btn btn-success" onclick="capturePhoto()">📸 Capturer</button>
+                        <button class="btn btn-danger" onclick="stopCamera()">❌ Annuler</button>
+                    </div>
+                </div>
+
+                <div id="photoContainer" class="hidden" style="margin-top: 20px;">
+                    <img id="capturedPhoto" class="captured-photo">
+                    <button class="btn btn-secondary" onclick="retakePhoto()">🔄 Reprendre</button>
+                </div>
+
+                <canvas id="canvas" class="hidden"></canvas>
+            </div>
+
+            <!-- Fingerprint Section -->
+            <div class="fingerprint-zone">
+                <div class="fingerprint-icon">👆</div>
+                <h3>Lecteur d'Empreintes</h3>
+                <p>Placez votre doigt sur le capteur MorphoTablet</p>
+                <p id="fingerprintStatus" style="margin-top: 10px; color: #667eea; font-weight: bold;">
+                    En attente...
+                </p>
+            </div>
+
+            <!-- Submit Button -->
+            <button class="btn btn-success" onclick="submitData()" id="btnSubmit">
+                ✅ Valider
+            </button>
+
+            <!-- Message -->
+            <div id="message" class="message"></div>
+        </div>
+
+        <!-- Device Info Card -->
+        <div class="card">
+            <h3>📱 Informations Appareil</h3>
+            <p><strong>Navigateur:</strong> <span id="browserInfo"></span></p>
+            <p><strong>Plateforme:</strong> <span id="platformInfo"></span></p>
+            <p><strong>Résolution:</strong> <span id="resolutionInfo"></span></p>
+            <p><strong>Caméra disponible:</strong> <span id="cameraInfo"></span></p>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'checkin';
+        let videoStream = null;
+        let capturedImageData = null;
+
+        // Initialize
+        window.onload = function() {
+            updateDeviceInfo();
+            checkCameraAvailability();
+        };
+
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Update button states
+            document.getElementById('btnCheckin').classList.remove('active');
+            document.getElementById('btnCheckout').classList.remove('active');
+            document.getElementById('btnEnroll').classList.remove('active');
+            
+            if (mode === 'checkin') {
+                document.getElementById('btnCheckin').classList.add('active');
+                updateStatus('Mode: Pointage d\'entrée');
+            } else if (mode === 'checkout') {
+                document.getElementById('btnCheckout').classList.add('active');
+                updateStatus('Mode: Pointage de sortie');
+            } else if (mode === 'enroll') {
+                document.getElementById('btnEnroll').classList.add('active');
+                updateStatus('Mode: Enregistrement biométrique');
+            }
+        }
+
+        function updateStatus(text) {
+            document.getElementById('statusText').innerText = text;
+        }
+
+        function updateDeviceInfo() {
+            document.getElementById('browserInfo').innerText = navigator.userAgent.split('(')[0];
+            document.getElementById('platformInfo').innerText = navigator.platform;
+            document.getElementById('resolutionInfo').innerText = window.screen.width + 'x' + window.screen.height;
+        }
+
+        async function checkCameraAvailability() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const cameras = devices.filter(device => device.kind === 'videoinput');
+                document.getElementById('cameraInfo').innerText = 
+                    cameras.length > 0 ? `✅ ${cameras.length} caméra(s) détectée(s)` : '❌ Aucune caméra';
+            } catch (error) {
+                document.getElementById('cameraInfo').innerText = '❌ Erreur de détection';
+            }
+        }
+
+        async function startCamera() {
+            try {
+                updateStatus('⏳ Démarrage de la caméra...');
+                
+                const constraints = {
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user'
+                    }
+                };
+
+                videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+                const video = document.getElementById('video');
+                video.srcObject = videoStream;
+
+                document.getElementById('btnStartCamera').classList.add('hidden');
+                document.getElementById('videoContainer').classList.remove('hidden');
+                
+                updateStatus('📹 Caméra active - Prêt pour la capture');
+                showMessage('Caméra démarrée avec succès!', 'success');
+            } catch (error) {
+                console.error('Camera error:', error);
+                showMessage('Erreur caméra: ' + error.message, 'error');
+                updateStatus('❌ Erreur caméra');
+            }
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+
+            capturedImageData = canvas.toDataURL('image/jpeg', 0.8);
+            document.getElementById('capturedPhoto').src = capturedImageData;
+
+            stopCamera();
+            document.getElementById('photoContainer').classList.remove('hidden');
+            
+            updateStatus('📸 Photo capturée avec succès');
+            showMessage('Photo capturée! Vous pouvez maintenant valider.', 'success');
+        }
+
+        function stopCamera() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+            document.getElementById('videoContainer').classList.add('hidden');
+            document.getElementById('btnStartCamera').classList.remove('hidden');
+        }
+
+        function retakePhoto() {
+            capturedImageData = null;
+            document.getElementById('photoContainer').classList.add('hidden');
+            updateStatus('🔄 Prêt pour une nouvelle photo');
+        }
+
+        function submitData() {
+            const employeeId = document.getElementById('employeeId').value;
+            
+            if (!employeeId) {
+                showMessage('⚠️ Veuillez entrer un ID employé', 'error');
+                return;
+            }
+
+            if (!capturedImageData) {
+                showMessage('⚠️ Veuillez capturer une photo', 'error');
+                return;
+            }
+
+            // Simulate fingerprint capture
+            document.getElementById('fingerprintStatus').innerText = '✅ Empreinte capturée (simulée)';
+            
+            const data = {
+                mode: currentMode,
+                employeeId: employeeId,
+                photo: capturedImageData,
+                fingerprintTemplate: 'SIMULATED_FINGERPRINT_' + employeeId + '_' + Date.now(),
+                timestamp: new Date().toISOString(),
+                location: 'MorphoTablet Direct Test'
+            };
+
+            // Save to localStorage for now
+            saveToLocalStorage(data);
+            
+            updateStatus('✅ Données enregistrées localement');
+            showMessage('✅ ' + getModeLabel() + ' enregistré avec succès!', 'success');
+            
+            // Reset form
+            setTimeout(() => {
+                document.getElementById('employeeId').value = '';
+                retakePhoto();
+                document.getElementById('fingerprintStatus').innerText = 'En attente...';
+            }, 2000);
+        }
+
+        function getModeLabel() {
+            if (currentMode === 'checkin') return 'Pointage d\'entrée';
+            if (currentMode === 'checkout') return 'Pointage de sortie';
+            if (currentMode === 'enroll') return 'Enregistrement biométrique';
+            return '';
+        }
+
+        function saveToLocalStorage(data) {
+            const key = 'morpho_' + currentMode + '_' + Date.now();
+            localStorage.setItem(key, JSON.stringify(data));
+            console.log('Data saved:', key, data);
+        }
+
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.innerText = text;
+            messageEl.className = 'message ' + type;
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 5000);
+        }
+
+        // Simulate fingerprint reader events (for testing)
+        setInterval(() => {
+            if (Math.random() > 0.95) {
+                document.getElementById('fingerprintStatus').innerText = '👆 Détection en cours...';
+                setTimeout(() => {
+                    document.getElementById('fingerprintStatus').innerText = 'En attente...';
+                }, 1000);
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
+

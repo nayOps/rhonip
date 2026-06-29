@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_primary">
+
+    <!-- Barre Tricolore -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="@drawable/tricolor_bar_horizontal" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp">
+
+        <!-- Logo/Icon Space (Glassmorphic) -->
+        <View
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:background="@drawable/glassmorphic_card"
+            android:layout_marginBottom="32dp" />
+
+        <!-- Welcome Title -->
+        <TextView
+            android:id="@+id/welcome_title"
+            style="@style/Heading1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bienvenue"
+            android:textAlignment="center"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Welcome Subtitle -->
+        <TextView
+            android:id="@+id/welcome_subtitle"
+            style="@style/Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Système de Gestion des Ressources Humaines"
+            android:textAlignment="center"
+            android:layout_marginBottom="48dp" />
+
+        <!-- Skip Button -->
+        <Button
+            android:id="@+id/skip_button"
+            style="@style/ButtonOutline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Passer"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</LinearLayout>

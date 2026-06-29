@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Iris Test</string>
+    <string name="iris_title">Test Reconnaissance Iris</string>
+    <string name="btn_enroll">Enregistrer</string>
+    <string name="btn_identify">Identifier</string>
+    <string name="btn_authenticate">Authentifier</string>
+    <string name="btn_verify">Vérifier</string>
+    <string name="status_initializing">Initialisation de l\'interface iris...</string>
+    <string name="status_ready">Interface iris prête</string>
+    <string name="status_capturing">Capture d\'iris en cours...</string>
+    <string name="iris_saved">Iris sauvegardé</string>
+    <string name="error_iris">Erreur interface iris</string>
+</resources>

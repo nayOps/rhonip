@@ -1,0 +1,70 @@
+sequenceDiagram
+    participant Client as Kit d'Enrôlement
+    participant Gateway as Enrollment Gateway
+    participant Core as FGP Core Service
+    participant Ext as Extensions Service
+    participant ABIS as ABIS Service
+    participant DB as PostgreSQL
+    participant Cache as Redis
+    participant S3 as MinIO/S3
+    
+    Note over Client,S3: Processus d'Enrôlement Complet
+    
+    Client->>Gateway: POST /api/v1/enrolments/<br/>Payload complet (27 + extensions + biométrie)
+    
+    Note over Gateway: Validation et Orchestration
+    Gateway->>Gateway: Validation schéma JSON
+    Gateway->>Gateway: Vérification signature JWS
+    Gateway->>Cache: Vérification cache (doublons récents)
+    
+    Note over Gateway,ABIS: Déduplication Biométrique
+    Gateway->>ABIS: POST /api/v1/abis/search/<br/>Recherche 1:N
+    ABIS->>DB: Recherche dans templates biométriques
+    DB-->>ABIS: Résultats de recherche
+    ABIS->>ABIS: Calcul scores de similarité
+    ABIS-->>Gateway: Réponse: HIT/NO_HIT/REVIEW
+    
+    alt Cas HIT (Doublon trouvé)
+        Gateway-->>Client: 409 Conflict<br/>Doublon détecté
+    else Cas REVIEW (Révision manuelle)
+        Gateway->>DB: Sauvegarde en attente
+        Gateway-->>Client: 202 Accepted<br/>En révision manuelle
+    else Cas NO_HIT (Pas de doublon)
+        
+        Note over Gateway,Core: Sauvegarde FGP Core
+        Gateway->>Core: POST /api/v1/core/persons/<br/>27 variables obligatoires
+        Core->>DB: INSERT INTO fgp_person_core
+        Core->>Cache: Invalidation cache
+        Core-->>Gateway: 201 Created + NIN généré
+        
+        Note over Gateway,Ext: Sauvegarde Extensions
+        Gateway->>Ext: POST /api/v1/extensions/{strate}/<br/>Variables spécifiques par strate
+        loop Pour chaque strate
+            Ext->>DB: INSERT INTO ext_{strate}
+            Ext->>Cache: Mise à jour cache extensions
+        end
+        Ext-->>Gateway: 201 Created + Extensions sauvegardées
+        
+        Note over Gateway,ABIS: Sauvegarde Biométrique
+        Gateway->>ABIS: POST /api/v1/abis/enroll/<br/>Gabarits biométriques
+        ABIS->>S3: Upload fichiers biométriques
+        ABIS->>DB: INSERT INTO fgp_biometric_templates
+        ABIS->>DB: INSERT INTO fgp_biometric
+        ABIS-->>Gateway: 201 Created + Gabarits indexés
+        
+        Note over Gateway: Finalisation
+        Gateway->>DB: INSERT INTO fgp_strata_membership
+        Gateway->>DB: INSERT INTO fgp_audit_trail
+        Gateway->>S3: Upload documents (si présents)
+        Gateway->>Cache: Mise à jour cache global
+        
+        Gateway-->>Client: 201 Created<br/>NIN + Statut + Récépissé
+    end
+    
+    Note over Client,S3: Cas d'Erreur
+    alt Erreur de validation
+        Gateway-->>Client: 422 Unprocessable Entity<br/>Détails des erreurs
+    else Erreur système
+        Gateway-->>Client: 500 Internal Server Error<br/>Message d'erreur
+    end
+

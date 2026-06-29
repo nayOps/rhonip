@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PlatformTarget>x86</PlatformTarget>
+    <RootNamespace>Fgp.PosPrinter.Bridge</RootNamespace>
+    <AssemblyName>Fgp.PosPrinter.Bridge</AssemblyName>
+    <Description>Sidecar x86 POS_SDK.dll — imprimante thermique guichet</Description>
+  </PropertyGroup>
+</Project>

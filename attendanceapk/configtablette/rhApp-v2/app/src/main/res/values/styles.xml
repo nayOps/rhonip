@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    
+    <!-- Flat Button Primary -->
+    <style name="ButtonPrimary" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_primary_flat</item>
+        <item name="android:textColor">@color/button_primary_text</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+    
+    <!-- Flat Button Secondary -->
+    <style name="ButtonSecondary" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_secondary_flat</item>
+        <item name="android:textColor">@color/button_secondary_text</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+    
+    <!-- Flat Button Outline -->
+    <style name="ButtonOutline" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_outline_flat</item>
+        <item name="android:textColor">@color/button_outline_text</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+    
+    <!-- Card Style (Flat) -->
+    <style name="CardFlat">
+        <item name="android:background">@drawable/card_flat</item>
+        <item name="android:padding">24dp</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+    
+    <!-- Text Input Style (Flat) -->
+    <style name="TextInputFlat" parent="Widget.AppCompat.EditText">
+        <item name="android:background">@drawable/input_flat</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+    
+    <!-- Heading Styles -->
+    <style name="Heading1">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:lineSpacingExtra">8dp</item>
+    </style>
+    
+    <style name="Heading2">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+    
+    <style name="Heading3">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+    
+    <!-- Body Text Styles -->
+    <style name="BodyLarge">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:lineSpacingMultiplier">1.6</item>
+    </style>
+    
+    <style name="Body">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:lineSpacingMultiplier">1.5</item>
+    </style>
+    
+    <style name="BodySmall">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:lineSpacingMultiplier">1.4</item>
+    </style>
+    
+    <!-- Progress Bar Style (Flat) -->
+    <style name="ProgressBarFlat" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_bar_flat</item>
+        <item name="android:minHeight">8dp</item>
+        <item name="android:maxHeight">8dp</item>
+    </style>
+    
+</resources>
+

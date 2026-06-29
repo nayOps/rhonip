@@ -1,0 +1,76 @@
+flowchart TD
+    subgraph "Enrôlement Process"
+        A[Kit d'Enrôlement<br/>Mobile/Poste fixe] --> B[Capture Documents<br/>OCR + Validation]
+        B --> C[Saisie Données<br/>27 variables + extensions]
+        C --> D[Capture Biométrie<br/>Photo + Empreintes + Iris]
+        D --> E[Validation Locale<br/>Contrôles qualité]
+        E --> F[Upload Sécurisé<br/>JWS + Chiffrement]
+    end
+    
+    subgraph "Enrollment Gateway"
+        F --> G[Reception Payload<br/>Validation schéma]
+        G --> H[Vérification Doublons<br/>Recherche préliminaire]
+        H --> I{ABIS Check<br/>Déduplication 1:N}
+        I -->|HIT| J[Rejet - Doublon trouvé]
+        I -->|NO_HIT| K[Validation Extensions]
+        I -->|REVIEW| L[File d'attente<br/>Révision manuelle]
+    end
+    
+    subgraph "Services Core"
+        K --> M[FGP Core Service<br/>Sauvegarde 27 variables]
+        K --> N[Extensions Service<br/>Sauvegarde par strate]
+        K --> O[ABIS Service<br/>Stockage gabarits]
+        
+        M --> P[Génération NIN<br/>CD-YYYY-NNNN-NNNNNNNNN]
+        N --> Q[Validation Métier<br/>Règles par strate]
+        O --> R[Indexation Biométrique<br/>Pour futures recherches]
+    end
+    
+    subgraph "Base de Données"
+        P --> S[(PostgreSQL<br/>FGP Core)]
+        Q --> T[(PostgreSQL<br/>Extensions)]
+        R --> U[(PostgreSQL<br/>Templates ABIS)]
+        
+        S --> V[Audit Trail<br/>Traçabilité complète]
+        T --> V
+        U --> V
+    end
+    
+    subgraph "Réponse"
+        V --> W[Génération Récépissé<br/>PDF + QR Code]
+        W --> X[Notification Secteur<br/>Webhook/API]
+        X --> Y[Confirmation Client<br/>NIN + Statut]
+    end
+    
+    subgraph "Monitoring"
+        Z[Prometheus<br/>Métriques] --> AA[Grafana<br/>Dashboards]
+        BB[ELK Stack<br/>Logs] --> AA
+        
+        G -.-> Z
+        M -.-> Z
+        N -.-> Z
+        O -.-> Z
+        
+        G -.-> BB
+        M -.-> BB
+        N -.-> BB
+        O -.-> BB
+    end
+    
+    %% Styling
+    classDef process fill:#e3f2fd,stroke:#0277bd,stroke-width:2px
+    classDef gateway fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef service fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+    classDef database fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef response fill:#e0f2f1,stroke:#00695c,stroke-width:2px
+    classDef monitoring fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    classDef error fill:#ffebee,stroke:#d32f2f,stroke-width:2px
+    
+    class A,B,C,D,E,F process
+    class G,H,I,K gateway
+    class M,N,O,P,Q,R service
+    class S,T,U,V database
+    class W,X,Y response
+    class Z,AA,BB monitoring
+    class J,L error
+

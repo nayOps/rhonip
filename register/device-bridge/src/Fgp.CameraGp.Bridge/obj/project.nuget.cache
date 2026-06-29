@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "EYO9HIqTv38=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\HYF\\Documents\\sdk\\fgp\\fgp\\device-bridge\\src\\Fgp.CameraGp.Bridge\\Fgp.CameraGp.Bridge.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\HYF\\AppData\\Local\\Temp\\cursor-sandbox-cache\\34dcbdf361026e3e651d956e625b2e08\\nuget\\microsoft.win32.systemevents\\8.0.0\\microsoft.win32.systemevents.8.0.0.nupkg.sha512",
+    "C:\\Users\\HYF\\AppData\\Local\\Temp\\cursor-sandbox-cache\\34dcbdf361026e3e651d956e625b2e08\\nuget\\system.drawing.common\\8.0.10\\system.drawing.common.8.0.10.nupkg.sha512"
+  ],
+  "logs": []
+}

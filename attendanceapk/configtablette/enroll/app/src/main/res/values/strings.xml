@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Enrôlement</string>
+    <string name="app_subtitle">Enrôlement empreintes — tablette Morpho</string>
+    
+    <!-- Loading -->
+    <string name="loading_title">Initialisation...</string>
+    <string name="loading_device">Initialisation du capteur...</string>
+    <string name="loading_data">Chargement des données...</string>
+    <string name="loading_ready">Application prête !</string>
+    
+    <!-- Attendance -->
+    <string name="attendance_title">Pointage présence</string>
+    <string name="attendance_place_finger">Placez votre doigt sur le capteur</string>
+    <string name="attendance_capturing">Capture en cours...</string>
+    <string name="attendance_matching">Recherche de correspondance...</string>
+    <string name="attendance_success">Empreinte reconnue</string>
+    <string name="attendance_failed">Empreinte non reconnue</string>
+    
+    <!-- Common -->
+    <string name="back">Retour</string>
+    <string name="capture">Capturer</string>
+    <string name="cancel">Annuler</string>
+    <string name="btn_refresh_app">Actualisation</string>
+    <string name="btn_reset_capture">Réinitialisation</string>
+    <string name="refresh_app_toast">Actualisation de l\'application...</string>
+    <string name="reset_capture_done">Capture réinitialisée — placez votre doigt</string>
+    <string name="home_subtitle">Capture empreintes Morpho — ONIP</string>
+</resources>

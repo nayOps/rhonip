@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ONIP HR - Gestion des Présences</title>
+<!-- Google Fonts: Hanken Grotesk -->
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#301400",
+                        "on-primary-fixed-variant": "#2d4287",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#757682",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#461f00",
+                        "on-background": "#191c1e",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "error": "#ba1a1a",
+                        "secondary": "#264dd9",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary": "#072369",
+                        "secondary-container": "#4568f3",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed": "#00164f",
+                        "inverse-primary": "#b6c4ff",
+                        "on-secondary-fixed": "#001355",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary-container": "#e89961",
+                        "surface": "#f7f9fb",
+                        "tertiary-fixed-dim": "#ffb785",
+                        "surface-bright": "#f7f9fb",
+                        "on-primary-container": "#94a8f5",
+                        "on-secondary-container": "#fffbff",
+                        "on-tertiary-fixed-variant": "#703806",
+                        "primary-container": "#253b80",
+                        "surface-container": "#eceef0",
+                        "outline-variant": "#c5c5d2",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface-dim": "#d8dadc",
+                        "primary-fixed": "#dce1ff",
+                        "on-secondary-fixed-variant": "#0035bd",
+                        "surface-tint": "#465aa1",
+                        "on-surface-variant": "#444651",
+                        "surface-variant": "#e0e3e5",
+                        "background": "#f7f9fb",
+                        "on-surface": "#191c1e",
+                        "secondary-fixed-dim": "#b8c3ff",
+                        "tertiary-container": "#673100",
+                        "inverse-surface": "#2d3133",
+                        "tertiary-fixed": "#ffdcc6",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary-fixed": "#dde1ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding": "1rem",
+                        "stack-space": "1.25rem",
+                        "section-margin": "2rem",
+                        "gutter": "1rem"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "label-bold": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-lg": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Hanken Grotesk', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .flat-plus-shadow {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- SideNavBar Shell -->
+<aside class="flex flex-col fixed left-0 top-0 h-screen py-6 px-4 z-40 bg-surface-container-lowest border-r border-outline-variant w-64">
+<!-- Brand Identity -->
+<div class="mb-10 px-2">
+<img alt="ONIP Logo" class="h-10 w-auto mb-2 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATU5nCq_qpWvsWxB1UlBkos4zzsI2xhHFY5EDWykM3sEkT5NAxTD_zusOuybckKM7ZdNZ7uWVP4YPoNmMayOnoXBZVSK-TUoFkq4Aav8GGauQ5IljLdDxM3y1_eH4EXQIW62z9U6WeJMrq_YT0ujw1cXQTulZR91Gnc5Ef4IAHZ_-yKXWDnWUEyGhaDMq2zeFyFkMr0dyRv6kLXBVzT2se-ACFlOnx3V20aIB-Dyv76yVGuBiGUNnohXc2Pd-fX47KCDKkwzzr2upG"/>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">ONIP HR</h1>
+<p class="font-label-bold text-label-bold text-on-surface-variant opacity-70">Portail Administratif</p>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-transform duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-bold text-label-bold">Tableau de Bord</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg shadow-sm transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="assignment_late">assignment_late</span>
+<span class="font-label-bold text-label-bold">Action Requise</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-transform duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-label-bold text-label-bold">Notification</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-transform duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="badge">badge</span>
+<span class="font-label-bold text-label-bold">Employé</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-transform duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-bold text-label-bold">Paramètres</span>
+</a>
+</nav>
+<!-- Profile / Footer -->
+<div class="mt-auto pt-6 border-t border-outline-variant px-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full border border-outline-variant bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Admin ONIP</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Superviseur RH</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 min-h-screen">
+<!-- TopAppBar Shell -->
+<header class="flex justify-between items-center px-gutter w-full sticky top-0 z-50 bg-surface-container-lowest h-16 border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<h2 class="font-headline-md text-headline-md font-bold text-primary">Feuille de Présence</h2>
+<div class="h-6 w-px bg-outline-variant mx-2"></div>
+<p class="text-on-surface-variant font-body-md text-body-md">Mardi, 24 Octobre 2023</p>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container rounded-full border-none focus:ring-2 focus:ring-primary text-body-md font-body-md w-64 transition-all duration-200" placeholder="Rechercher un agent..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full hover:bg-surface-container text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="language">language</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<section class="p-8 max-w-7xl mx-auto">
+<!-- Filter Bar -->
+<div class="mb-8 space-y-6">
+<div class="flex items-center justify-between">
+<!-- Segmented Control -->
+<div class="bg-surface-container-low p-1 rounded-xl flex gap-1 flat-plus-shadow">
+<button class="px-6 py-2 rounded-lg font-label-bold text-label-bold bg-white text-primary shadow-sm">Aujourd'hui</button>
+<button class="px-6 py-2 rounded-lg font-label-bold text-label-bold text-on-surface-variant hover:bg-surface-container-highest transition-colors">Cette Semaine</button>
+<button class="px-6 py-2 rounded-lg font-label-bold text-label-bold text-on-surface-variant hover:bg-surface-container-highest transition-colors">Ce Mois</button>
+</div>
+<div class="flex gap-4">
+<div class="relative">
+<select class="appearance-none bg-white border border-outline-variant px-4 py-2 pr-10 rounded-lg text-body-md font-body-md focus:ring-2 focus:ring-primary flat-plus-shadow">
+<option>Toutes les Directions</option>
+<option>Direction Générale</option>
+<option>Ressources Humaines</option>
+<option>Informatique</option>
+<option>Opérations</option>
+</select>
+<span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined pointer-events-none text-on-surface-variant" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</div>
+<button class="flex items-center gap-2 bg-primary text-white px-6 py-2 rounded-lg font-label-bold text-label-bold hover:opacity-90 transition-opacity flat-plus-shadow">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+                            Exporter (PDF/Excel)
+                        </button>
+</div>
+</div>
+<!-- Quick Stats Summary -->
+<div class="grid grid-cols-4 gap-4">
+<div class="bg-white p-4 rounded-xl flat-plus-shadow border-l-4 border-primary">
+<p class="text-label-bold font-label-bold text-on-surface-variant opacity-70">Effectif Total</p>
+<p class="text-headline-md font-headline-md text-primary mt-1">1,248 Agents</p>
+</div>
+<div class="bg-white p-4 rounded-xl flat-plus-shadow border-l-4 border-green-500">
+<p class="text-label-bold font-label-bold text-on-surface-variant opacity-70">Présents (Matin)</p>
+<p class="text-headline-md font-headline-md text-green-600 mt-1">1,102 <span class="text-sm font-normal text-on-surface-variant">(88%)</span></p>
+</div>
+<div class="bg-white p-4 rounded-xl flat-plus-shadow border-l-4 border-amber-500">
+<p class="text-label-bold font-label-bold text-on-surface-variant opacity-70">En Retard</p>
+<p class="text-headline-md font-headline-md text-amber-600 mt-1">45 Agents</p>
+</div>
+<div class="bg-white p-4 rounded-xl flat-plus-shadow border-l-4 border-error">
+<p class="text-label-bold font-label-bold text-on-surface-variant opacity-70">Absents</p>
+<p class="text-headline-md font-headline-md text-error mt-1">101 Agents</p>
+</div>
+</div>
+</div>
+<!-- Attendance Table Container -->
+<div class="bg-white rounded-xl flat-plus-shadow overflow-hidden border border-outline-variant">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="px-6 py-4 font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider">Agent &amp; Département</th>
+<th class="px-4 py-4 font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider text-center bg-blue-50/50">Matin : Entrée 1</th>
+<th class="px-4 py-4 font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider text-center bg-blue-50/50">Matin : Sortie 1</th>
+<th class="px-4 py-4 font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider text-center bg-indigo-50/50">Après-midi : Entrée 2</th>
+<th class="px-4 py-4 font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider text-center bg-indigo-50/50">Après-midi : Sortie 2</th>
+<th class="px-6 py-4 font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30 font-body-md text-body-md">
+<!-- Agent Row 1 -->
+<tr class="hover:bg-surface transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-sm">MB</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">MAMADOU Bakary</p>
+<p class="text-on-surface-variant text-sm opacity-80">Dir. Informatique</p>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-primary">07:52</span>
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase">À l'heure</span>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-primary">12:31</span>
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase">Sortie OK</span>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-primary">13:58</span>
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase">À l'heure</span>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-primary">17:05</span>
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase">Sortie OK</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Agent Row 2 (Late example) -->
+<tr class="hover:bg-surface transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container text-white flex items-center justify-center font-bold text-sm">KS</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">KONE Salimata</p>
+<p class="text-on-surface-variant text-sm opacity-80">Ressources Humaines</p>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-amber-600">08:15</span>
+<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold uppercase">En Retard</span>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-primary">12:35</span>
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase">Sortie OK</span>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-primary">13:45</span>
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase">À l'heure</span>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-primary">17:10</span>
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase">Sortie OK</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Agent Row 3 (Absent example) -->
+<tr class="hover:bg-surface transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-sm">TD</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">TRAORE Dramane</p>
+<p class="text-on-surface-variant text-sm opacity-80">Logistique</p>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-outline-variant">-- : --</span>
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[10px] font-bold uppercase">Absent</span>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-outline-variant">-- : --</span>
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[10px] font-bold uppercase">Absent</span>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-outline-variant">-- : --</span>
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[10px] font-bold uppercase">Absent</span>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-outline-variant">-- : --</span>
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[10px] font-bold uppercase">Absent</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Agent Row 4 -->
+<tr class="hover:bg-surface transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-container text-white flex items-center justify-center font-bold text-sm">YA</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">YAO Ange-Marie</p>
+<p class="text-on-surface-variant text-sm opacity-80">Communication</p>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-primary">07:45</span>
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase">À l'heure</span>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-primary">12:20</span>
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase">Sortie OK</span>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-amber-600">14:20</span>
+<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold uppercase">En Retard</span>
+</div>
+</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="font-bold text-primary">17:01</span>
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase">Sortie OK</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 hover:bg-surface-container rounded-lg text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination Footer -->
+<div class="px-6 py-4 bg-surface-container-low border-t border-outline-variant flex items-center justify-between">
+<p class="text-body-md font-body-md text-on-surface-variant">Affichage de 1-10 sur 1,248 agents</p>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-label-bold text-label-bold">Précédent</button>
+<button class="px-4 py-1.5 bg-primary text-white rounded-lg font-label-bold text-label-bold">1</button>
+<button class="px-4 py-1.5 border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-label-bold text-label-bold">2</button>
+<button class="px-4 py-1.5 border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-label-bold text-label-bold">3</button>
+<button class="px-3 py-1.5 border border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-label-bold text-label-bold">Suivant</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Button for Manual Entry (Contextual) -->
+<div class="fixed bottom-8 right-8 z-50">
+<button class="w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform active:scale-95 group relative">
+<span class="material-symbols-outlined text-[28px]" data-icon="add">add</span>
+<span class="absolute right-16 bg-inverse-surface text-inverse-on-surface px-4 py-2 rounded-lg text-label-bold font-label-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl">
+                Pointage Manuel
+            </span>
+</button>
+</div>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                document.querySelectorAll('nav a').forEach(el => {
+                    el.classList.remove('bg-secondary-container', 'text-on-secondary-container', 'shadow-sm');
+                    el.classList.add('text-on-surface-variant', 'hover:bg-surface-container-low');
+                });
+                link.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-low');
+                link.classList.add('bg-secondary-container', 'text-on-secondary-container', 'shadow-sm');
+            });
+        });
+
+        // Simple segmented control toggle effect
+        const filterButtons = document.querySelectorAll('.bg-surface-container-low button');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => {
+                    b.classList.remove('bg-white', 'text-primary', 'shadow-sm');
+                    b.classList.add('text-on-surface-variant', 'hover:bg-surface-container-highest');
+                });
+                btn.classList.add('bg-white', 'text-primary', 'shadow-sm');
+                btn.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-highest');
+            });
+        });
+    </script>
+</body></html>

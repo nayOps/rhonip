@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dossier Agent - ONIP Portal</title>
+<!-- Tailwind CSS with Forms & Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Font: Hanken Grotesk -->
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#465aa1",
+                        "on-tertiary-fixed": "#301400",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb785",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "on-primary-container": "#94a8f5",
+                        "secondary-container": "#4568f3",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#c5c5d2",
+                        "surface-dim": "#d8dadc",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#dde1ff",
+                        "outline": "#757682",
+                        "surface-variant": "#e0e3e5",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#b6c4ff",
+                        "inverse-surface": "#2d3133",
+                        "tertiary": "#461f00",
+                        "primary": "#072369",
+                        "on-secondary-fixed": "#001355",
+                        "tertiary-container": "#673100",
+                        "on-tertiary-container": "#e89961",
+                        "secondary": "#264dd9",
+                        "surface-container-low": "#f2f4f6",
+                        "tertiary-fixed": "#ffdcc6",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary-fixed-variant": "#2d4287",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#dce1ff",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-surface-variant": "#444651",
+                        "background": "#f7f9fb",
+                        "surface": "#f7f9fb",
+                        "on-secondary-fixed-variant": "#0035bd",
+                        "secondary-fixed-dim": "#b8c3ff",
+                        "primary-container": "#253b80",
+                        "on-primary-fixed": "#00164f",
+                        "on-secondary-container": "#fffbff",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#eceef0",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-bright": "#f7f9fb",
+                        "on-surface": "#191c1e",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed-variant": "#703806",
+                        "on-background": "#191c1e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-margin": "2rem",
+                        "stack-space": "1.25rem",
+                        "gutter": "1rem",
+                        "container-padding": "1rem"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "label-bold": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "headline-lg": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Hanken Grotesk', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for better integration */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .form-input-focus:focus-within {
+            border-color: #264dd9;
+            box-shadow: 0 0 0 1px #264dd9;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface flex min-h-screen">
+<!-- Predicted SideNavBar (Left) -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-primary dark:bg-primary-container shadow-md flex flex-col py-6 z-50">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 bg-on-primary rounded-lg flex items-center justify-center text-primary font-bold text-headline-md">
+                ON
+            </div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">ONIP Portal</h1>
+<p class="font-label-sm text-label-sm text-on-primary/60">HR Management</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary mx-2 hover:bg-primary-fixed-dim/10 transition-colors cursor-pointer active:scale-95 duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg mx-2 cursor-pointer active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">badge</span>
+<span class="font-body-md text-body-md">Employees</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary mx-2 hover:bg-primary-fixed-dim/10 transition-colors cursor-pointer active:scale-95 duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-body-md text-body-md">Attendance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/80 hover:text-on-primary mx-2 hover:bg-primary-fixed-dim/10 transition-colors cursor-pointer active:scale-95 duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<div class="p-3 bg-primary-container dark:bg-primary rounded-xl flex items-center gap-3 text-on-primary/90">
+<img class="w-10 h-10 rounded-full border border-on-primary/20 object-cover" data-alt="Close up headshot of a professional female HR administrator with a warm, confident expression in a clean corporate setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUTXVbBebpYpWwt0RV5Y7xnxKECAZ1YM5Lj_DUMF9fJz-SydipX36hkZ17_hPAkOzc38Y0WdO7QbIN-RdtHTDJ5-dC5A7OjZumi42ZZutyIMu8rtyvPzQOOmCjIyRwYg2mUEAgip1Vonb5eJS3eqUPV9ch7rOcjIsCukJ0VEAIOgInaT3d04wlMiElUzcitmgFjS1bLgQ4bKIOjIjnbtczfQlpeJUiy5qYltCJLq-W9Wwqmf1c1PP55Xfrrzc5mCrSjTiZiv8Fsxhf"/>
+<div class="overflow-hidden">
+<p class="font-label-bold text-label-bold truncate">admin@onip.local</p>
+<p class="text-[10px] opacity-60">Administrateur</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-sm">unfold_more</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 relative">
+<!-- Predicted TopNavBar -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-surface dark:bg-surface-container border-b border-outline-variant dark:border-outline z-40 flex justify-between items-center px-6">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md focus-within:ring-2 focus-within:ring-secondary-container rounded-lg">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-2 text-label-sm font-label-sm focus:ring-0" placeholder="Rechercher un agent..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-high transition-all rounded-full relative">
+<span class="material-symbols-outlined text-primary">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 hover:bg-surface-container-high transition-all rounded-full">
+<span class="material-symbols-outlined text-primary">help</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden lg:block">
+<p class="font-label-bold text-label-bold text-on-surface">HR Admin</p>
+<p class="text-[10px] text-on-surface-variant">Direction Générale</p>
+</div>
+<img class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="Portrait of a modern HR professional in a light grey blazer, professional studio lighting with soft shadows, minimalist corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIfZqzWijbVvifKPixRv1kFW8e5LaVSh34x4oqWEmIgzPdmP4uA7JbNiyMbB6wR_dEfd67O6ywH1ACS43K3F8tBZHwkQqXyDTCzrCPGjNvrnaXPkGMRCIl9L7-mE97buMaF3w1ZNIrZ7DehsdXAB8Hx_HKOV8qXWOmUPCKtYYjruQ-EL8vM2Ysvn_KDO_LFDuY1WuT9quCe1OyFKPgFOMYy1QIHmYsPyeGmAmZYH913ryFW1iZ304SqViffnHUdhrpDktCfxohHZH3"/>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="pt-24 pb-12 px-8 max-w-7xl mx-auto">
+<!-- Header Section with Breadcrumbs & Actions -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+<div>
+<nav class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm mb-2">
+<a class="hover:text-primary" href="#">Tableau de bord</a>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<a class="hover:text-primary" href="#">Employés</a>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary font-label-bold">Profil Agent</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-primary">Dossier Agent</h2>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2 border border-outline text-primary font-label-bold rounded-lg hover:bg-surface-container-low transition-all active:scale-95">
+                        Annuler
+                    </button>
+<button class="px-6 py-2 bg-primary text-on-primary font-label-bold rounded-lg hover:bg-primary-container transition-all shadow-sm active:scale-95 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">save</span>
+                        Sauvegarder
+                    </button>
+</div>
+</div>
+<!-- Profile Overview Card (Contextual) -->
+<div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm mb-8 flex flex-col md:flex-row items-center gap-8">
+<div class="relative">
+<div class="w-32 h-32 rounded-full border-4 border-surface-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional ID portrait of a middle-aged male government agent in a formal dark blue suit with a white shirt, clear sharp focus, bright daylight office background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuARLyqVtJDvOG4GliF6r6E22Pecpy0SQ7GH7ReplY3NQB0Eid-K1E0gfDoJI6IMewqxK9w1f2-MI_Xds7nQ__we0WmZiGk6CHKsAbwgDqbQ_Ni4yKUYr3G7-j9Bo4_uV_e1PrQX9hF12yQHGF36r_2PghHm9lXDZt_Gr8jlc_n5qGuuok2Jq0LCBBc4-SWu7MbJZSyynX_SwbPa4vL43_zplX0dfq-N6KZ2P31nljrLZiix6UIgPeJCSvsnykea8ANsJW5mhoK_JiUV"/>
+</div>
+<button class="absolute bottom-1 right-1 bg-secondary text-on-secondary p-1.5 rounded-full shadow-md border-2 border-on-secondary">
+<span class="material-symbols-outlined text-sm">photo_camera</span>
+</button>
+</div>
+<div class="flex-1 text-center md:text-left">
+<div class="flex flex-col md:flex-row items-center gap-3 mb-2">
+<h3 class="font-headline-md text-headline-md text-on-surface">SOUZY DJIMBO SAKANYI</h3>
+<span class="px-3 py-1 bg-green-100 text-green-800 text-[11px] font-bold rounded-full uppercase tracking-wider">Actif</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-2 gap-x-6">
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+<span class="material-symbols-outlined text-lg">id_card</span>
+                            1010020216
+                        </div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+<span class="material-symbols-outlined text-lg">business</span>
+                            Agent de Liaison
+                        </div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+<span class="material-symbols-outlined text-lg">location_on</span>
+                            Direction Centrale
+                        </div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+<span class="material-symbols-outlined text-lg">mail</span>
+                            s.sakanyi@onip.gouv.cd
+                        </div>
+</div>
+</div>
+</div>
+<!-- Tabs Component -->
+<div class="border-b border-outline-variant mb-8 flex gap-8 overflow-x-auto no-scrollbar">
+<button class="pb-4 px-1 text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap hover:text-primary transition-colors">Présences</button>
+<button class="pb-4 px-1 text-primary border-b-2 border-primary font-label-bold text-label-sm whitespace-nowrap">Informations</button>
+<button class="pb-4 px-1 text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap hover:text-primary transition-colors">Enfants</button>
+<button class="pb-4 px-1 text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap hover:text-primary transition-colors">Éducations</button>
+<button class="pb-4 px-1 text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap hover:text-primary transition-colors">Expériences</button>
+<button class="pb-4 px-1 text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap hover:text-primary transition-colors">Documents</button>
+</div>
+<!-- Form Content -->
+<div class="space-y-8">
+<!-- Section 1: Identité Personnelle -->
+<section class="bg-surface-container-lowest rounded-xl p-8 border border-outline-variant/30 shadow-sm">
+<div class="flex items-center gap-3 mb-6">
+<span class="w-1 h-6 bg-primary rounded-full"></span>
+<h4 class="font-headline-md text-headline-md text-on-surface">Identité Personnelle</h4>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Matricule</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md focus:ring-1 focus:ring-secondary focus:border-secondary outline-none transition-all" type="text" value="1010020216"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Numéro de sécurité sociale</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md focus:ring-1 focus:ring-secondary focus:border-secondary transition-all" placeholder="CNSS-XXXX-XXXX" type="text"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Site</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md focus:ring-1 focus:ring-secondary focus:border-secondary">
+<option>Kinshasa Central</option>
+<option>Lubumbashi</option>
+<option>Goma</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Type de contrat</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md focus:ring-1 focus:ring-secondary focus:border-secondary">
+<option>Statutaire</option>
+<option>Contractuel</option>
+<option>Mandataire</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Date d'engagement*</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md focus:ring-1 focus:ring-secondary focus:border-secondary" type="date"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Direction</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md focus:ring-1 focus:ring-secondary focus:border-secondary" type="text" value="Direction Générale"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Grade</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md focus:ring-1 focus:ring-secondary focus:border-secondary">
+<option>Directeur Chef de Service</option>
+<option>Chef de Bureau</option>
+<option>Attaché de Bureau</option>
+</select>
+</div>
+<div class="space-y-1.5 md:col-span-2">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Position</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md focus:ring-1 focus:ring-secondary focus:border-secondary pr-10" type="text" value="AGENT DE LIAISON"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-on-surface-variant">unfold_more</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Prénom</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md" type="text" value="SOUZY"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Post-nom</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md" type="text" value="DJIMBO"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Nom</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md" type="text" value="SAKANYI"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Genre</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md">
+<option selected="">Masculin</option>
+<option>Féminin</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Date de naissance*</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md" type="date" value="1985-06-12"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Lieu de naissance</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md" type="text" value="Kinshasa"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Nationalité</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md" type="text" value="Congolaise (RDC)"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Type de pièce d'identité</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md">
+<option>Carte d'Électeur</option>
+<option>Passeport</option>
+<option>Permis de conduire</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Numéro de pièce d'identité</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md" type="text"/>
+</div>
+</div>
+</section>
+<!-- Section 2: Coordonnées & Urgence -->
+<section class="bg-surface-container-lowest rounded-xl p-8 border border-outline-variant/30 shadow-sm">
+<div class="flex items-center gap-3 mb-6">
+<span class="w-1 h-6 bg-secondary rounded-full"></span>
+<h4 class="font-headline-md text-headline-md text-on-surface">Coordonnées &amp; Contacts d'Urgence</h4>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8">
+<!-- Direct Contacts -->
+<div class="space-y-6">
+<h5 class="font-label-bold text-label-bold text-secondary uppercase tracking-wider">Communication</h5>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-sm text-on-surface-variant">Tél. Professionnel</label>
+<div class="flex">
+<span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-outline-variant bg-surface-container-high text-on-surface-variant">+</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-r-lg p-2.5 font-body-md text-body-md" type="tel"/>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-sm text-on-surface-variant">Tél. Mobile</label>
+<div class="flex">
+<span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-outline-variant bg-surface-container-high text-on-surface-variant">+</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-r-lg p-2.5 font-body-md text-body-md" type="tel"/>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-sm text-on-surface-variant">Email Professionnel</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 font-body-md text-body-md" type="email" value="s.sakanyi@onip.gouv.cd"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-sm text-on-surface-variant">Email Personnel</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 font-body-md text-body-md" type="email"/>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-sm text-on-surface-variant">Adresse physique complète</label>
+<textarea class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md" placeholder="Avenue, Quartier, Commune..." rows="3"></textarea>
+</div>
+</div>
+<!-- Emergency Contacts -->
+<div class="space-y-6">
+<h5 class="font-label-bold text-label-bold text-secondary uppercase tracking-wider">Urgence &amp; Médical</h5>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-sm text-on-surface-variant">Nom Contact d'Urgence</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 font-body-md text-body-md" type="text"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-sm text-on-surface-variant">Relation</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 font-body-md text-body-md" type="text"/>
+</div>
+<div class="space-y-1.5 sm:col-span-2">
+<label class="font-label-bold text-label-sm text-on-surface-variant">Tél. Contact d'Urgence</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 font-body-md text-body-md" type="tel"/>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/50 grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-sm text-on-surface-variant">Médecin Référent</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 font-body-md text-body-md" type="text"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-sm text-on-surface-variant">Tél. Médecin</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-2.5 font-body-md text-body-md" type="tel"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Informations Bancaires -->
+<section class="bg-surface-container-lowest rounded-xl p-8 border border-outline-variant/30 shadow-sm">
+<div class="flex items-center gap-3 mb-6">
+<span class="w-1 h-6 bg-tertiary-container rounded-full"></span>
+<h4 class="font-headline-md text-headline-md text-on-surface">Paiement &amp; Bancaire</h4>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Mode de paiement</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md">
+<option>Virement Bancaire</option>
+<option>Chèque</option>
+<option>Espèces</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Nom de la Banque (Payeur)</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md" type="text" value="SOFIBANQUE"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Numéro de compte</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-md text-body-md" placeholder="CDXX XXXX XXXX XXXX XXXX" type="text"/>
+</div>
+</div>
+</section>
+<!-- Section 4: Commentaires -->
+<section class="bg-surface-container-lowest rounded-xl p-8 border border-outline-variant/30 shadow-sm">
+<div class="flex items-center gap-3 mb-4">
+<span class="w-1 h-6 bg-outline rounded-full"></span>
+<h4 class="font-headline-md text-headline-md text-on-surface">Notes &amp; Commentaires</h4>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-bold text-label-bold text-on-surface-variant">Observations administratives</label>
+<textarea class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-4 font-body-md text-body-md" placeholder="Ajouter des notes concernant cet agent..." rows="4"></textarea>
+</div>
+</section>
+</div>
+<!-- Footer Action Buttons (Replicated for easy reach) -->
+<div class="mt-12 flex justify-end gap-4 border-t border-outline-variant pt-8">
+<button class="px-8 py-3 border border-outline text-primary font-label-bold rounded-xl hover:bg-surface-container-low transition-all">
+                    Annuler les modifications
+                </button>
+<button class="px-8 py-3 bg-primary text-on-primary font-label-bold rounded-xl hover:bg-primary-container transition-all shadow-md flex items-center gap-2">
+<span class="material-symbols-outlined">save_as</span>
+                    Sauvegarder le dossier
+                </button>
+</div>
+</div>
+</main>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Subtle input interaction effects
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            el.addEventListener('focus', () => {
+                el.parentElement.classList.add('scale-[1.01]');
+            });
+            el.addEventListener('blur', () => {
+                el.parentElement.classList.remove('scale-[1.01]');
+            });
+        });
+
+        // Tab Navigation Simulation
+        document.querySelectorAll('nav.no-scrollbar button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('nav.no-scrollbar button').forEach(b => {
+                    b.classList.remove('text-primary', 'border-b-2', 'border-primary', 'font-label-bold');
+                    b.classList.add('text-on-surface-variant', 'font-label-sm');
+                });
+                this.classList.remove('text-on-surface-variant', 'font-label-sm');
+                this.classList.add('text-primary', 'border-b-2', 'border-primary', 'font-label-bold');
+            });
+        });
+    </script>
+</body></html>

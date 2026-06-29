@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RH App V2</string>
+    
+    <!-- Loading -->
+    <string name="loading_title">Initialisation...</string>
+    <string name="loading_device">Initialisation du capteur...</string>
+    <string name="loading_data">Chargement des données...</string>
+    <string name="loading_ready">Application prête !</string>
+    
+    <!-- Home -->
+    <string name="home_title">ONIP RH</string>
+    <string name="mark_attendance">Marquer Présence</string>
+    <string name="register_employee">Enregistrer Employé</string>
+    
+    <!-- Attendance -->
+    <string name="attendance_title">Marquer Présence</string>
+    <string name="attendance_place_finger">Placez votre doigt sur le capteur</string>
+    <string name="attendance_capturing">Capture en cours...</string>
+    <string name="attendance_matching">Recherche de correspondance...</string>
+    <string name="attendance_success">Empreinte reconnue</string>
+    <string name="attendance_failed">Empreinte non reconnue</string>
+    
+    <!-- Auth -->
+    <string name="auth_title">Authentification</string>
+    <string name="auth_description">Placez votre doigt pour vous authentifier</string>
+    <string name="auth_button">Connexion</string>
+    <string name="auth_success">Authentification réussie</string>
+    <string name="auth_failed">Authentification échouée</string>
+    
+    <!-- Common -->
+    <string name="back">Retour</string>
+    <string name="capture">Capturer</string>
+    <string name="cancel">Annuler</string>
+    <string name="save">Sauvegarder</string>
+</resources>
+
+

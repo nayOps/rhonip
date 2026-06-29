@@ -1,0 +1,131 @@
+# Services Payday RH — profil: rh
+# Chemins relatifs à rh/ (project_directory).
+# Utilise la même base PostgreSQL (onip_postgres) que register.
+
+x-rh-db-env: &rh-db-env
+  DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@onip_postgres:5432/${POSTGRES_DB}
+
+services:
+  keycloak:
+    profiles: [rh]
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: onip_keycloak
+    command: start-dev
+    environment:
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+    ports:
+      - "${KEYCLOAK_PORT:-8080}:8080"
+    networks:
+      - onip_network
+    restart: unless-stopped
+
+  rh_server:
+    profiles: [rh]
+    container_name: rh_server
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
+    entrypoint: /app/docker/backend/server-entrypoint.sh
+    env_file:
+      - ../.env
+    environment:
+      <<: *rh-db-env
+      CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD}@onip_redis:6379/3
+      CELERY_BROKER_URL: redis://:${REDIS_PASSWORD}@onip_redis:6379/3
+      REDIS_URL: redis://:${REDIS_PASSWORD}@onip_redis:6379/3
+      DEBUG: ${RH_DEBUG:-1}
+      SECRET_KEY: ${RH_SECRET_KEY:-change-me-rh-secret}
+      ALLOWED_HOSTS: ${RH_ALLOWED_HOSTS:-localhost,127.0.0.1,rh.onip.gouv.local,rh.onip.localhost,rh.onip.gouv.lan,rh_server,server,192.168.1.79,192.168.1.74,192.168.1.72,192.168.10.104,10.142.19.246}
+      CSRF_TRUSTED_ORIGINS: ${RH_CSRF_TRUSTED_ORIGINS:-http://rh.onip.gouv.local,http://192.168.10.104:8100,http://10.142.19.246:8100,http://192.168.1.72:8100,http://localhost:8100,http://127.0.0.1:8100}
+      GUICHET_INTERNAL_API_KEY: ${GUICHET_INTERNAL_API_KEY:-fgp_guichet_internal_dev}
+      FGP_MEDIA_ROOT: /app/media
+      KEYCLOAK_BASE_URL: http://localhost:${KEYCLOAK_PORT:-8080}
+      KEYCLOAK_INTERNAL_URL: http://keycloak:8080
+      KEYCLOAK_BASE_PATH: ${KEYCLOAK_BASE_PATH:-}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-master}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-payday}
+      KEYCLOAK_CLIENT_SECRET_KEY: ${KEYCLOAK_CLIENT_SECRET_KEY:-change-me}
+      KEYCLOAK_CLIENT_ADMIN_ROLE: ${KEYCLOAK_CLIENT_ADMIN_ROLE:-admin}
+      KEYCLOAK_REALM_ADMIN_ROLE: ${KEYCLOAK_REALM_ADMIN_ROLE:-admin}
+      KEYCLOAK_EXEMPT_URIS: ${KEYCLOAK_EXEMPT_URIS:-}
+      PASSWORD_RESET_REDIRECT_URL: http://localhost:${KEYCLOAK_PORT:-8080}/realms/${KEYCLOAK_REALM:-master}/login-actions/reset-credentials
+      CORS_ORIGIN_WHITELIST: http://localhost:${RH_SERVER_PORT:-8100},http://${RH_PUBLIC_HOST:-rh.onip.gouv.local}
+    volumes:
+      - ./template:/app/backend/template
+      - ./static:/app/backend/static
+      - ./payday:/app/backend/payday
+      - ./employee:/app/backend/employee
+      - ./leave:/app/backend/leave
+      - ./core:/app/backend/core
+      - ./api:/app/backend/api
+      - fgp_media:/app/media
+      - rh_media_volume:/app/backend/media
+      - ../agents:/app/agents:ro
+      - ../datas:/app/datas:ro
+    ports:
+      - "${RH_SERVER_PORT:-8100}:8000"
+    depends_on:
+      onip_postgres:
+        condition: service_healthy
+      onip_redis:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+    networks:
+      onip_network:
+        aliases:
+          - server
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          python -c "import urllib.request;
+          urllib.request.urlopen(
+            urllib.request.Request(
+              'http://127.0.0.1:8000/api/guichet/refs/',
+              headers={'X-Guichet-Internal-Key': '${GUICHET_INTERNAL_API_KEY:-fgp_guichet_internal_dev}'}
+            ),
+            timeout=5
+          )"
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  rh_worker:
+    profiles: [rh]
+    container_name: rh_worker
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
+    entrypoint: /app/docker/backend/worker-entrypoint.sh
+    env_file:
+      - ../.env
+    environment:
+      <<: *rh-db-env
+      CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD}@onip_redis:6379/3
+      CELERY_BROKER_URL: redis://:${REDIS_PASSWORD}@onip_redis:6379/3
+      REDIS_URL: redis://:${REDIS_PASSWORD}@onip_redis:6379/3
+      DEBUG: ${RH_DEBUG:-1}
+      SECRET_KEY: ${RH_SECRET_KEY:-change-me-rh-secret}
+      ALLOWED_HOSTS: ${RH_ALLOWED_HOSTS:-localhost,127.0.0.1,rh.onip.gouv.local,rh.onip.localhost,rh.onip.gouv.lan,rh_server,server,192.168.1.79,192.168.1.74,192.168.1.72,192.168.10.104,10.142.19.246}
+      CSRF_TRUSTED_ORIGINS: ${RH_CSRF_TRUSTED_ORIGINS:-http://rh.onip.gouv.local,http://192.168.10.104:8100,http://10.142.19.246:8100,http://192.168.1.72:8100,http://localhost:8100,http://127.0.0.1:8100}
+      GUICHET_INTERNAL_API_KEY: ${GUICHET_INTERNAL_API_KEY:-fgp_guichet_internal_dev}
+    volumes:
+      - rh_static_volume:/app/backend/static
+      - rh_media_volume:/app/backend/media
+    depends_on:
+      - rh_server
+    networks:
+      - onip_network
+    restart: unless-stopped
+
+volumes:
+  rh_static_volume:
+    driver: local
+  rh_media_volume:
+    driver: local

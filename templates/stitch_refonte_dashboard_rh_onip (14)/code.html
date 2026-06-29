@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agent Profile - ONIP Institutional HR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Hanken Grotesk', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .active-tab {
+            border-bottom: 2px solid #264dd9;
+            color: #072369;
+            font-weight: 600;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#264dd9",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#fffbff",
+                        "secondary-fixed": "#dde1ff",
+                        "primary-fixed": "#dce1ff",
+                        "inverse-on-surface": "#eff1f3",
+                        "inverse-primary": "#b6c4ff",
+                        "secondary-container": "#4568f3",
+                        "primary-container": "#253b80",
+                        "surface-container": "#eceef0",
+                        "on-secondary-fixed-variant": "#0035bd",
+                        "outline": "#757682",
+                        "on-surface": "#191c1e",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#b8c3ff",
+                        "on-secondary-fixed": "#001355",
+                        "primary": "#072369",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb785",
+                        "on-primary-fixed-variant": "#2d4287",
+                        "tertiary": "#461f00",
+                        "surface-bright": "#f7f9fb",
+                        "inverse-surface": "#2d3133",
+                        "surface-dim": "#d8dadc",
+                        "surface-variant": "#e0e3e5",
+                        "on-primary-container": "#94a8f5",
+                        "background": "#f7f9fb",
+                        "tertiary-fixed": "#ffdcc6",
+                        "surface-tint": "#465aa1",
+                        "on-tertiary-container": "#e89961",
+                        "outline-variant": "#c5c5d2",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#191c1e",
+                        "surface-container-high": "#e6e8ea",
+                        "surface": "#f7f9fb",
+                        "on-tertiary-fixed-variant": "#703806",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f2f4f6",
+                        "tertiary-container": "#673100",
+                        "on-primary-fixed": "#00164f",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary-fixed": "#301400",
+                        "on-surface-variant": "#444651",
+                        "on-error-container": "#93000a"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"],
+                        "label-bold": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background">
+<!-- Shell: SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-primary dark:bg-primary-container flex flex-col shadow-sm z-50">
+<div class="px-6 py-8">
+<h1 class="font-headline-lg text-headline-lg font-black text-on-primary">ONIP</h1>
+<p class="font-label-bold text-label-bold text-primary-fixed-dim">Institutional HR</p>
+</div>
+<nav class="flex-grow">
+<!-- Active state manually determined as Workforce for profile view -->
+<a class="text-primary-fixed-dim hover:bg-primary-container/50 rounded-lg mx-2 my-1 flex items-center gap-3 px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-bold text-label-bold">Dashboard</span>
+</a>
+<a class="bg-secondary-container text-on-secondary-container rounded-lg mx-2 my-1 flex items-center gap-3 px-4 py-3 transition-all scale-95" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-bold text-label-bold">Workforce</span>
+</a>
+<a class="text-primary-fixed-dim hover:bg-primary-container/50 rounded-lg mx-2 my-1 flex items-center gap-3 px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">person_add</span>
+<span class="font-label-bold text-label-bold">Recruitment</span>
+</a>
+<a class="text-primary-fixed-dim hover:bg-primary-container/50 rounded-lg mx-2 my-1 flex items-center gap-3 px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="font-label-bold text-label-bold">Compliance</span>
+</a>
+<a class="text-primary-fixed-dim hover:bg-primary-container/50 rounded-lg mx-2 my-1 flex items-center gap-3 px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-bold text-label-bold">Analytics</span>
+</a>
+</nav>
+<div class="mt-auto pb-6">
+<a class="text-primary-fixed-dim hover:bg-primary-container/50 rounded-lg mx-2 my-1 flex items-center gap-3 px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-bold text-label-bold">Help Center</span>
+</a>
+<a class="text-primary-fixed-dim hover:bg-primary-container/50 rounded-lg mx-2 my-1 flex items-center gap-3 px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-bold text-label-bold">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar Shell Integration -->
+<header class="w-full h-16 bg-surface-container-lowest flex justify-between items-center px-8 border-b border-outline-variant sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer">arrow_back</span>
+<h2 class="font-headline-md text-headline-md font-bold text-primary">Dossier de l'Agent</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-high p-2 rounded-full transition-colors">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-high p-2 rounded-full transition-colors">settings</span>
+</div>
+<div class="flex items-center gap-3 border-l border-outline-variant pl-6">
+<div class="text-right">
+<p class="text-label-bold font-label-bold text-on-surface">Admin User</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">HR Manager</p>
+</div>
+<img class="w-10 h-10 rounded-full object-cover border-2 border-surface-container-high" data-alt="A professional headshot of a middle-aged administrative professional in a corporate environment. The person has a friendly but authoritative expression, wearing a navy blue blazer over a crisp white shirt. The background is a soft-focus modern office setting with bright daylighting and blue accents, maintaining a high-trust institutional aesthetic consistent with a government HR portal." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjyOLGaaCsDOCsBJQIEPfvYDnpksDomjtgRrd_BE47dGBHBpRiywvGsU7nTaY8RhltJ6XpogDS8xyCX1RKRwsgNeqv0y3VrPmjtzOzHRv2noHWWYzBpL7yH8ErY075MM5qVGbl6leIo861IF5UDxxNye1PcG-sDAu2Ff17eIWMz7cU3gBQGzCRM1kQiSd4dJVZXMixf5kzxM6wghrqClie7HvYWt4tEuc-_g2gCo61HpebJ8jaNpnbOnBl0wtBj-r3JwcZXJ5WrfPL"/>
+</div>
+</div>
+</header>
+<div class="p-8 max-w-7xl mx-auto">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+<div class="flex items-center gap-6">
+<div class="relative">
+<img class="w-32 h-32 rounded-xl object-cover shadow-sm border-4 border-white" data-alt="A high-quality professional portrait of Jean Dupont, a Liaison Agent. He is a man in his late 30s with short dark hair, wearing a professional gray suit and a light blue shirt. The lighting is soft and even, typical of high-end corporate photography. The background is a clean, minimalist white wall with a subtle gradient, ensuring the subject stands out with clarity and authority." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKktdn9d4rxh5Er7YGNp0mtQSuNIUkX-pN1AdeFaIkrsEqzpJCwhSx1YTtu3sPGnn4eTQFo0njj2v4t5eLVq0BthCBN8u1r_CI7Vf89gSP4qqGY5iXhXiwBASKNcoBkOEVvSSFIeIuyBQBzNP46ALSHggoro8ni7YBeeUzUldX587lA5ZDevsF6S3z_SJZg2tYKZcVbiUTMwLKbB-Yn66g7bBZuu8BNpejpLAm9ziPynXoKVD45AOCo-b7xLwdBIcaS71wLx96VO_i"/>
+<span class="absolute -bottom-2 -right-2 bg-green-500 border-4 border-white w-6 h-6 rounded-full" title="Agent Actif"></span>
+</div>
+<div>
+<h1 class="font-headline-lg text-headline-lg text-primary">Jean Dupont</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Liaison Agent — Département des Opérations</p>
+<div class="flex gap-2 mt-3">
+<span class="px-3 py-1 bg-secondary/10 text-secondary text-label-bold font-label-bold rounded-full border border-secondary/20">Permanent</span>
+<span class="px-3 py-1 bg-surface-container-high text-on-surface-variant text-label-bold font-label-bold rounded-full">Niveau G-4</span>
+</div>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-6 py-2.5 bg-surface-container-lowest border border-outline-variant text-on-surface font-label-bold text-label-bold rounded-lg hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+                        Exporter le dossier (PDF)
+                    </button>
+<button class="flex items-center gap-2 px-6 py-2.5 bg-secondary text-on-primary font-label-bold text-label-bold rounded-lg hover:shadow-lg transition-all">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+                        Modifier le profil
+                    </button>
+</div>
+</div>
+<!-- Tabbed Navigation -->
+<div class="flex gap-8 border-b border-outline-variant mb-8 overflow-x-auto no-scrollbar">
+<button class="pb-4 active-tab text-body-md font-body-md transition-colors whitespace-nowrap">Informations Personnelles</button>
+<button class="pb-4 text-on-surface-variant hover:text-primary transition-colors text-body-md font-body-md whitespace-nowrap">Dossier Administratif</button>
+<button class="pb-4 text-on-surface-variant hover:text-primary transition-colors text-body-md font-body-md whitespace-nowrap">Formations &amp; Compétences</button>
+<button class="pb-4 text-on-surface-variant hover:text-primary transition-colors text-body-md font-body-md whitespace-nowrap">Documents</button>
+</div>
+<!-- Bento Content Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Left Column: Informations Personnelles (Active Section) -->
+<div class="lg:col-span-2 space-y-8">
+<!-- Personal Details Card -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant/30">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-secondary">person</span>
+<h3 class="font-headline-md text-headline-md text-primary">Détails Personnels</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase mb-1">Nom Complet</p>
+<p class="text-body-lg font-body-lg text-on-surface">Jean-Marc Dupont</p>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase mb-1">Nationalité</p>
+<p class="text-body-lg font-body-lg text-on-surface">Française</p>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase mb-1">Date de Naissance</p>
+<p class="text-body-lg font-body-lg text-on-surface">14 Mai 1985</p>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase mb-1">Genre</p>
+<p class="text-body-lg font-body-lg text-on-surface">Masculin</p>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase mb-1">Lieu de Naissance</p>
+<p class="text-body-lg font-body-lg text-on-surface">Lyon, France</p>
+</div>
+</div>
+</div>
+<!-- Contact Info Card -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant/30">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-secondary">contact_mail</span>
+<h3 class="font-headline-md text-headline-md text-primary">Coordonnées de Contact</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
+<div class="col-span-1 md:col-span-2">
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase mb-1">Adresse Domicile</p>
+<p class="text-body-lg font-body-lg text-on-surface">42 Avenue des Champs-Élysées, 75008 Paris</p>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase mb-1">Email Professionnel</p>
+<p class="text-body-lg font-body-lg text-secondary underline">j.dupont@onip.gouv.fr</p>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase mb-1">Téléphone Professionnel</p>
+<p class="text-body-lg font-body-lg text-on-surface">+33 1 42 68 55 00</p>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase mb-1">Téléphone Personnel</p>
+<p class="text-body-lg font-body-lg text-on-surface">+33 6 12 34 56 78</p>
+</div>
+</div>
+</div>
+<!-- Emergency Contact Card -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant/30">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-error">emergency</span>
+<h3 class="font-headline-md text-headline-md text-primary">Contact d'Urgence</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-surface-container-low p-4 rounded-lg">
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase mb-1">Nom</p>
+<p class="text-body-lg font-body-lg text-on-surface font-semibold">Marie Dupont</p>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase mb-1">Téléphone</p>
+<p class="text-body-lg font-body-lg text-on-surface">+33 6 87 65 43 21</p>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant uppercase mb-1">Relation</p>
+<p class="text-body-lg font-body-lg text-on-surface">Épouse</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Dossier Administratif Summary -->
+<div class="space-y-6">
+<div class="bg-primary text-on-primary rounded-xl p-6 shadow-md overflow-hidden relative">
+<!-- Decorative background element -->
+<div class="absolute -right-10 -top-10 opacity-10">
+<span class="material-symbols-outlined text-[160px]">badge</span>
+</div>
+<div class="flex items-center gap-3 mb-6 relative z-10">
+<span class="material-symbols-outlined text-primary-fixed-dim">work</span>
+<h3 class="font-headline-md text-headline-md text-on-primary">Dossier Administratif</h3>
+</div>
+<div class="space-y-6 relative z-10">
+<div class="flex justify-between items-center border-b border-on-primary/10 pb-3">
+<div>
+<p class="text-[10px] uppercase text-primary-fixed-dim tracking-widest font-bold">Matricule</p>
+<p class="text-body-lg font-headline-md">ONIP-2023-4491</p>
+</div>
+<span class="material-symbols-outlined text-primary-fixed-dim">content_copy</span>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<div>
+<p class="text-[10px] uppercase text-primary-fixed-dim tracking-widest font-bold">Site d'Affectation</p>
+<p class="text-body-md">Direction Centrale - Paris</p>
+</div>
+<div>
+<p class="text-[10px] uppercase text-primary-fixed-dim tracking-widest font-bold">Type de Contrat</p>
+<p class="text-body-md">CDI (Plein temps)</p>
+</div>
+<div>
+<p class="text-[10px] uppercase text-primary-fixed-dim tracking-widest font-bold">Date d'Embauche</p>
+<p class="text-body-md">01 Janvier 2023</p>
+</div>
+<div>
+<p class="text-[10px] uppercase text-primary-fixed-dim tracking-widest font-bold">Échelon / Grade</p>
+<p class="text-body-md">Grade Principal - Niveau 4</p>
+</div>
+</div>
+<button class="w-full mt-4 py-3 bg-on-primary text-primary font-label-bold text-label-bold rounded-lg hover:bg-secondary-fixed transition-colors">
+                                Consulter le dossier complet
+                            </button>
+</div>
+</div>
+<!-- Quick Actions Card -->
+<div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-sm">
+<h4 class="text-label-bold font-label-bold text-on-surface-variant uppercase mb-4 tracking-wide">Actions de Dossier</h4>
+<div class="space-y-2">
+<button class="w-full flex justify-between items-center px-4 py-3 hover:bg-surface-container rounded-lg group transition-all">
+<span class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">upload_file</span>
+<span class="text-body-md text-on-surface">Ajouter un document</span>
+</span>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">chevron_right</span>
+</button>
+<button class="w-full flex justify-between items-center px-4 py-3 hover:bg-surface-container rounded-lg group transition-all">
+<span class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">history</span>
+<span class="text-body-md text-on-surface">Historique des postes</span>
+</span>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">chevron_right</span>
+</button>
+<button class="w-full flex justify-between items-center px-4 py-3 hover:bg-surface-container rounded-lg group transition-all">
+<span class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">school</span>
+<span class="text-body-md text-on-surface">Évaluations annuelles</span>
+</span>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interactions for tabs
+        const tabs = document.querySelectorAll('button.transition-colors');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active-tab', 'font-semibold'));
+                tabs.forEach(t => t.classList.add('text-on-surface-variant'));
+                tab.classList.add('active-tab');
+                tab.classList.remove('text-on-surface-variant');
+            });
+        });
+
+        // Hover effects for the sidebar items
+        const sideNavItems = document.querySelectorAll('aside a');
+        sideNavItems.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                if (!item.classList.contains('bg-secondary-container')) {
+                    item.style.transform = 'translateX(4px)';
+                }
+            });
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = 'translateX(0)';
+            });
+        });
+    </script>
+</body></html>

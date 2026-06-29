@@ -1,0 +1,9 @@
+.env
+*.sqlite
+pg_import/
+exports/
+entites_admin.ndjson
+__pycache__/
+*.pyc
+.DS_Store
+*.zip

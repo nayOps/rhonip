@@ -1,0 +1,26 @@
+# Android / Gradle
+build/
+.gradle/
+local.properties
+.idea/
+*.iml
+*.apk
+*.aab
+*.dex
+*.class
+
+# Python
+**/__pycache__/
+**/*.py[cod]
+**/venv/
+**/.venv/
+*.egg-info/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Large vendor packages (download separately)
+configtablette/MorphoTablet_2_Customer_Support_Package_V2_8.zip
