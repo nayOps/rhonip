@@ -427,24 +427,27 @@ if not DEBUG:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
 
-    SENTRY_DSN = os.getenv("SENTRY_DSN", 'https://1d9413f4fa64c6d6fa53542b6244192d@o4505861077204992.ingest.sentry.io/4505861079826432')
+    SENTRY_DSN = os.getenv(
+        "SENTRY_DSN",
+        "https://1d9413f4fa64c6d6fa53542b6244192d@o4505861077204992.ingest.sentry.io/4505861079826432",
+    ).strip()
     SENTRY_ENVIRONMENT = os.getenv("SENTRY_ENVIRONMENT", 'production')
     SENTRY_RELEASE = os.getenv("SENTRY_RELEASE", '1.0.0')
-    SENTRY_TRACES_SAMPLE_RATE = os.getenv("SENTRY_TRACES_SAMPLE_RATE", 0.5)
-    SENTRY_TRACES_SAMPLE_RATE = float(SENTRY_TRACES_SAMPLE_RATE)
-    SENTRY_TRACE_SAMPLING = os.getenv("SENTRY_TRACE_SAMPLING", 0.5)
-    SENTRY_TRACE_SAMPLING = float(SENTRY_TRACE_SAMPLING)
+    SENTRY_TRACES_SAMPLE_RATE = float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", "0.1"))
+    SENTRY_PROFILES_SAMPLE_RATE = float(os.getenv("SENTRY_PROFILES_SAMPLE_RATE", "0"))
+    SENTRY_TRACE_SAMPLING = float(os.getenv("SENTRY_TRACE_SAMPLING", "0.1"))
     SENTRY_TRANSPORT = os.getenv("SENTRY_TRANSPORT", 'sentry_sdk.transport.HttpTransport')
     SENTRY_TRANSPORT_OPTIONS = os.getenv("SENTRY_TRANSPORT_OPTIONS", '{}')
     SENTRY_TRANSPORT_OPTIONS = json.loads(SENTRY_TRANSPORT_OPTIONS)
 
-    sentry_sdk.init(
-        dsn=SENTRY_DSN,
-        integrations=[DjangoIntegration()],
-        send_default_pii=True,
-        traces_sample_rate=1.0,
-        profiles_sample_rate=1.0,
-    )
+    if SENTRY_DSN:
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,
+            integrations=[DjangoIntegration()],
+            send_default_pii=True,
+            traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
+            profiles_sample_rate=SENTRY_PROFILES_SAMPLE_RATE,
+        )
 
     # Logging settings
     LOGGING = {

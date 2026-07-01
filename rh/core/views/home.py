@@ -388,7 +388,8 @@ class Home(LoginRequiredMixin, View):
         
         # Filtrer uniquement les employés avec une date de naissance valide
         employees_with_birthday = Employee.objects.filter(
-            date_of_birth__isnull=False
+            date_of_birth__isnull=False,
+            date_of_birth__month=current_month,
         )
         
         birthdays = []

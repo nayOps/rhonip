@@ -31,4 +31,4 @@ fi
 
 echo "==> static OK: $(find /app/backend/staticfiles -type f 2>/dev/null | wc -l) fichiers"
 
-exec gunicorn payday.wsgi --bind 0.0.0.0:8000
+exec gunicorn payday.wsgi --bind 0.0.0.0:8000 --workers 2 --timeout 120 --graceful-timeout 30
