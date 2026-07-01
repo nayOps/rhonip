@@ -65,34 +65,84 @@
                 android:layout_marginBottom="24dp"
                 android:gravity="center">
 
-                <ImageView
-                    android:id="@+id/img_attendance_fingerprint"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="24dp"
-                    android:src="@drawable/ic_fingerprint"
-                    android:contentDescription="Empreinte digitale" />
-
-                <ProgressBar
-                    android:id="@+id/progress_attendance"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:layout_marginBottom="16dp"
-                    android:max="100"
-                    android:progress="0"
-                    android:progressDrawable="@drawable/progress_bar_flat"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:id="@+id/txt_attendance_status"
+                <LinearLayout
+                    android:id="@+id/layout_matricule_section"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/attendance_place_finger"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/attendance_enter_matricule"
+                        android:gravity="center"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="12dp" />
+
+                    <EditText
+                        android:id="@+id/edit_matricule"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:hint="@string/attendance_matricule_hint"
+                        android:inputType="textCapCharacters"
+                        android:maxLines="1"
+                        android:background="@drawable/input_flat"
+                        android:padding="12dp"
+                        android:layout_marginBottom="12dp" />
+
+                    <Button
+                        android:id="@+id/btn_validate_matricule"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="52dp"
+                        android:background="@drawable/button_accent_flat"
+                        android:text="@string/attendance_continue"
+                        android:textColor="@color/button_accent_text"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_fingerprint_section"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:gravity="center"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp" />
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/img_attendance_fingerprint"
+                        android:layout_width="200dp"
+                        android:layout_height="200dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="24dp"
+                        android:src="@drawable/ic_fingerprint"
+                        android:contentDescription="Empreinte digitale" />
+
+                    <ProgressBar
+                        android:id="@+id/progress_attendance"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:max="100"
+                        android:progress="0"
+                        android:progressDrawable="@drawable/progress_bar_flat"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/txt_attendance_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/attendance_place_finger"
+                        android:gravity="center"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -105,37 +155,8 @@
                 android:text="@string/capture"
                 android:textColor="@color/button_accent_text"
                 android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btn_refresh_attendance"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginRight="8dp"
-                    android:background="@drawable/button_secondary_flat"
-                    android:text="@string/btn_refresh_app"
-                    android:textColor="@color/white"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/btn_reset_attendance"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="8dp"
-                    android:background="@drawable/button_outline_on_dark"
-                    android:text="@string/btn_reset_capture"
-                    android:textColor="@color/text_on_dark"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
+                android:textStyle="bold"
+                android:visibility="gone" />
 
         </LinearLayout>
 

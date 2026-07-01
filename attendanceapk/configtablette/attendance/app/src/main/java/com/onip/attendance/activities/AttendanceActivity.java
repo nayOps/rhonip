@@ -10,7 +10,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,13 +43,18 @@ public class AttendanceActivity extends Activity {
     private static final String TAG = "AttendanceActivity";
     
     // UI Components
+    private LinearLayout layoutMatriculeSection;
+    private LinearLayout layoutFingerprintSection;
+    private EditText editMatricule;
+    private Button btnValidateMatricule;
     private TextView txtStatus;
     private ImageView imgFingerprint;
     private ProgressBar progressBar;
     private Button btnCapture;
     private Button btnBack;
-    private Button btnRefresh;
-    private Button btnReset;
+    
+    // Employé sélectionné via matricule
+    private Employee selectedEmployee = null;
     
     // MorphoSmart Components
     private MorphoDevice morphoDevice;
@@ -100,16 +107,17 @@ public class AttendanceActivity extends Activity {
     }
     
     private void initializeViews() {
+        layoutMatriculeSection = findViewById(R.id.layout_matricule_section);
+        layoutFingerprintSection = findViewById(R.id.layout_fingerprint_section);
+        editMatricule = findViewById(R.id.edit_matricule);
+        btnValidateMatricule = findViewById(R.id.btn_validate_matricule);
         txtStatus = findViewById(R.id.txt_attendance_status);
         imgFingerprint = findViewById(R.id.img_attendance_fingerprint);
         progressBar = findViewById(R.id.progress_attendance);
         btnCapture = findViewById(R.id.btn_capture_attendance);
         btnBack = findViewById(R.id.btn_back_attendance);
-        btnRefresh = findViewById(R.id.btn_refresh_attendance);
-        btnReset = findViewById(R.id.btn_reset_attendance);
-        
-        txtStatus.setText(R.string.attendance_place_finger);
-        btnCapture.setText(R.string.capture);
+
+        btnValidateMatricule.setOnClickListener(v -> validateMatricule());
         btnCapture.setOnClickListener(v -> captureFingerprint());
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> {
@@ -119,45 +127,80 @@ public class AttendanceActivity extends Activity {
                 finish();
             });
         }
-        if (btnRefresh != null) {
-            btnRefresh.setOnClickListener(v -> refreshApplication());
-        }
-        if (btnReset != null) {
-            btnReset.setOnClickListener(v -> resetFingerprintCapture());
-        }
     }
 
-    private void refreshApplication() {
-        autoReturnHandler.removeCallbacksAndMessages(null);
-        if (capturing) {
-            MorphoCaptureHelper.cancelAcquisition(morphoDevice);
-            capturing = false;
+    private void validateMatricule() {
+        String matricule = editMatricule.getText().toString().trim();
+        if (matricule.isEmpty()) {
+            Toast.makeText(this, R.string.attendance_matricule_empty, Toast.LENGTH_SHORT).show();
+            return;
         }
-        Toast.makeText(this, R.string.refresh_app_toast, Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, LoadingActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        finish();
+
+        Employee found = findEmployeeByMatricule(matricule);
+        if (found == null) {
+            Toast.makeText(this, R.string.attendance_matricule_not_found, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Map<String, byte[]> templates = allTemplates.get(found.getId());
+        if (templates == null || templates.isEmpty()) {
+            Toast.makeText(this, R.string.attendance_no_fingerprint, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        selectedEmployee = found;
+        layoutMatriculeSection.setVisibility(View.GONE);
+        layoutFingerprintSection.setVisibility(View.VISIBLE);
+        btnCapture.setVisibility(View.VISIBLE);
+        txtStatus.setText("👤 " + found.getFirstName() + " " + found.getLastName()
+                + "\n\n" + getString(R.string.attendance_place_finger));
+        btnCapture.setText(R.string.capture);
+        btnCapture.setEnabled(true);
     }
 
-    private void resetFingerprintCapture() {
-        autoReturnHandler.removeCallbacksAndMessages(null);
+    private Employee findEmployeeByMatricule(String matricule) {
+        String normalized = matricule.trim().toUpperCase();
+        for (Employee employee : employees) {
+            if (employee.getNin() != null && employee.getNin().trim().toUpperCase().equals(normalized)) {
+                return employee;
+            }
+        }
+        return null;
+    }
+
+    private void resetToMatriculeScreen() {
+        selectedEmployee = null;
         matchedEmployee = null;
-        processObserver = null;
+        capturing = false;
+        matchingInProgress = false;
 
-        new Thread(() -> {
-            MorphoCaptureHelper.cancelAcquisition(morphoDevice);
-            runOnUiThread(() -> {
-                if (imgFingerprint != null) {
-                    imgFingerprint.setImageResource(R.drawable.ic_fingerprint);
-                }
-                progressBar.setProgress(0);
-                resetCaptureUi(getString(R.string.reset_capture_done));
-                Toast.makeText(this, R.string.reset_capture_done, Toast.LENGTH_SHORT).show();
-            });
-        }).start();
+        if (editMatricule != null) {
+            editMatricule.setText("");
+            editMatricule.requestFocus();
+        }
+        if (imgFingerprint != null) {
+            imgFingerprint.setImageResource(R.drawable.ic_fingerprint);
+        }
+        if (progressBar != null) {
+            progressBar.setProgress(0);
+            progressBar.setVisibility(View.GONE);
+        }
+        if (layoutMatriculeSection != null) {
+            layoutMatriculeSection.setVisibility(View.VISIBLE);
+        }
+        if (layoutFingerprintSection != null) {
+            layoutFingerprintSection.setVisibility(View.GONE);
+        }
+        if (btnCapture != null) {
+            btnCapture.setVisibility(View.GONE);
+            btnCapture.setText(R.string.capture);
+            btnCapture.setEnabled(true);
+        }
+        if (btnValidateMatricule != null) {
+            btnValidateMatricule.setEnabled(true);
+        }
     }
-    
+
     private void loadGlobalData() {
         morphoDevice = app.getGlobalMorphoDevice();
         employees = app.getGlobalEmployees();
@@ -173,22 +216,22 @@ public class AttendanceActivity extends Activity {
         Log.d(TAG, "   - Device: " + (morphoDevice != null ? "✅" : "❌"));
         
         if (morphoDevice == null) {
-            txtStatus.setText("❌ Capteur non disponible\nVeuillez redémarrer l'application");
-            btnCapture.setEnabled(false);
+            Toast.makeText(this, "Capteur non disponible — redémarrez l'application", Toast.LENGTH_LONG).show();
+            btnValidateMatricule.setEnabled(false);
             return;
         }
         
         if (employees.isEmpty() || allTemplates.isEmpty()) {
-            txtStatus.setText("❌ Données non chargées\nVeuillez redémarrer l'application");
-            btnCapture.setEnabled(false);
+            Toast.makeText(this, "Données non chargées — redémarrez l'application", Toast.LENGTH_LONG).show();
+            btnValidateMatricule.setEnabled(false);
             return;
         }
         
-        btnCapture.setEnabled(true);
+        btnValidateMatricule.setEnabled(true);
     }
     
     private void captureFingerprint() {
-        if (capturing || morphoDevice == null) {
+        if (capturing || morphoDevice == null || selectedEmployee == null) {
             if (capturing) {
                 cancelCapture();
             }
@@ -260,13 +303,23 @@ public class AttendanceActivity extends Activity {
     }
     
     private void matchFingerprint(byte[] capturedTemplate) {
+        if (selectedEmployee == null) {
+            runOnUiThreadSafe(() -> resetCaptureUi("❌ Matricule non validé"));
+            return;
+        }
         if (matchingInProgress) {
             return;
         }
         matchingInProgress = true;
 
+        Map<Integer, Map<String, byte[]>> scopedTemplates = new HashMap<>();
+        Map<String, byte[]> employeeTemplates = allTemplates.get(selectedEmployee.getId());
+        if (employeeTemplates != null) {
+            scopedTemplates.put(selectedEmployee.getId(), employeeTemplates);
+        }
+
         new Thread(() -> {
-            Log.d(TAG, "=== MATCHING verifyMatch (SDK Morpho) ===");
+            Log.d(TAG, "=== MATCHING matricule " + selectedEmployee.getNin() + " ===");
             long startTime = System.currentTimeMillis();
 
             Employee bestMatch = null;
@@ -275,11 +328,13 @@ public class AttendanceActivity extends Activity {
             int comparisonsDone = 0;
 
             runOnUiThreadSafe(() ->
-                    txtStatus.setText("Recherche de correspondance...\n0/" + allTemplates.size() + " agent(s)"));
+                    txtStatus.setText("Vérification empreinte...\n" + selectedEmployee.getFirstName()
+                            + " " + selectedEmployee.getLastName()));
 
             try {
-                // Passe 1 : index droit uniquement (le plus rapide pour ~200 agents)
-                MatchPassResult pass1 = runMatchPass(capturedTemplate, new String[]{INDEX_DROIT}, bestMatch, bestScore, bestFinger, comparisonsDone, true);
+                MatchPassResult pass1 = runMatchPass(
+                        capturedTemplate, scopedTemplates, new String[]{INDEX_DROIT},
+                        bestMatch, bestScore, bestFinger, comparisonsDone, false);
                 bestMatch = pass1.bestMatch;
                 bestScore = pass1.bestScore;
                 bestFinger = pass1.bestFinger;
@@ -288,6 +343,7 @@ public class AttendanceActivity extends Activity {
                 if (bestScore < MATCH_SCORE_EXCELLENT) {
                     MatchPassResult pass2 = runMatchPass(
                             capturedTemplate,
+                            scopedTemplates,
                             new String[]{"Pouce_Droit", "Index_Gauche"},
                             bestMatch,
                             bestScore,
@@ -347,7 +403,9 @@ public class AttendanceActivity extends Activity {
         int comparisonsDone;
     }
 
-    private MatchPassResult runMatchPass(byte[] capturedTemplate, String[] fingerNames,
+    private MatchPassResult runMatchPass(byte[] capturedTemplate,
+                                       Map<Integer, Map<String, byte[]>> templatesSource,
+                                       String[] fingerNames,
                                        Employee currentBest, int currentScore, String currentFinger,
                                        int comparisonsDone, boolean updateProgress) {
         MatchPassResult result = new MatchPassResult();
@@ -357,9 +415,9 @@ public class AttendanceActivity extends Activity {
         result.comparisonsDone = comparisonsDone;
 
         int checked = 0;
-        int total = allTemplates.size();
+        int total = templatesSource.size();
 
-        for (Map.Entry<Integer, Map<String, byte[]>> entry : allTemplates.entrySet()) {
+        for (Map.Entry<Integer, Map<String, byte[]>> entry : templatesSource.entrySet()) {
             Employee employee = employeeById.get(entry.getKey());
             if (employee == null) {
                 continue;
@@ -482,10 +540,9 @@ public class AttendanceActivity extends Activity {
 
         autoReturnHandler.postDelayed(() -> {
             if (isActivityAlive()) {
-                matchedEmployee = null;
-                resetCaptureUi(getString(R.string.attendance_place_finger));
+                resetToMatriculeScreen();
             }
-        }, 4000);
+        }, 3000);
     }
 
     @Override

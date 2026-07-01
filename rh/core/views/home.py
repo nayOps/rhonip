@@ -1,17 +1,18 @@
 from types import SimpleNamespace
 
+from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.apps import apps
-from datetime import date, timedelta
+from datetime import date, timedelta, time
 from calendar import month_name
 
 from core.models import Approbation, Announcement, Organization
 from leave.models import Leave, EarlyLeave
 from mission.models import Mission
-from employee.models import Overtime, Attendance
+from employee.models import Overtime
 
 
 class Home(LoginRequiredMixin, View):
@@ -128,29 +129,35 @@ class Home(LoginRequiredMixin, View):
 
     def _get_employee_presence_rate(self, employee):
         from calendar import monthrange
+        from employee.utils.attendance_stats import bulk_punches_by_employee, _day_detail
 
         if not employee:
             return 0
 
-        year, month = self.today.year, self.today.month
+        today = timezone.localdate()
+        year, month = today.year, today.month
         last_day = monthrange(year, month)[1]
         month_start = date(year, month, 1)
         month_end = date(year, month, last_day)
+        period_end = min(month_end, today)
 
-        attendances = Attendance.objects.filter(
-            employee=employee,
-            date__gte=month_start,
-            date__lte=min(month_end, self.today),
-            direction='IN',
-        ).values('date').distinct().count()
+        bulk = bulk_punches_by_employee([employee.pk], month_start, period_end)
+        attendance_by_date = bulk.get(employee.pk, {})
 
-        working_days = sum(
-            1 for d in range((min(month_end, self.today) - month_start).days + 1)
-            if (month_start + timedelta(days=d)).weekday() < 5
-        )
+        present_days = 0
+        working_days = 0
+        current = month_start
+        while current <= period_end:
+            if current.weekday() < 5:
+                working_days += 1
+                detail = _day_detail(attendance_by_date, current)
+                if detail.get('validated_slots', 0) > 0:
+                    present_days += 1
+            current += timedelta(days=1)
+
         if working_days <= 0:
             return 0
-        return round(min(100, (attendances / working_days) * 100), 1)
+        return round(min(100, (present_days / working_days) * 100), 1)
 
     def _get_training_courses(self, employee):
         from training.models import Training
@@ -421,31 +428,56 @@ class Home(LoginRequiredMixin, View):
         return active_employees
     
     def _get_attendance_today(self):
-        """Récupère les présences d'aujourd'hui"""
-        today_attendances = Attendance.objects.filter(date=self.today).select_related('employee')
-        
-        # Séparer les entrées et sorties
-        entries = today_attendances.filter(direction='IN').order_by('time')
-        exits = today_attendances.filter(direction='OUT').order_by('time')
-        
-        # Créer une liste des employés présents aujourd'hui
+        """Présences du jour (pointages tablette + saisie manuelle, plages RH)."""
+        from employee.utils.attendance_schedule_config import first_slot_code
+        from employee.utils.attendance_stats import bulk_punches_by_employee, _day_detail
+        from employee.utils.roster import roster_employees_queryset
+
+        today = timezone.localdate()
+        employees = roster_employees_queryset().select_related('designation', 'direction')
+        employee_ids = list(employees.values_list('pk', flat=True))
+        bulk = bulk_punches_by_employee(employee_ids, today, today)
+        entry_code = first_slot_code()
+
         present_employees = []
-        employees_with_entry = set(entries.values_list('employee_id', flat=True))
-        
-        for entry in entries[:10]:  # Limiter à 10 pour l'affichage
-            employee = entry.employee
-            exit_record = exits.filter(employee=employee).first()
-            
-            present_employees.append({
-                'employee': employee,
-                'entry_time': entry.time,
-                'exit_time': exit_record.time if exit_record else None,
-                'is_present': exit_record is None,  # Encore présent si pas de sortie
-            })
-        
+        total_entries = 0
+        total_exits = 0
+
+        for employee in employees:
+            detail = _day_detail(bulk.get(employee.pk, {}), today)
+            if detail.get('validated_slots', 0) <= 0:
+                continue
+
+            slots = detail.get('slots', {})
+            morning_slot = slots.get('MORNING_IN') or slots.get(entry_code, {})
+            evening_slot = slots.get('EVENING_OUT', {})
+
+            entry_time = morning_slot.get('punch_time')
+            exit_time = evening_slot.get('punch_time')
+
+            if entry_time:
+                total_entries += 1
+            if exit_time:
+                total_exits += 1
+
+            if entry_time is None:
+                punch_times = bulk.get(employee.pk, {}).get(today, [])
+                entry_time = punch_times[0] if punch_times else None
+
+            present_employees.append(
+                {
+                    'employee': employee,
+                    'entry_time': entry_time,
+                    'exit_time': exit_time,
+                    'is_present': exit_time is None and entry_time is not None,
+                }
+            )
+
+        present_employees.sort(key=lambda row: (row['entry_time'] is None, row['entry_time'] or time.max))
+
         return {
-            'total_present': len(employees_with_entry),
-            'total_entries': entries.count(),
-            'total_exits': exits.count(),
-            'employees': present_employees,
+            'total_present': len(present_employees),
+            'total_entries': total_entries,
+            'total_exits': total_exits,
+            'employees': present_employees[:10],
         }

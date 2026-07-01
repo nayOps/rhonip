@@ -11,6 +11,12 @@
     
     <!-- Attendance -->
     <string name="attendance_title">Pointage présence</string>
+    <string name="attendance_enter_matricule">Saisissez votre matricule</string>
+    <string name="attendance_matricule_hint">Matricule</string>
+    <string name="attendance_continue">Continuer</string>
+    <string name="attendance_matricule_empty">Veuillez saisir votre matricule</string>
+    <string name="attendance_matricule_not_found">Matricule introuvable</string>
+    <string name="attendance_no_fingerprint">Aucune empreinte enregistrée pour cet employé</string>
     <string name="attendance_place_finger">Placez votre doigt sur le capteur</string>
     <string name="attendance_capturing">Capture en cours...</string>
     <string name="attendance_matching">Recherche de correspondance...</string>

@@ -18,9 +18,9 @@ public class ConfigManager {
     private static final String KEY_BACKEND_IP = "backend_ip";
     private static final String KEY_BACKEND_PORT = "backend_port";
     
-    // Valeurs par défaut (corrigées pour correspondre au backend Docker)
-    private static final String DEFAULT_IP = "192.168.1.72";
-    private static final String DEFAULT_PORT = "8100"; // Port RH Docker (rh_server)
+    // Serveur RH production VPS
+    private static final String DEFAULT_IP = "102.68.62.85";
+    private static final String DEFAULT_PORT = "8100";
     
     private SharedPreferences prefs;
     private Context context;
