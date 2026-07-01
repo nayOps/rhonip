@@ -38,6 +38,19 @@ def form_factory(model, fields):
     class_name = str("%sForm" % model._meta.object_name)
     return type(class_name, (forms.Form,), fields)
 
+def strip_dal_media_js(form_class):
+    """Scripts DAL/Select2 déjà dans base.html — évite double chargement."""
+    class FormWithoutDalJs(form_class):
+        @property
+        def media(self):
+            base_media = super().media
+            return forms.Media(css=base_media._css)
+
+    FormWithoutDalJs.__name__ = form_class.__name__
+    FormWithoutDalJs.__qualname__ = form_class.__qualname__
+    return FormWithoutDalJs
+
+
 def modelform_factory(model, fields, layout=Layout()):
     flow = Flow.objects.filter(content_type__model=model._meta.model_name)
     #if flow.exists(): fields.remove('approvers', None)
@@ -56,6 +69,7 @@ def modelform_factory(model, fields, layout=Layout()):
     attrs['helper'] = helper
     class_name = str("%sModelForm" % model._meta.object_name)
     form_class = type(class_name, (forms.ModelForm,), attrs)
+    form_class = strip_dal_media_js(form_class)
 
     if model._meta.label_lower == 'employee.employee':
         from employee.forms import make_all_fields_optional

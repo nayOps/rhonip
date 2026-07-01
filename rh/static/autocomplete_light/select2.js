@@ -89,13 +89,26 @@ document.addEventListener('dal-init-function', function () {
                 tokenSeparators = null;
             }
         }
+        function resolveDropdownParent($el) {
+            var $modal = $el.closest('.modal');
+            if ($modal.length) {
+                return $modal;
+            }
+            var $main = $('#main');
+            return $main.length ? $main : $(document.body);
+        }
+
+        var lang = ($element.attr('data-autocomplete-light-language') || 'fr').split('-')[0];
+        $element.attr('lang', lang);
+
         $element.select2({
             tokenSeparators: tokenSeparators,
-            debug: true,
+            debug: false,
+            width: '100%',
             containerCssClass: ':all:',
             placeholder: $element.attr('data-placeholder') || '',
-            language: $element.attr('data-autocomplete-light-language'),
-            minimumInputLength: $element.attr('data-minimum-input-length') || 0,
+            language: lang,
+            minimumInputLength: parseInt($element.attr('data-minimum-input-length') || '0', 10),
             allowClear: !$element.is('[required]'),
             templateResult: result_template,
             templateSelection: selected_template,
@@ -103,7 +116,7 @@ document.addEventListener('dal-init-function', function () {
             with: null,
             tags: use_tags,
             theme: 'bootstrap-5',
-            dropdownParent: $element.parent()
+            dropdownParent: resolveDropdownParent($element),
         });
 
         $element.on('select2:selecting', function (e) {

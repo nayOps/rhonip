@@ -1,5 +1,4 @@
 from dal import autocomplete
-
 from core.forms import modelform_factory as base_modelform_factory
 from employee.choices.countries import DEFAULT_COUNTRY, COUNTRY_CHOICES
 from employee.choices.country_field import CountryChoiceField
@@ -11,6 +10,13 @@ _COUNTRY_WIDGET = autocomplete.ListSelect2(
     },
 )
 
+# Non modifiables sur fiche employé existante (données d'identité / compte).
+_LOCKED_EMPLOYEE_FIELDS = (
+    'registration_number',
+    'designation',
+    'email_professional',
+)
+
 
 def make_all_fields_optional(form_class):
     class OptionalForm(form_class):
@@ -19,6 +25,18 @@ def make_all_fields_optional(form_class):
             for field in self.fields.values():
                 field.required = False
             self._prepare_country_fields()
+            self._lock_identity_fields()
+
+        def _lock_identity_fields(self):
+            if not getattr(self.instance, 'pk', None):
+                return
+            for name in _LOCKED_EMPLOYEE_FIELDS:
+                if name not in self.fields:
+                    continue
+                field = self.fields[name]
+                field.disabled = True
+                css = field.widget.attrs.get('class', '')
+                field.widget.attrs['class'] = f'{css} onip-field-locked'.strip()
 
         def _prepare_country_fields(self):
             known = {value for value, _label in COUNTRY_CHOICES if value}
@@ -66,7 +84,7 @@ def employee_modelform_factory(model, fields, layout=None):
         'citizenship': _COUNTRY_WIDGET,
         'home_country': _COUNTRY_WIDGET,
     }
-    return make_all_fields_optional(form_class)
+    return form_class
 
 
 def optional_inline_formset_factory(parent_model, model, **kwargs):

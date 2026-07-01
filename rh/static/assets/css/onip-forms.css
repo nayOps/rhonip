@@ -260,6 +260,18 @@
     cursor: not-allowed;
 }
 
+.onip-form .select2-container--disabled .select2-selection--single,
+.onip-form .select2-container--disabled .select2-selection--multiple {
+    background-color: #e5e7eb !important;
+    color: var(--onip-form-muted) !important;
+    cursor: not-allowed !important;
+    border-color: var(--onip-form-border, #d1d5db) !important;
+}
+
+.onip-form .select2-container--disabled .select2-selection__arrow {
+    opacity: 0.45;
+}
+
 .onip-form .form-control.is-invalid,
 .onip-form .form-select.is-invalid {
     background-color: #fff !important;

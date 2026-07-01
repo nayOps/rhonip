@@ -70,10 +70,11 @@ body {
 }
 
 .auth-brand-logo {
-    width: 8.5rem;
+    width: 11rem;
     max-width: 100%;
     height: auto;
     margin-bottom: 2.25rem;
+    object-fit: contain;
 }
 
 .auth-brand-title {

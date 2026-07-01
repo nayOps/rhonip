@@ -71,12 +71,27 @@ function initEmployeeGeographySection() {
         return drcValues.has(text);
     }
 
+    function setSelectDisabled(select, disabled) {
+        if (window.jQuery) {
+            var $select = window.jQuery(select);
+            if ($select.hasClass('select2-hidden-accessible')) {
+                $select.prop('disabled', disabled);
+                return;
+            }
+        }
+        select.disabled = disabled;
+    }
+
     function toggleGeography() {
         const show = isDrc(homeCountry.value);
+        const wasHidden = section.hidden;
         section.hidden = !show;
         section.querySelectorAll('select').forEach(function (select) {
-            select.disabled = !show;
+            setSelectDisabled(select, !show);
         });
+        if (show && wasHidden && typeof window.onipReinitSelect2In === 'function' && window.jQuery) {
+            window.onipReinitSelect2In(window.jQuery(section), true);
+        }
     }
 
     homeCountry.addEventListener('change', toggleGeography);
