@@ -12,7 +12,7 @@ from calendar import month_name
 from core.models import Approbation, Announcement, Organization
 from leave.models import Leave, EarlyLeave
 from mission.models import Mission
-from employee.models import Overtime
+from employee.models import Overtime, Attendance
 
 
 class Home(LoginRequiredMixin, View):
@@ -443,7 +443,20 @@ class Home(LoginRequiredMixin, View):
                 return None
 
         today = timezone.localdate()
-        employees = roster_employees_queryset().select_related('designation', 'direction')
+        punched_ids = list(
+            Attendance.objects.filter(date=today).values_list('employee_id', flat=True).distinct()
+        )
+        if not punched_ids:
+            return {
+                'total_present': 0,
+                'total_entries': 0,
+                'total_exits': 0,
+                'employees': [],
+            }
+
+        employees = roster_employees_queryset().filter(pk__in=punched_ids).select_related(
+            'designation', 'direction'
+        )
         employee_ids = list(employees.values_list('pk', flat=True))
         bulk = bulk_punches_by_employee(employee_ids, today, today)
         entry_code = first_slot_code()
