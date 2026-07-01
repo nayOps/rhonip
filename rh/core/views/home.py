@@ -444,8 +444,10 @@ class Home(LoginRequiredMixin, View):
         total_exits = 0
 
         for employee in employees:
-            detail = _day_detail(bulk.get(employee.pk, {}), today)
-            if detail.get('validated_slots', 0) <= 0:
+            emp_bulk = bulk.get(employee.pk, {})
+            punch_times = emp_bulk.get(today, [])
+            detail = _day_detail(emp_bulk, today)
+            if detail.get('validated_slots', 0) <= 0 and not punch_times:
                 continue
 
             slots = detail.get('slots', {})
@@ -461,7 +463,6 @@ class Home(LoginRequiredMixin, View):
                 total_exits += 1
 
             if entry_time is None:
-                punch_times = bulk.get(employee.pk, {}).get(today, [])
                 entry_time = punch_times[0] if punch_times else None
 
             present_employees.append(

@@ -272,8 +272,10 @@ def build_company_registry(request, employees, year, month, week_start):
     daily_list_rows = []
     present_morning = 0
     for employee in employees:
-        detail = _day_detail(daily_bulk.get(employee.pk, {}), focus_day)
-        if detail.get('validated_slots', 0) <= 0:
+        emp_bulk = daily_bulk.get(employee.pk, {})
+        punch_times = emp_bulk.get(focus_day, [])
+        detail = _day_detail(emp_bulk, focus_day)
+        if detail.get('validated_slots', 0) <= 0 and not punch_times:
             continue
         slots = detail.get('slots', {})
         morning_punch = _morning_punch_on_day(daily_bulk.get(employee.pk, {}), focus_day)
