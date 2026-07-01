@@ -431,7 +431,16 @@ class Home(LoginRequiredMixin, View):
         """Présences du jour (pointages tablette + saisie manuelle, plages RH)."""
         from employee.utils.attendance_schedule_config import first_slot_code
         from employee.utils.attendance_stats import bulk_punches_by_employee, _day_detail
+        from employee.utils.attendance_slots import _coerce_time
         from employee.utils.roster import roster_employees_queryset
+
+        def _as_time(value):
+            if value is None:
+                return None
+            try:
+                return _coerce_time(value)
+            except (TypeError, ValueError):
+                return None
 
         today = timezone.localdate()
         employees = roster_employees_queryset().select_related('designation', 'direction')
@@ -454,16 +463,16 @@ class Home(LoginRequiredMixin, View):
             morning_slot = slots.get('MORNING_IN') or slots.get(entry_code, {})
             evening_slot = slots.get('EVENING_OUT', {})
 
-            entry_time = morning_slot.get('punch_time')
-            exit_time = evening_slot.get('punch_time')
+            entry_time = _as_time(morning_slot.get('punch_time'))
+            exit_time = _as_time(evening_slot.get('punch_time'))
 
             if entry_time:
                 total_entries += 1
             if exit_time:
                 total_exits += 1
 
-            if entry_time is None:
-                entry_time = punch_times[0] if punch_times else None
+            if entry_time is None and punch_times:
+                entry_time = _as_time(punch_times[0])
 
             present_employees.append(
                 {
@@ -474,7 +483,9 @@ class Home(LoginRequiredMixin, View):
                 }
             )
 
-        present_employees.sort(key=lambda row: (row['entry_time'] is None, row['entry_time'] or time.max))
+        present_employees.sort(
+            key=lambda row: (row['entry_time'] is None, row['entry_time'] or time.max)
+        )
 
         return {
             'total_present': len(present_employees),
