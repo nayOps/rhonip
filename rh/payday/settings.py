@@ -427,10 +427,7 @@ if not DEBUG:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
 
-    SENTRY_DSN = os.getenv(
-        "SENTRY_DSN",
-        "https://1d9413f4fa64c6d6fa53542b6244192d@o4505861077204992.ingest.sentry.io/4505861079826432",
-    ).strip()
+    SENTRY_DSN = (os.getenv("SENTRY_DSN") or "").strip()
     SENTRY_ENVIRONMENT = os.getenv("SENTRY_ENVIRONMENT", 'production')
     SENTRY_RELEASE = os.getenv("SENTRY_RELEASE", '1.0.0')
     SENTRY_TRACES_SAMPLE_RATE = float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", "0.1"))
@@ -450,12 +447,13 @@ if not DEBUG:
         )
 
     # Logging settings
+    _log_handlers = ['sentry', 'console'] if SENTRY_DSN else ['console']
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
         'root': {
             'level': 'WARNING',
-            'handlers': ['sentry'],
+            'handlers': _log_handlers,
         },
         'formatters': {
             'verbose': {

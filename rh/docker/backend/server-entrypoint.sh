@@ -12,11 +12,16 @@ do
     sleep 2
 done
 
-echo "==> collectstatic..."
-python manage.py collectstatic --noinput --clear
-
 CSS_FILE="/app/backend/staticfiles/assets/css/main/app.css"
 SRC_CSS="/app/backend/static/assets/css/main/app.css"
+
+echo "==> collectstatic..."
+if [ -f "$CSS_FILE" ]; then
+    echo "==> static deja present, skip collectstatic"
+else
+    python manage.py collectstatic --noinput
+fi
+
 if [ ! -f "$CSS_FILE" ] && [ -f "$SRC_CSS" ]; then
     echo "WARN: staticfiles vide, copie de secours depuis static/"
     mkdir -p /app/backend/staticfiles
