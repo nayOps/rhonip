@@ -221,7 +221,15 @@ class Home(LoginRequiredMixin, View):
         active_contracts = self._get_active_contracts()
         
         # Présences aujourd'hui
-        attendance_today = self._get_attendance_today()
+        try:
+            attendance_today = self._get_attendance_today()
+        except Exception:
+            attendance_today = {
+                'total_present': 0,
+                'total_entries': 0,
+                'total_exits': 0,
+                'employees': [],
+            }
         
         # Congés en attente de validation
         pending_leaves = self._get_pending_leaves_for_approval()
