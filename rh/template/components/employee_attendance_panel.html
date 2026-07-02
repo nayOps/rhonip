@@ -104,6 +104,9 @@
                     <td class="ed-slot-cell">
                         <div class="ed-slot-time">{{ slot.time }}</div>
                         <span class="ed-slot-badge {{ slot.badge_class }}">{{ slot.badge }}</span>
+                        {% if slot.status_note %}
+                        <div class="ed-slot-note">{{ slot.status_note }}</div>
+                        {% endif %}
                     </td>
                     {% endfor %}
                 </tr>

@@ -13,6 +13,10 @@ from employee.utils.attendance_schedule_config import (
     first_slot_code,
 )
 
+VALIDATED_SLOT_STATUSES = frozenset(
+    {'ok', 'late', 'missed_entry', 'early_exit', 'outside_slot'}
+)
+
 
 def slot_display_cell(slot_data, slot_code):
     if not slot_data:
@@ -20,30 +24,64 @@ def slot_display_cell(slot_data, slot_code):
 
     status = slot_data.get('status', 'missed')
     punch_label = slot_data.get('punch_label', '--:--')
+    status_note = slot_data.get('status_note', '')
+
+    def _cell(time_label, badge, badge_class, note=''):
+        payload = {
+            'time': time_label,
+            'badge': badge,
+            'badge_class': badge_class,
+        }
+        if note:
+            payload['status_note'] = note
+        return payload
 
     if status == 'pending':
-        return {
-            'time': '--:--',
-            'badge': _('EN COURS'),
-            'badge_class': 'pending',
-        }
+        return _cell('--:--', _('EN COURS'), 'pending')
+
     if status in ('missing', 'missed'):
-        return {
-            'time': '--:--',
-            'badge': _('MANQUÉE'),
-            'badge_class': 'missed',
-        }
+        if slot_code == 'EVENING_OUT':
+            return _cell('--:--', _('SORTIE MANQUÉE'), 'missed')
+        if slot_code == 'MORNING_IN':
+            return _cell('--:--', _('ENTRÉE MANQUÉE'), 'missed')
+        return _cell('--:--', _('MANQUÉE'), 'missed')
+
+    if status == 'missed_entry':
+        return _cell(
+            punch_label,
+            _('ENTRÉE RATÉE'),
+            'missed',
+            status_note or _('Hors plage (à partir de 10h01)'),
+        )
+
+    if status == 'early_exit':
+        return _cell(
+            punch_label,
+            _('SORTIE EN AVANCE'),
+            'missed',
+            status_note or _('Avant 15h00'),
+        )
+
+    if status == 'outside_slot':
+        return _cell(
+            punch_label,
+            _('HORS PLAGE'),
+            'warning',
+            status_note or _('Après 16h30'),
+        )
+
+    if status == 'late':
+        note = status_note
+        if slot_code == 'MORNING_IN' and not note:
+            delay = slot_data.get('delay_minutes', 0)
+            if delay:
+                note = _('Retard de %(delay)s min') % {'delay': delay}
+        return _cell(punch_label, _('RETARD'), 'late', note)
+
     if slot_code in ('LUNCH_OUT', 'EVENING_OUT'):
-        return {
-            'time': punch_label,
-            'badge': _('SORTIE OK'),
-            'badge_class': 'ok',
-        }
-    return {
-        'time': punch_label,
-        'badge': _('À L\'HEURE'),
-        'badge_class': 'ok',
-    }
+        return _cell(punch_label, _('SORTIE OK'), 'ok', status_note)
+
+    return _cell(punch_label, _('À L\'HEURE'), 'ok', status_note)
 
 
 def slots_display_row(slots_by_code):
@@ -70,17 +108,39 @@ def _coerce_time(value):
     raise TypeError(f'Heure de pointage invalide: {value!r}')
 
 
+def _is_two_slot_mode():
+    return get_total_slots() == 2 and not has_lunch_slots()
+
+
 def punch_fits_slot(punch_time, slot):
     """Vérifie si un pointage peut être affecté à cette plage (sans cascade)."""
     return slot['accept_from'] <= punch_time <= slot['accept_until']
 
 
+def _assign_two_slot_punches(punches, presence_slots):
+    entry_code = presence_slots[0]['code']
+    exit_code = presence_slots[1]['code']
+    assigned = {entry_code: None, exit_code: None}
+    if not punches:
+        return assigned
+    assigned[entry_code] = punches[0]
+    if len(punches) >= 2:
+        assigned[exit_code] = punches[-1]
+    return assigned
+
+
 def assign_punches_to_slots(punch_times):
     """
-    Affecte les pointages du jour aux plages configurées (ordre chronologique + cascade).
+    Affecte les pointages du jour aux plages configurées.
+    Mode 2 plages : 1er pointage = entrée, dernier = sortie.
+    Mode 4 plages : ordre chronologique + fenêtres acceptées.
     """
     presence_slots = get_presence_slots()
     punches = sorted(_coerce_time(t) for t in (punch_times or []) if t is not None)
+
+    if _is_two_slot_mode() and len(presence_slots) == 2:
+        return _assign_two_slot_punches(punches, presence_slots)
+
     assigned = {slot['code']: None for slot in presence_slots}
     used_indices = set()
 
@@ -132,15 +192,84 @@ def _unpunched_slot_status(day, slot, now=None):
 
 
 def _entry_slot_status(day, punch_time, reference, slot):
-    """Avant la référence : présent. À partir de la référence : retard si après."""
+    """Avant la référence : à l'heure. À partir de la référence : retard si dans la plage."""
     if not punch_time:
-        return _unpunched_slot_status(day, slot), 0
+        return _unpunched_slot_status(day, slot), 0, ''
+
+    accept_until = slot['accept_until']
+    if punch_time > accept_until:
+        delay_minutes = _delay_after_reference(day, punch_time, reference)
+        return (
+            'missed_entry',
+            delay_minutes,
+            _('Entrée ratée — pointage à %(time)s (hors plage, à partir de 10h01)')
+            % {'time': punch_time.strftime('%H:%M')},
+        )
+
+    if punch_time < reference:
+        return 'ok', 0, ''
+
+    delay_minutes = _delay_after_reference(day, punch_time, reference)
+    if delay_minutes > 0:
+        return (
+            'late',
+            delay_minutes,
+            _('Retard de %(delay)s min') % {'delay': delay_minutes},
+        )
+    return 'ok', 0, ''
+
+
+def _exit_slot_status(day, punch_time, slot, now=None):
+    if not punch_time:
+        status = _unpunched_slot_status(day, slot, now)
+        if status == 'missed':
+            return 'missed', _('Sortie manquée')
+        return status, ''
+
+    accept_from = slot['accept_from']
+    accept_until = slot['accept_until']
+
+    if punch_time < accept_from:
+        return (
+            'early_exit',
+            _('Sortie en avance à %(time)s (avant 15h00) — sortie manquée dans la plage')
+            % {'time': punch_time.strftime('%H:%M')},
+        )
+
+    if punch_time > accept_until:
+        return (
+            'outside_slot',
+            _('Sortie à %(time)s (hors plage, après 16h30)')
+            % {'time': punch_time.strftime('%H:%M')},
+        )
+
+    return 'ok', ''
+
+
+def _legacy_entry_slot_status(day, punch_time, reference, slot):
+    if not punch_time:
+        return _unpunched_slot_status(day, slot), 0, ''
     delay_minutes = _delay_after_reference(day, punch_time, reference)
     if punch_time < reference:
-        return 'ok', 0
+        return 'ok', 0, ''
     if delay_minutes > 0:
-        return 'late', delay_minutes
-    return 'ok', 0
+        return 'late', delay_minutes, _('Retard de %(delay)s min') % {'delay': delay_minutes}
+    return 'ok', 0, ''
+
+
+def _build_slot_row(slot, punch_time, slot_status, delay_minutes, status_note, now):
+    return {
+        'code': slot['code'],
+        'label': slot['label'],
+        'target': slot['target'],
+        'accept_from': slot['accept_from'],
+        'accept_until': slot['accept_until'],
+        'punch_time': punch_time,
+        'punch_label': punch_time.strftime('%H:%M') if punch_time else '—',
+        'status': slot_status,
+        'delay_minutes': delay_minutes,
+        'status_note': status_note,
+    }
 
 
 def evaluate_day_slots(day, punch_times):
@@ -149,6 +278,7 @@ def evaluate_day_slots(day, punch_times):
     lunch_min, lunch_max = get_lunch_break_limits()
     presence_slots = get_presence_slots()
     entry_code = first_slot_code()
+    two_slot_mode = _is_two_slot_mode()
 
     if day.weekday() >= 5:
         return {
@@ -171,34 +301,32 @@ def evaluate_day_slots(day, punch_times):
     for slot in presence_slots:
         punch_time = assigned[slot['code']]
         delay_minutes = 0
+        status_note = ''
         slot_status = _unpunched_slot_status(day, slot, now)
 
         if punch_time:
             reference = slot.get('reference')
-            if slot['code'] == entry_code and reference:
-                slot_status, delay_minutes = _entry_slot_status(day, punch_time, reference, slot)
+            if two_slot_mode and slot['code'] == entry_code and reference:
+                slot_status, delay_minutes, status_note = _entry_slot_status(
+                    day, punch_time, reference, slot
+                )
+            elif two_slot_mode and slot['code'] == 'EVENING_OUT':
+                slot_status, status_note = _exit_slot_status(day, punch_time, slot, now)
+            elif slot['code'] == entry_code and reference:
+                slot_status, delay_minutes, status_note = _legacy_entry_slot_status(
+                    day, punch_time, reference, slot
+                )
             elif reference:
                 slot_status = 'ok'
                 delay_minutes = _delay_after_reference(day, punch_time, reference)
-                if delay_minutes > 0 and slot['code'] == 'EVENING_OUT':
-                    slot_status = 'ok'
-                elif delay_minutes > 0:
+                if delay_minutes > 0 and slot['code'] != 'EVENING_OUT':
                     slot_status = 'late'
+                    status_note = _('Retard de %(delay)s min') % {'delay': delay_minutes}
             else:
                 slot_status = 'ok'
 
         slots.append(
-            {
-                'code': slot['code'],
-                'label': slot['label'],
-                'target': slot['target'],
-                'accept_from': slot['accept_from'],
-                'accept_until': slot['accept_until'],
-                'punch_time': punch_time,
-                'punch_label': punch_time.strftime('%H:%M') if punch_time else '—',
-                'status': slot_status,
-                'delay_minutes': delay_minutes,
-            }
+            _build_slot_row(slot, punch_time, slot_status, delay_minutes, status_note, now)
         )
 
     slots_by_code = {slot['code']: slot for slot in slots}
@@ -207,8 +335,18 @@ def evaluate_day_slots(day, punch_times):
     lunch_in = slots_by_code.get('LUNCH_IN', {})
     evening = slots_by_code.get('EVENING_OUT', slots[-1] if slots else {})
 
-    missing_slots = [slot['label'] for slot in slots if slot['status'] == 'missed']
-    validated_slots = sum(1 for slot in slots if slot['status'] in ('ok', 'late'))
+    missing_slots = []
+    for slot in slots:
+        if slot['status'] != 'missed':
+            continue
+        if slot['code'] == 'EVENING_OUT':
+            missing_slots.append(_('Sortie'))
+        elif slot['code'] == 'MORNING_IN':
+            missing_slots.append(_('Entrée'))
+        else:
+            missing_slots.append(slot['label'])
+
+    validated_slots = sum(1 for slot in slots if slot['status'] in VALIDATED_SLOT_STATUSES)
 
     day_start = entry_slot.get('punch_time') or lunch_out.get('punch_time')
     worked_minutes = 0
@@ -222,7 +360,7 @@ def evaluate_day_slots(day, punch_times):
     schedule = ' · '.join(schedule_parts) if schedule_parts else ''
 
     notes = []
-    second_slot = presence_slots[1] if len(presence_slots) > 1 else None
+    delay_minutes = entry_slot.get('delay_minutes', 0)
 
     if not entry_slot.get('punch_time') and validated_slots == 0:
         entry_status = entry_slot.get('status')
@@ -243,7 +381,7 @@ def evaluate_day_slots(day, punch_times):
             'status': 'absent',
             'status_label': _('ABSENT'),
             'schedule': schedule,
-            'note': _('Non justifié'),
+            'note': _('Entrée manquante — absence non justifiée'),
             'delay_minutes': 0,
             'worked_minutes': 0,
             'slots': slots_by_code,
@@ -252,18 +390,9 @@ def evaluate_day_slots(day, punch_times):
             'missing_slots': missing_slots,
         }
 
-    if (
-        not entry_slot.get('punch_time')
-        and second_slot
-        and slots_by_code.get(second_slot['code'], {}).get('punch_time')
-    ):
-        fallback_time = slots_by_code[second_slot['code']]['punch_time'].strftime('%H:%M')
-        notes.append(
-            _('Entrée manquée — pointage reporté à %(time)s (plage 2)')
-            % {'time': fallback_time}
-        )
-
-    delay_minutes = entry_slot.get('delay_minutes', 0)
+    for slot in slots:
+        if slot.get('status_note'):
+            notes.append(str(slot['status_note']))
 
     if has_lunch_slots() and lunch_out.get('punch_time') and lunch_in.get('punch_time'):
         break_minutes = _minutes_between(day, lunch_out['punch_time'], lunch_in['punch_time'])
@@ -273,36 +402,47 @@ def evaluate_day_slots(day, punch_times):
                 % {'minutes': break_minutes}
             )
 
-    if evening.get('punch_time') and evening['punch_time'] < work_end:
+    if (
+        not two_slot_mode
+        and evening.get('punch_time')
+        and evening['punch_time'] < work_end
+    ):
         notes.append(
             _('Sortie anticipée à %(time)s')
             % {'time': evening['punch_time'].strftime('%H:%M')}
         )
 
-    if missing_slots:
+    if missing_slots and not two_slot_mode:
         notes.append(
             _('Plages manquantes : %(slots)s')
             % {'slots': ', '.join(str(label) for label in missing_slots)}
         )
 
-    if delay_minutes > 0 and entry_slot.get('punch_time'):
+    if (
+        delay_minutes > 0
+        and entry_slot.get('punch_time')
+        and entry_slot.get('status') == 'late'
+        and not any(_('Retard') in note for note in notes)
+    ):
         notes.insert(
             0,
-            _('Arrivée %(time)s (Retard de %(delay)s min)')
+            _('Arrivée %(time)s (retard de %(delay)s min)')
             % {
                 'time': entry_slot['punch_time'].strftime('%H:%M'),
                 'delay': delay_minutes,
             },
         )
 
-    note = ' · '.join(notes)
+    note = ' · '.join(dict.fromkeys(notes))
 
     if not entry_slot.get('punch_time'):
         status = 'partial'
-    elif missing_slots:
-        status = 'late' if delay_minutes > 0 else 'partial'
-    elif delay_minutes > 0:
+    elif entry_slot.get('status') == 'missed_entry' or delay_minutes > 0:
         status = 'late'
+    elif missing_slots:
+        status = 'partial'
+    elif evening.get('status') == 'early_exit':
+        status = 'partial'
     else:
         status = 'present'
 

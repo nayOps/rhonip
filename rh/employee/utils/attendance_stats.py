@@ -13,7 +13,7 @@ from employee.utils.attendance_schedule_config import (
     get_slot_ui_headers,
     get_total_slots,
 )
-from employee.utils.attendance_slots import evaluate_day_slots, slots_display_row
+from employee.utils.attendance_slots import evaluate_day_slots, slot_display_cell, slots_display_row
 from employee.utils.late_justification import (
     can_request_justification,
     is_day_late_excused,
@@ -386,26 +386,35 @@ def build_attendance_report(employee, year, month):
 
         detail = _day_detail(attendance_by_date, day)
         slots = detail.get('slots', {})
+        entry_code = get_slot_codes()[0] if get_slot_codes() else 'MORNING_IN'
+        entry_slot = slots.get(entry_code, {})
+
+        def _report_slot_value(code):
+            slot = slots.get(code) or {}
+            cell = slot_display_cell(slot, code)
+            if cell['time'] == '--:--':
+                return '—'
+            if slot.get('status') in ('ok',):
+                return cell['time']
+            return f"{cell['time']} — {cell['badge']}"
 
         rows.append(
             {
                 'date_label': day.strftime('%d/%m/%Y'),
-                'slot_values': [
-                    slots.get(code, {}).get('punch_label', '—')
-                    for code in get_slot_codes()
-                ],
+                'slot_values': [_report_slot_value(code) for code in get_slot_codes()],
                 'duration_label': _format_duration(detail['worked_minutes'])
                 if detail['worked_minutes']
                 else '—',
                 'status': detail['status'],
                 'status_label': detail['status_label'],
-                'is_late_entry': detail['status'] == 'late',
+                'note': detail.get('note', ''),
+                'is_late_entry': entry_slot.get('status') in ('late', 'missed_entry'),
                 'validated_slots': detail.get('validated_slots', 0),
                 'total_slots': detail.get('total_slots', get_total_slots()),
             }
         )
 
-        if detail['note'] and detail['status'] in ('late', 'partial', 'absent'):
+        if detail['note'] and detail['status'] in ('late', 'partial', 'absent', 'present'):
             observations.append(f"{day.strftime('%d/%m')}: {detail['note']}")
 
     generated_at = date.today()

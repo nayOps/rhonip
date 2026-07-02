@@ -68,6 +68,9 @@
                                     <a href="{{ row.detail_url }}" class="ca-agent-name">{{ row.employee.full_name }}</a>
                                     <span class="ca-agent-matricule">{{ row.registration_number }}</span>
                                     <span class="ca-agent-dept">{{ row.direction }}</span>
+                                    {% if row.note %}
+                                    <span class="ca-agent-note">{{ row.note }}</span>
+                                    {% endif %}
                                 </div>
                             </div>
                         </td>
@@ -75,6 +78,9 @@
                         <td>
                             <div class="ca-slot-time">{{ slot.time }}</div>
                             <span class="ca-slot-badge {{ slot.badge_class }}">{{ slot.badge }}</span>
+                            {% if slot.status_note %}
+                            <div class="ca-slot-note">{{ slot.status_note }}</div>
+                            {% endif %}
                         </td>
                         {% endfor %}
                         <td class="text-end">
