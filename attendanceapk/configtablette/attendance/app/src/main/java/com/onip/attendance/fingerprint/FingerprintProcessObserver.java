@@ -81,8 +81,8 @@ public class FingerprintProcessObserver implements Observer {
             case 5: return "Appuyez plus fort";
             case 6: return "Retirez votre doigt";
             case 7: return "Retirez votre doigt";
-            case 8: return "Doigt détecté ✓";
-            default: return "Commande: " + command;
+            case 8: return "Doigt détecté";
+            default: return "Ajustez votre doigt";
         }
     }
     
@@ -105,7 +105,7 @@ public class FingerprintProcessObserver implements Observer {
                     fingerprintImageView.setImageBitmap(imageBitmap);
                 }
                 if (statusTextView != null) {
-                    statusTextView.setText("Image en temps réel...");
+                    statusTextView.setText("Placez votre doigt");
                 }
             });
             
@@ -123,7 +123,7 @@ public class FingerprintProcessObserver implements Observer {
                 qualityProgressBar.setProgress((Integer) quality);
             }
             if (statusTextView != null) {
-                statusTextView.setText("Qualité: " + quality + "%");
+                statusTextView.setText("Lecture en cours…");
             }
         });
     }
@@ -134,7 +134,7 @@ public class FingerprintProcessObserver implements Observer {
         
         activity.runOnUiThread(() -> {
             if (statusTextView != null) {
-                statusTextView.setText("Détection: " + detectQuality + "%");
+                statusTextView.setText("Lecture en cours…");
             }
         });
     }

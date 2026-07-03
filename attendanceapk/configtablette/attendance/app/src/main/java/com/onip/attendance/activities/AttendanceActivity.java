@@ -1,7 +1,6 @@
 package com.onip.attendance.activities;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +22,7 @@ import com.onip.attendance.fingerprint.MorphoCaptureHelper;
 import com.onip.attendance.models.Employee;
 import com.onip.attendance.services.AttendanceService;
 import com.onip.attendance.services.DeviceManager;
+import com.onip.attendance.utils.SettingsLauncher;
 import com.morpho.morphosmart.sdk.ErrorCodes;
 import com.morpho.morphosmart.sdk.FalseAcceptanceRate;
 import com.morpho.morphosmart.sdk.MorphoDevice;
@@ -51,7 +51,6 @@ public class AttendanceActivity extends Activity {
     private ImageView imgFingerprint;
     private ProgressBar progressBar;
     private Button btnCapture;
-    private Button btnBack;
     
     // Employé sélectionné via matricule
     private Employee selectedEmployee = null;
@@ -98,6 +97,7 @@ public class AttendanceActivity extends Activity {
             DeviceManager.rebindUsbHost(this);
 
             initializeViews();
+            SettingsLauncher.wire(this, R.id.btn_settings_attendance);
             loadGlobalData();
         } catch (Exception e) {
             Log.e(TAG, "Crash initialisation écran pointage", e);
@@ -115,18 +115,9 @@ public class AttendanceActivity extends Activity {
         imgFingerprint = findViewById(R.id.img_attendance_fingerprint);
         progressBar = findViewById(R.id.progress_attendance);
         btnCapture = findViewById(R.id.btn_capture_attendance);
-        btnBack = findViewById(R.id.btn_back_attendance);
 
         btnValidateMatricule.setOnClickListener(v -> validateMatricule());
         btnCapture.setOnClickListener(v -> captureFingerprint());
-        if (btnBack != null) {
-            btnBack.setOnClickListener(v -> {
-                Intent intent = new Intent(this, LoadingActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(intent);
-                finish();
-            });
-        }
     }
 
     private void validateMatricule() {
@@ -152,20 +143,30 @@ public class AttendanceActivity extends Activity {
         layoutMatriculeSection.setVisibility(View.GONE);
         layoutFingerprintSection.setVisibility(View.VISIBLE);
         btnCapture.setVisibility(View.VISIBLE);
-        txtStatus.setText("👤 " + found.getFirstName() + " " + found.getLastName()
+        txtStatus.setText(found.getFirstName() + " " + found.getLastName()
                 + "\n\n" + getString(R.string.attendance_place_finger));
         btnCapture.setText(R.string.capture);
         btnCapture.setEnabled(true);
     }
 
     private Employee findEmployeeByMatricule(String matricule) {
-        String normalized = matricule.trim().toUpperCase();
+        String normalized = normalizeMatricule(matricule);
+        if (normalized.isEmpty()) {
+            return null;
+        }
         for (Employee employee : employees) {
-            if (employee.getNin() != null && employee.getNin().trim().toUpperCase().equals(normalized)) {
+            if (normalizeMatricule(employee.getNin()).equals(normalized)) {
                 return employee;
             }
         }
         return null;
+    }
+
+    private static String normalizeMatricule(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.replaceAll("\\s+", "").trim().toUpperCase();
     }
 
     private void resetToMatriculeScreen() {
@@ -216,13 +217,13 @@ public class AttendanceActivity extends Activity {
         Log.d(TAG, "   - Device: " + (morphoDevice != null ? "✅" : "❌"));
         
         if (morphoDevice == null) {
-            Toast.makeText(this, "Capteur non disponible — redémarrez l'application", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.attendance_sensor_unavailable, Toast.LENGTH_SHORT).show();
             btnValidateMatricule.setEnabled(false);
             return;
         }
-        
+
         if (employees.isEmpty() || allTemplates.isEmpty()) {
-            Toast.makeText(this, "Données non chargées — redémarrez l'application", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.attendance_data_unavailable, Toast.LENGTH_LONG).show();
             btnValidateMatricule.setEnabled(false);
             return;
         }
@@ -239,15 +240,15 @@ public class AttendanceActivity extends Activity {
         }
 
         if (!MorphoCaptureHelper.isDeviceResponsive(morphoDevice)) {
-            txtStatus.setText("Capteur bloqué — retournez à l'accueil et relancez l'application.");
+            txtStatus.setText(R.string.attendance_sensor_blocked);
             return;
         }
 
         capturing = true;
         btnCapture.setEnabled(true);
-        btnCapture.setText("Annuler");
+        btnCapture.setText(R.string.cancel);
         progressBar.setVisibility(View.VISIBLE);
-        txtStatus.setText("Capture en cours... Placez votre doigt");
+        txtStatus.setText(R.string.attendance_capturing);
         
         processObserver = new FingerprintProcessObserver(this, txtStatus, imgFingerprint, progressBar);
         
@@ -276,9 +277,9 @@ public class AttendanceActivity extends Activity {
                 }
                 
             } catch (Exception e) {
-                Log.e(TAG, "❌ Exception capture: " + e.getMessage(), e);
+                Log.e(TAG, "Erreur capture", e);
                 MorphoCaptureHelper.cancelAcquisition(morphoDevice);
-                runOnUiThread(() -> resetCaptureUi("❌ Erreur: " + e.getMessage()));
+                runOnUiThread(() -> resetCaptureUi(getString(R.string.attendance_error_generic)));
             }
         }).start();
     }
@@ -286,7 +287,7 @@ public class AttendanceActivity extends Activity {
     private void cancelCapture() {
         new Thread(() -> {
             MorphoCaptureHelper.cancelAcquisition(morphoDevice);
-            runOnUiThread(() -> resetCaptureUi("Capture annulée."));
+            runOnUiThread(() -> resetCaptureUi(getString(R.string.attendance_cancelled)));
         }).start();
     }
 
@@ -304,7 +305,7 @@ public class AttendanceActivity extends Activity {
     
     private void matchFingerprint(byte[] capturedTemplate) {
         if (selectedEmployee == null) {
-            runOnUiThreadSafe(() -> resetCaptureUi("❌ Matricule non validé"));
+            runOnUiThreadSafe(() -> resetCaptureUi(getString(R.string.attendance_error_generic)));
             return;
         }
         if (matchingInProgress) {
@@ -328,8 +329,7 @@ public class AttendanceActivity extends Activity {
             int comparisonsDone = 0;
 
             runOnUiThreadSafe(() ->
-                    txtStatus.setText("Vérification empreinte...\n" + selectedEmployee.getFirstName()
-                            + " " + selectedEmployee.getLastName()));
+                    txtStatus.setText(getString(R.string.attendance_matching)));
 
             try {
                 MatchPassResult pass1 = runMatchPass(
@@ -358,7 +358,7 @@ public class AttendanceActivity extends Activity {
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Erreur matching", e);
-                runOnUiThreadSafe(() -> resetCaptureUi("❌ Erreur matching: " + e.getMessage()));
+                runOnUiThreadSafe(() -> resetCaptureUi(getString(R.string.attendance_error_generic)));
                 matchingInProgress = false;
                 return;
             }
@@ -375,18 +375,12 @@ public class AttendanceActivity extends Activity {
             if (finalMatch != null && finalScore >= MATCH_SCORE_MINIMUM) {
                 matchedEmployee = finalMatch;
                 runOnUiThreadSafe(() -> {
-                    txtStatus.setText("✅ Empreinte reconnue\n\n" +
-                            "👤 " + finalMatch.getFirstName() + " " + finalMatch.getLastName() + "\n" +
-                            "Score: " + finalScore + "\n" +
-                            "Doigt: " + finalBestFinger + "\n\n" +
-                            "Enregistrement du pointage...");
+                    txtStatus.setText(getString(R.string.attendance_recording));
                     recordAttendanceForEmployee(finalMatch);
                 });
             } else {
                 runOnUiThreadSafe(() -> {
-                    txtStatus.setText("❌ Empreinte non reconnue\n\n" +
-                            "Comparaisons: " + finalComparisonsDone + "\n" +
-                            "Temps: " + elapsedTime + " ms");
+                    txtStatus.setText(R.string.attendance_failed);
                     btnCapture.setText(R.string.capture);
                     btnCapture.setEnabled(true);
                     progressBar.setVisibility(View.GONE);
@@ -448,7 +442,7 @@ public class AttendanceActivity extends Activity {
             if (updateProgress && checked % 10 == 0) {
                 final int progress = checked;
                 runOnUiThreadSafe(() ->
-                        txtStatus.setText("Recherche de correspondance...\n" + progress + "/" + total + " agent(s)"));
+                        txtStatus.setText(getString(R.string.attendance_matching)));
             }
 
             if (result.bestScore >= MATCH_SCORE_EXCELLENT) {
@@ -473,8 +467,7 @@ public class AttendanceActivity extends Activity {
     private void recordAttendanceForEmployee(Employee employee) {
         Log.d(TAG, "Enregistrement pointage pour: " + employee);
 
-        runOnUiThread(() -> txtStatus.setText(
-                "👤 " + employee.getFirstName() + " " + employee.getLastName() + "\n\nEnregistrement en cours..."));
+        runOnUiThread(() -> txtStatus.setText(R.string.attendance_recording));
 
         attendanceService.recordPunch(employee.getId(), new AttendanceService.PunchCallback() {
             @Override
@@ -486,7 +479,11 @@ public class AttendanceActivity extends Activity {
             public void onError(String error) {
                 Log.e(TAG, "Erreur enregistrement pointage: " + error);
                 runOnUiThread(() -> {
-                    txtStatus.setText("❌ Erreur enregistrement\n" + error);
+                    if (error != null && !error.isEmpty()) {
+                        txtStatus.setText(error);
+                    } else {
+                        txtStatus.setText(R.string.attendance_error_generic);
+                    }
                     btnCapture.setEnabled(true);
                     progressBar.setVisibility(View.GONE);
                     capturing = false;
@@ -503,46 +500,40 @@ public class AttendanceActivity extends Activity {
             punchTime = result.assignedSlot.optString("punchTime", "");
         }
 
-        int validated = 0;
-        int total = 4;
-        String dayStatusLabel = "";
-        if (result.dayEvaluation != null) {
-            validated = result.dayEvaluation.optInt("validatedSlots", 0);
-            total = result.dayEvaluation.optInt("totalSlots", 4);
-            dayStatusLabel = result.dayEvaluation.optString("dayStatusLabel", "");
-        }
-
         StringBuilder message = new StringBuilder();
-        message.append("✅ ").append(result.message).append("\n\n");
-        message.append("👤 ").append(employee.getFirstName()).append(" ").append(employee.getLastName()).append("\n");
+        message.append(getString(R.string.attendance_success)).append("\n\n");
+        message.append(employee.getFirstName()).append(" ").append(employee.getLastName());
         if (!slotLabel.isEmpty()) {
-            message.append("📍 ").append(slotLabel);
+            message.append("\n").append(slotLabel);
             if (!punchTime.isEmpty() && !"—".equals(punchTime)) {
                 message.append(" — ").append(punchTime);
             }
-            message.append("\n");
-        }
-        message.append("📊 ").append(validated).append("/").append(total).append(" plages\n");
-        if (!dayStatusLabel.isEmpty()) {
-            message.append("📋 ").append(dayStatusLabel);
         }
         if (result.queuedOffline) {
-            message.append("\n⏳ Sync RH en attente");
+            message.append("\n").append(getString(R.string.attendance_offline_saved));
         }
 
         txtStatus.setText(message.toString());
-        btnCapture.setText("Capturer");
+        btnCapture.setText(R.string.capture);
         btnCapture.setEnabled(true);
         progressBar.setVisibility(View.GONE);
         capturing = false;
 
-        Toast.makeText(this, result.message, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, R.string.attendance_success, Toast.LENGTH_SHORT).show();
 
         autoReturnHandler.postDelayed(() -> {
             if (isActivityAlive()) {
                 resetToMatriculeScreen();
             }
         }, 3000);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (app != null && app.isDataLoaded()) {
+            loadGlobalData();
+        }
     }
 
     @Override

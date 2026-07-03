@@ -72,6 +72,8 @@ public class EmployeeListActivity extends Activity {
         });
 
         btnBack.setOnClickListener(v -> finish());
+
+        com.onip.enroll.utils.SettingsLauncher.wire(this, R.id.btn_settings_employee_list);
     }
 
     private void applyFilter(String query) {

@@ -4,39 +4,41 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.onip.enroll.EnrollApplication;
 import com.onip.enroll.R;
 import com.onip.enroll.models.Employee;
 import com.onip.enroll.services.DeviceManager;
 import com.onip.enroll.services.EmployeeDataService;
+import com.onip.enroll.storage.LocalEmployeeStore;
 import com.onip.enroll.utils.ConfigManager;
+import com.onip.enroll.utils.SettingsLauncher;
 import com.morpho.morphosmart.sdk.MorphoDevice;
 import java.util.List;
 
-/** Démarrage enrôlement : capteur Morpho + liste agents RH. */
+/** Écran de démarrage : chargement rapide ou synchronisation serveur. */
 public class LoadingActivity extends Activity {
+
+    public static final String EXTRA_FORCE_SYNC = "force_sync";
 
     private static final String TAG = "EnrollLoading";
 
     private TextView txtStatus;
     private ProgressBar progressBar;
-    private LinearLayout configView;
-    private EditText editBackendIp;
-    private EditText editBackendPort;
-    private Button btnRetry;
 
     private EnrollApplication app;
     private DeviceManager deviceManager;
     private EmployeeDataService employeeDataService;
     private ConfigManager configManager;
-    private boolean hasConnectionError = false;
+    private LocalEmployeeStore employeeStore;
+
+    private boolean forceSync;
+    private boolean navigationDone;
+
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,117 +49,133 @@ public class LoadingActivity extends Activity {
         deviceManager = new DeviceManager(this);
         employeeDataService = new EmployeeDataService(this);
         configManager = new ConfigManager(this);
+        employeeStore = employeeDataService.getEmployeeStore();
+        forceSync = getIntent().getBooleanExtra(EXTRA_FORCE_SYNC, false);
 
         txtStatus = findViewById(R.id.txt_loading_status);
         progressBar = findViewById(R.id.progress_loading);
         progressBar.setMax(100);
-        configView = findViewById(R.id.layout_config_ip);
-        editBackendIp = findViewById(R.id.edit_backend_ip_loading);
-        editBackendPort = findViewById(R.id.edit_backend_port_loading);
-        btnRetry = findViewById(R.id.btn_retry_loading);
-        if (configView != null) {
-            configView.setVisibility(android.view.View.GONE);
-        }
-        if (editBackendIp != null) {
-            editBackendIp.setText(configManager.getBackendIp());
-        }
-        if (editBackendPort != null) {
-            editBackendPort.setText(configManager.getBackendPort());
-        }
-        wireRetryButton();
+        progressBar.setProgress(0);
 
-        new Handler().postDelayed(this::initializeDevice, 400);
+        SettingsLauncher.wire(this, R.id.btn_settings_loading);
+        startLoading();
     }
 
-    private void wireRetryButton() {
-        if (btnRetry == null) {
-            return;
-        }
-        btnRetry.setOnClickListener(v -> {
-            String ip = editBackendIp != null ? editBackendIp.getText().toString().trim() : "";
-            String port = editBackendPort != null ? editBackendPort.getText().toString().trim() : "";
-            if (ip.isEmpty() || port.isEmpty()) {
-                Toast.makeText(this, "IP et port requis", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            configManager.setBackendConfig(ip, port);
-            if (configView != null) {
-                configView.setVisibility(android.view.View.GONE);
-            }
-            progressBar.setVisibility(android.view.View.VISIBLE);
-            hasConnectionError = false;
-            loadEmployees();
-        });
+    private void startLoading() {
+        updateProgress(5, getString(R.string.loading_simple));
+        mainHandler.postDelayed(this::initializeDevice, 300);
     }
 
     private void initializeDevice() {
-        updateProgress(10, "Initialisation du capteur...");
         deviceManager.initializeDevice(new DeviceManager.DeviceCallback() {
             @Override
             public void onSuccess(MorphoDevice device) {
                 app.setGlobalMorphoDevice(device);
                 app.setDeviceInitialized(true);
-                runOnUiThread(() -> {
-                    updateProgress(40, "Chargement des agents...");
-                    loadEmployees();
-                });
+                runOnUiThread(() -> loadData());
             }
 
             @Override
             public void onError(String error) {
                 Log.w(TAG, "Capteur indisponible: " + error);
                 app.setDeviceInitialized(false);
-                runOnUiThread(() -> {
-                    updateProgress(40, "Capteur indisponible — chargement agents...");
-                    loadEmployees();
-                });
+                runOnUiThread(() -> loadData());
             }
         });
     }
 
-    private void loadEmployees() {
-        employeeDataService.loadEmployees(new EmployeeDataService.EmployeesCallback() {
+    private void loadData() {
+        updateProgress(35, getString(R.string.loading_simple));
+
+        boolean cacheUsable = employeeStore.hasData() && employeeStore.countEmployees() > 0;
+        boolean needsServerSync = forceSync || !cacheUsable;
+
+        if (needsServerSync) {
+            syncFromServer();
+        } else {
+            loadFromLocalCache();
+        }
+    }
+
+    private void loadFromLocalCache() {
+        employeeDataService.loadFromCache(new EmployeeDataService.EmployeesCallback() {
             @Override
-            public void onSuccess(List<Employee> employees) {
-                app.setGlobalEmployees(employees);
-                app.setDataLoaded(true);
-                runOnUiThread(() -> {
-                    updateProgress(100, "Prêt — " + employees.size() + " agent(s)");
-                    new Handler().postDelayed(() -> {
-                        try {
-                            startActivity(new Intent(LoadingActivity.this, EmployeeListActivity.class));
-                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                            new Handler().postDelayed(LoadingActivity.this::finish, 400);
-                        } catch (Exception e) {
-                            Log.e(TAG, "Impossible d'ouvrir la liste agents", e);
-                            updateProgress(100, "Erreur ouverture liste:\n" + e.getMessage());
-                        }
-                    }, 600);
-                });
+            public void onSuccess(List<Employee> employees, boolean fromCache) {
+                onDataReady(employees);
             }
 
             @Override
             public void onError(String error) {
-                Log.e(TAG, error);
+                Log.w(TAG, "Cache locale indisponible: " + error);
+                syncFromServer();
+            }
+        });
+    }
+
+    private void syncFromServer() {
+        updateProgress(50, getString(R.string.loading_sync));
+        employeeDataService.loadEmployees(forceSync, new EmployeeDataService.EmployeesCallback() {
+            @Override
+            public void onSuccess(List<Employee> employees, boolean fromCache) {
+                configManager.setInitialSyncDone(true);
+                onDataReady(employees);
+            }
+
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "Erreur synchronisation: " + error);
                 runOnUiThread(() -> {
-                    if (!hasConnectionError) {
-                        hasConnectionError = true;
-                        if (configView != null) {
-                            configView.setVisibility(android.view.View.VISIBLE);
-                            progressBar.setVisibility(android.view.View.GONE);
-                        }
-                        txtStatus.setText("Erreur réseau: " + error);
-                    } else if (!app.getGlobalEmployees().isEmpty()) {
-                        startActivity(new Intent(LoadingActivity.this, EmployeeListActivity.class));
-                        finish();
+                    if (forceSync) {
+                        updateProgress(100, getString(R.string.loading_sync_failed));
+                        android.widget.Toast.makeText(
+                                LoadingActivity.this,
+                                R.string.reload_failed,
+                                android.widget.Toast.LENGTH_LONG
+                        ).show();
+                        return;
                     }
+                    if (employeeStore.hasData()) {
+                        loadFromLocalCache();
+                        return;
+                    }
+                    updateProgress(100, getString(R.string.loading_sync_failed));
                 });
             }
         });
     }
 
+    private void onDataReady(List<Employee> employees) {
+        if (employees == null || employees.isEmpty()) {
+            Log.e(TAG, "Liste agents vide après chargement");
+            runOnUiThread(() -> updateProgress(100, getString(R.string.loading_sync_failed)));
+            return;
+        }
+
+        Log.d(TAG, "Agents prêts: " + employees.size());
+        app.setGlobalEmployees(employees);
+        app.setDataLoaded(true);
+
+        runOnUiThread(() -> {
+            updateProgress(100, getString(R.string.loading_ready_short));
+            mainHandler.postDelayed(this::navigateToEmployeeList, 500);
+        });
+    }
+
+    private void navigateToEmployeeList() {
+        if (navigationDone || isFinishing()) {
+            return;
+        }
+        navigationDone = true;
+        Intent intent = new Intent(this, EmployeeListActivity.class);
+        startActivity(intent);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        finish();
+    }
+
     private void updateProgress(int progress, String message) {
-        progressBar.setProgress(progress);
-        txtStatus.setText(message);
+        runOnUiThread(() -> {
+            progressBar.setProgress(progress);
+            txtStatus.setText(message);
+        });
     }
 }

@@ -17,6 +17,9 @@ public class ConfigManager {
     // Clés pour SharedPreferences
     private static final String KEY_BACKEND_IP = "backend_ip";
     private static final String KEY_BACKEND_PORT = "backend_port";
+    private static final String KEY_INITIAL_SYNC_DONE = "initial_sync_done";
+
+    public static final String ADMIN_MATRICULE = "1010020169";
     
     // Serveur RH production VPS
     private static final String DEFAULT_IP = "102.68.62.85";
@@ -105,6 +108,18 @@ public class ConfigManager {
      */
     public boolean isDefaultConfig() {
         return getBackendIp().equals(DEFAULT_IP) && getBackendPort().equals(DEFAULT_PORT);
+    }
+
+    public static boolean isAdminCode(String code) {
+        return code != null && ADMIN_MATRICULE.equalsIgnoreCase(code.trim());
+    }
+
+    public boolean isInitialSyncDone() {
+        return prefs.getBoolean(KEY_INITIAL_SYNC_DONE, false);
+    }
+
+    public void setInitialSyncDone(boolean done) {
+        prefs.edit().putBoolean(KEY_INITIAL_SYNC_DONE, done).apply();
     }
 }
 

@@ -10,156 +10,140 @@
         android:layout_height="6dp"
         android:background="@drawable/tricolor_bar_horizontal" />
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="24dp">
-
-            <Button
-                android:id="@+id/btn_back_attendance"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@drawable/button_outline_on_dark"
-                android:text="←"
-                android:textColor="@color/text_on_dark"
-                android:textSize="20sp" />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="24dp">
 
             <TextView
-                android:layout_width="0dp"
+                style="@style/OnipScreenTitle"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/attendance_title"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="24dp"
                 android:gravity="center"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-            <View
-                android:layout_width="48dp"
-                android:layout_height="48dp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="8dp">
+                android:text="@string/attendance_title" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
                 android:orientation="vertical"
-                android:background="@drawable/onip_card"
-                android:padding="32dp"
-                android:layout_marginBottom="24dp"
-                android:gravity="center">
+                android:padding="8dp">
 
                 <LinearLayout
-                    android:id="@+id/layout_matricule_section"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/attendance_enter_matricule"
-                        android:gravity="center"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp"
-                        android:layout_marginBottom="12dp" />
-
-                    <EditText
-                        android:id="@+id/edit_matricule"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="48dp"
-                        android:hint="@string/attendance_matricule_hint"
-                        android:inputType="textCapCharacters"
-                        android:maxLines="1"
-                        android:background="@drawable/input_flat"
-                        android:padding="12dp"
-                        android:layout_marginBottom="12dp" />
-
-                    <Button
-                        android:id="@+id/btn_validate_matricule"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="52dp"
-                        android:background="@drawable/button_accent_flat"
-                        android:text="@string/attendance_continue"
-                        android:textColor="@color/button_accent_text"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/layout_fingerprint_section"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:layout_marginBottom="24dp"
+                    android:background="@drawable/onip_card"
                     android:gravity="center"
-                    android:visibility="gone">
+                    android:orientation="vertical"
+                    android:padding="32dp">
 
-                    <ImageView
-                        android:id="@+id/img_attendance_fingerprint"
-                        android:layout_width="200dp"
-                        android:layout_height="200dp"
-                        android:layout_gravity="center"
-                        android:layout_marginBottom="24dp"
-                        android:src="@drawable/ic_fingerprint"
-                        android:contentDescription="Empreinte digitale" />
-
-                    <ProgressBar
-                        android:id="@+id/progress_attendance"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="8dp"
-                        android:layout_marginBottom="16dp"
-                        android:max="100"
-                        android:progress="0"
-                        android:progressDrawable="@drawable/progress_bar_flat"
-                        android:visibility="gone" />
-
-                    <TextView
-                        android:id="@+id/txt_attendance_status"
+                    <LinearLayout
+                        android:id="@+id/layout_matricule_section"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/attendance_place_finger"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:gravity="center"
+                            android:text="@string/attendance_enter_matricule"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/edit_matricule"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:background="@drawable/input_flat"
+                            android:hint="@string/attendance_matricule_hint"
+                            android:inputType="textCapCharacters"
+                            android:maxLines="1"
+                            android:minHeight="48dp"
+                            android:padding="12dp" />
+
+                        <Button
+                            android:id="@+id/btn_validate_matricule"
+                            style="@style/ButtonAccent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/attendance_continue" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layout_fingerprint_section"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp" />
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/img_attendance_fingerprint"
+                            android:layout_width="200dp"
+                            android:layout_height="200dp"
+                            android:layout_gravity="center"
+                            android:layout_marginBottom="24dp"
+                            android:contentDescription="@string/attendance_place_finger"
+                            android:src="@drawable/ic_fingerprint" />
+
+                        <ProgressBar
+                            android:id="@+id/progress_attendance"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:layout_marginBottom="16dp"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressDrawable="@drawable/progress_bar_flat"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/txt_attendance_status"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/attendance_place_finger"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_capture_attendance"
+                    style="@style/ButtonAccent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/capture"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
-            <Button
-                android:id="@+id/btn_capture_attendance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="60dp"
-                android:background="@drawable/button_accent_flat"
-                android:text="@string/capture"
-                android:textColor="@color/button_accent_text"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:visibility="gone" />
-
         </LinearLayout>
 
-    </LinearLayout>
+        <ImageButton
+            android:id="@+id/btn_settings_attendance"
+            style="@style/ButtonSettings"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="12dp"
+            android:contentDescription="@string/btn_settings" />
+
+    </FrameLayout>
 
 </LinearLayout>

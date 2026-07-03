@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_secondary">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:background="@drawable/tricolor_bar_horizontal" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                style="@style/OnipBrandTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:text="@string/admin_settings_title" />
+
+            <TextView
+                style="@style/OnipSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="32dp"
+                android:text="@string/admin_settings_subtitle"
+                android:textAlignment="center" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/onip_card"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    style="@style/Heading3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="@string/admin_server_section" />
+
+                <EditText
+                    android:id="@+id/edit_backend_ip_admin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/input_flat"
+                    android:hint="@string/admin_ip_hint"
+                    android:inputType="text"
+                    android:minHeight="48dp"
+                    android:padding="12dp" />
+
+                <EditText
+                    android:id="@+id/edit_backend_port_admin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    android:background="@drawable/input_flat"
+                    android:hint="@string/admin_port_hint"
+                    android:inputType="number"
+                    android:minHeight="48dp"
+                    android:padding="12dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_admin_save"
+                        style="@style/ButtonPrimary"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:text="@string/admin_save" />
+
+                    <Button
+                        android:id="@+id/btn_admin_reload"
+                        style="@style/ButtonOutline"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="@string/btn_reload_data" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txt_connection_status"
+                    style="@style/BodySmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:text="@string/admin_connection_hint"
+                    android:textAlignment="center" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_admin_back"
+                style="@style/ButtonSecondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/back" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</LinearLayout>

@@ -101,7 +101,7 @@ public class LoadingActivity extends Activity {
             titleConfig.setPadding(0, 0, 0, 16);
             
             editBackendIp = new android.widget.EditText(this);
-            editBackendIp.setHint("IP du backend (ex: 192.168.1.74)");
+            editBackendIp.setHint("IP du backend (ex: 102.68.62.85)");
             editBackendIp.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
             editBackendIp.setPadding(16, 16, 16, 16);
             editBackendIp.setBackgroundResource(R.drawable.input_flat);
@@ -111,7 +111,7 @@ public class LoadingActivity extends Activity {
             ((android.widget.LinearLayout.LayoutParams) editBackendIp.getLayoutParams()).setMargins(0, 0, 0, 16);
             
             editBackendPort = new android.widget.EditText(this);
-            editBackendPort.setHint("Port (ex: 8082)");
+            editBackendPort.setHint("Port (ex: 8100)");
             editBackendPort.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
             editBackendPort.setPadding(16, 16, 16, 16);
             editBackendPort.setBackgroundResource(R.drawable.input_flat);

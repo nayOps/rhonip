@@ -9,7 +9,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,11 +48,18 @@ public class AttendanceActivity extends Activity {
     private static final String TAG = "AttendanceActivity";
     
     // UI Components
+    private LinearLayout layoutMatriculeSection;
+    private LinearLayout layoutFingerprintSection;
+    private EditText editMatricule;
+    private Button btnValidateMatricule;
     private TextView txtStatus;
     private ImageView imgFingerprint;
     private ProgressBar progressBar;
     private Button btnCapture;
     private Button btnBack;
+    
+    // Employé sélectionné via matricule
+    private Employee selectedEmployee = null;
     
     // MorphoSmart Components
     private MorphoDevice morphoDevice;
@@ -92,16 +101,55 @@ public class AttendanceActivity extends Activity {
     }
     
     private void initializeViews() {
+        layoutMatriculeSection = findViewById(R.id.layout_matricule_section);
+        layoutFingerprintSection = findViewById(R.id.layout_fingerprint_section);
+        editMatricule = findViewById(R.id.edit_matricule);
+        btnValidateMatricule = findViewById(R.id.btn_validate_matricule);
         txtStatus = findViewById(R.id.txt_attendance_status);
         imgFingerprint = findViewById(R.id.img_attendance_fingerprint);
         progressBar = findViewById(R.id.progress_attendance);
         btnCapture = findViewById(R.id.btn_capture_attendance);
         btnBack = findViewById(R.id.btn_back_attendance);
         
-        txtStatus.setText("Placez votre doigt sur le capteur");
-        btnCapture.setText("Capturer");
+        btnValidateMatricule.setOnClickListener(v -> validateMatricule());
         btnCapture.setOnClickListener(v -> captureFingerprint());
         btnBack.setOnClickListener(v -> finish());
+    }
+    
+    private void validateMatricule() {
+        String matricule = editMatricule.getText().toString().trim();
+        if (matricule.isEmpty()) {
+            Toast.makeText(this, "Veuillez saisir votre matricule", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        Employee found = findEmployeeByMatricule(matricule);
+        if (found == null) {
+            Toast.makeText(this, "Matricule introuvable", Toast.LENGTH_LONG).show();
+            return;
+        }
+        
+        if (!allTemplates.containsKey(found.getId()) || allTemplates.get(found.getId()).isEmpty()) {
+            Toast.makeText(this, "Aucune empreinte enregistrée pour cet employé", Toast.LENGTH_LONG).show();
+            return;
+        }
+        
+        selectedEmployee = found;
+        layoutMatriculeSection.setVisibility(View.GONE);
+        layoutFingerprintSection.setVisibility(View.VISIBLE);
+        btnCapture.setVisibility(View.VISIBLE);
+        txtStatus.setText("👤 " + found.getFirstName() + " " + found.getLastName() + "\n\nPlacez votre doigt sur le capteur");
+        btnCapture.setEnabled(true);
+    }
+    
+    private Employee findEmployeeByMatricule(String matricule) {
+        String normalized = matricule.trim().toUpperCase();
+        for (Employee employee : employees) {
+            if (employee.getNin() != null && employee.getNin().trim().toUpperCase().equals(normalized)) {
+                return employee;
+            }
+        }
+        return null;
     }
     
     private void loadGlobalData() {
@@ -116,21 +164,21 @@ public class AttendanceActivity extends Activity {
         
         if (morphoDevice == null) {
             txtStatus.setText("❌ Capteur non disponible\nVeuillez redémarrer l'application");
-            btnCapture.setEnabled(false);
+            btnValidateMatricule.setEnabled(false);
             return;
         }
         
         if (employees.isEmpty() || allTemplates.isEmpty()) {
             txtStatus.setText("❌ Données non chargées\nVeuillez redémarrer l'application");
-            btnCapture.setEnabled(false);
+            btnValidateMatricule.setEnabled(false);
             return;
         }
         
-        btnCapture.setEnabled(true);
+        btnValidateMatricule.setEnabled(true);
     }
     
     private void captureFingerprint() {
-        if (capturing || morphoDevice == null) {
+        if (capturing || morphoDevice == null || selectedEmployee == null) {
             return;
         }
         
@@ -201,8 +249,18 @@ public class AttendanceActivity extends Activity {
     }
     
     private void matchFingerprint(byte[] capturedTemplate) {
+        if (selectedEmployee == null) {
+            runOnUiThread(() -> {
+                txtStatus.setText("❌ Matricule non validé");
+                btnCapture.setEnabled(true);
+                progressBar.setVisibility(View.GONE);
+                capturing = false;
+            });
+            return;
+        }
+        
         new Thread(() -> {
-            Log.d(TAG, "=== MATCHING OPTIMISÉ ===");
+            Log.d(TAG, "=== MATCHING MATRICULE " + selectedEmployee.getNin() + " ===");
             
             long startTime = System.currentTimeMillis();
             
@@ -217,49 +275,37 @@ public class AttendanceActivity extends Activity {
             
             Employee bestMatch = null;
             int bestScore = 0;
-            String bestFinger = null;
             
-            // Vérification séquentielle avec arrêt anticipé
-            for (Employee employee : employees) {
-                if (!allTemplates.containsKey(employee.getId())) {
-                    continue;
-                }
-                
+            Employee employee = selectedEmployee;
+            if (allTemplates.containsKey(employee.getId())) {
                 Map<String, byte[]> empTemplates = allTemplates.get(employee.getId());
                 
-                // Vérifier les doigts prioritaires
                 for (String fingerName : priorityFingers) {
-                    if (empTemplates.containsKey(fingerName)) {
-                        byte[] storedTemplate = empTemplates.get(fingerName);
-                        
-                        TemplateList templateList = new TemplateList();
-                        Template storedTemplateObj = new Template();
-                        storedTemplateObj.setData(storedTemplate);
-                        storedTemplateObj.setTemplateType(TemplateType.MORPHO_PK_ISO_FMR);
-                        templateList.putTemplate(storedTemplateObj);
-                        
-                        ResultMatching resultMatching = new ResultMatching();
-                        int ret = morphoDevice.verify(timeOut, far, coder, detectModeChoice, matchingStrategy,
-                                templateList, callbackCmd, null, resultMatching);
-                        
-                        if (ret == ErrorCodes.MORPHO_OK && resultMatching != null) {
-                            int matchingScore = resultMatching.getMatchingScore();
-                            
-                            if (matchingScore > bestScore) {
-                                bestScore = matchingScore;
-                                bestMatch = employee;
-                                bestFinger = fingerName;
-                            }
-                            
-                            if (matchingScore >= 75) {
-                                break;
-                            }
+                    if (!empTemplates.containsKey(fingerName)) {
+                        continue;
+                    }
+                    byte[] storedTemplate = empTemplates.get(fingerName);
+                    
+                    TemplateList templateList = new TemplateList();
+                    Template storedTemplateObj = new Template();
+                    storedTemplateObj.setData(storedTemplate);
+                    storedTemplateObj.setTemplateType(TemplateType.MORPHO_PK_ISO_FMR);
+                    templateList.putTemplate(storedTemplateObj);
+                    
+                    ResultMatching resultMatching = new ResultMatching();
+                    int ret = morphoDevice.verify(timeOut, far, coder, detectModeChoice, matchingStrategy,
+                            templateList, callbackCmd, null, resultMatching);
+                    
+                    if (ret == ErrorCodes.MORPHO_OK && resultMatching != null) {
+                        int matchingScore = resultMatching.getMatchingScore();
+                        if (matchingScore > bestScore) {
+                            bestScore = matchingScore;
+                            bestMatch = employee;
+                        }
+                        if (matchingScore >= 75) {
+                            break;
                         }
                     }
-                }
-                
-                if (bestScore >= 75) {
-                    break;
                 }
             }
             

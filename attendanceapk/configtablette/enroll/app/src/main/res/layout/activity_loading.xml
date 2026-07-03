@@ -3,122 +3,78 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/background_secondary"
-    android:gravity="center">
+    android:background="@color/background_secondary">
 
     <View
         android:layout_width="match_parent"
         android:layout_height="6dp"
         android:background="@drawable/tricolor_bar_horizontal" />
 
-    <LinearLayout
-        android:id="@+id/layout_loading_main"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="32dp">
-
-        <ImageView
-            android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:src="@drawable/ic_onip_logo"
-            android:contentDescription="Logo ONIP"
-            android:layout_marginBottom="24dp" />
-
-        <TextView
-            style="@style/OnipBrandTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ONIP RH"
-            android:textAlignment="center"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            style="@style/OnipSubtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_subtitle"
-            android:textAlignment="center"
-            android:layout_marginBottom="32dp" />
-
-        <TextView
-            android:id="@+id/txt_loading_status"
-            style="@style/Body"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Initialisation..."
-            android:textAlignment="center"
-            android:layout_marginBottom="24dp" />
-
-        <ProgressBar
-            android:id="@+id/progress_loading"
-            style="@style/ProgressBarFlat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="100"
-            android:progress="0"
-            android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp" />
-
-        <Button
-            android:id="@+id/btn_open_config_loading"
-            style="@style/ButtonOutline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Configurer IP / port" />
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/layout_config_ip"
+            android:id="@+id/layout_loading_main"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
             android:orientation="vertical"
-            android:background="@drawable/onip_card"
-            android:padding="24dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:visibility="gone">
+            android:padding="32dp">
+
+            <ImageView
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_marginBottom="24dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/ic_onip_logo" />
 
             <TextView
-                style="@style/Heading3"
+                style="@style/OnipBrandTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Configuration Backend"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="8dp"
+                android:text="ONIP RH"
+                android:textAlignment="center" />
 
-            <EditText
-                android:id="@+id/edit_backend_ip_loading"
+            <TextView
+                style="@style/OnipSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="40dp"
+                android:text="@string/app_subtitle"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/txt_loading_status"
+                style="@style/Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:text="@string/loading_simple"
+                android:textAlignment="center" />
+
+            <ProgressBar
+                android:id="@+id/progress_loading"
+                style="@style/ProgressBarFlat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:hint="IP du backend (ex: 102.68.62.85)"
-                android:inputType="text"
-                android:background="@drawable/input_flat"
-                android:padding="12dp"
-                android:layout_marginBottom="16dp" />
-
-            <EditText
-                android:id="@+id/edit_backend_port_loading"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:hint="Port (ex: 8100)"
-                android:inputType="number"
-                android:background="@drawable/input_flat"
-                android:padding="12dp"
-                android:layout_marginBottom="16dp" />
-
-            <Button
-                android:id="@+id/btn_retry_loading"
-                style="@style/ButtonPrimary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Relancer le chargement" />
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:max="100"
+                android:progress="0" />
 
         </LinearLayout>
 
-    </LinearLayout>
+        <ImageButton
+            android:id="@+id/btn_settings_loading"
+            style="@style/ButtonSettings"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="12dp"
+            android:contentDescription="@string/btn_settings" />
+
+    </FrameLayout>
 
 </LinearLayout>

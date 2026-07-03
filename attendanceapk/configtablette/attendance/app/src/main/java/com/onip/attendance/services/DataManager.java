@@ -12,7 +12,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,30 +47,110 @@ public class DataManager {
     }
 
     public void loadAllData(AllDataCallback callback) {
-        new LoadAllDataTask(callback).execute();
+        loadAllData(false, callback);
     }
 
-    private class LoadAllDataTask extends AsyncTask<Void, Void, BundleLoadResult> {
-        private final AllDataCallback callback;
+    public void loadAllData(boolean forceFullSync, AllDataCallback callback) {
+        new LoadAllDataTask(forceFullSync, callback).execute();
+    }
+
+    public void loadFromCache(AllDataCallback callback) {
+        new LoadCacheTask(callback).execute();
+    }
+
+    public interface ConnectionCallback {
+        void onSuccess(int enrolledCount, int employeeCount);
+        void onError(String error);
+    }
+
+    public void testServerConnection(ConnectionCallback callback) {
+        new TestConnectionTask(callback).execute();
+    }
+
+    private class TestConnectionTask extends AsyncTask<Void, Void, BundleLoadResult> {
+        private final ConnectionCallback callback;
         private String errorMessage;
 
-        LoadAllDataTask(AllDataCallback callback) {
+        TestConnectionTask(ConnectionCallback callback) {
             this.callback = callback;
         }
 
         @Override
         protected BundleLoadResult doInBackground(Void... voids) {
-            String since = templateStore.getSyncVersion();
+            try {
+                return fetchBundle();
+            } catch (Exception e) {
+                errorMessage = e.getMessage();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(BundleLoadResult result) {
+            if (callback == null) {
+                return;
+            }
+            if (result != null) {
+                callback.onSuccess(result.templates.size(), result.employees.size());
+            } else {
+                callback.onError(errorMessage != null ? errorMessage : "Connexion impossible");
+            }
+        }
+    }
+
+    private class LoadCacheTask extends AsyncTask<Void, Void, BundleLoadResult> {
+        private final AllDataCallback callback;
+
+        LoadCacheTask(AllDataCallback callback) {
+            this.callback = callback;
+        }
+
+        @Override
+        protected BundleLoadResult doInBackground(Void... voids) {
+            if (!templateStore.hasData()) {
+                return null;
+            }
+            return new BundleLoadResult(
+                    templateStore.loadEmployees(),
+                    templateStore.loadTemplates(),
+                    true
+            );
+        }
+
+        @Override
+        protected void onPostExecute(BundleLoadResult result) {
+            if (callback == null) {
+                return;
+            }
+            if (result != null && !result.templates.isEmpty()) {
+                callback.onSuccess(result.employees, result.templates, true);
+            } else {
+                callback.onError("Aucune donnée locale");
+            }
+        }
+    }
+
+    private class LoadAllDataTask extends AsyncTask<Void, Void, BundleLoadResult> {
+        private final AllDataCallback callback;
+        private final boolean forceFullSync;
+        private String errorMessage;
+
+        LoadAllDataTask(boolean forceFullSync, AllDataCallback callback) {
+            this.forceFullSync = forceFullSync;
+            this.callback = callback;
+        }
+
+        @Override
+        protected BundleLoadResult doInBackground(Void... voids) {
             int retry = 0;
             while (retry < MAX_RETRIES) {
                 try {
-                    BundleLoadResult remote = fetchBundle(since);
-                    if (remote != null) {
-                        if (remote.fullReplace) {
-                            templateStore.replaceAll(remote.employees, remote.templates);
-                        } else {
-                            templateStore.mergeBundle(remote.employees, remote.templates);
+                    BundleLoadResult remote = fetchBundle();
+                    if (remote != null && !remote.templates.isEmpty()) {
+                        if (forceFullSync) {
+                            templateStore.clearAll();
                         }
+                        templateStore.replaceAll(remote.employees, remote.templates);
                         if (remote.version != null && !remote.version.isEmpty()) {
                             templateStore.setSyncVersion(remote.version);
                         }
@@ -81,6 +160,9 @@ public class DataManager {
                                 false
                         );
                     }
+                    if (remote != null && remote.templates.isEmpty()) {
+                        errorMessage = "Aucune empreinte reçue du serveur";
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, "Erreur bundle tentative " + (retry + 1) + ": " + e.getMessage());
                     errorMessage = e.getMessage();
@@ -88,7 +170,7 @@ public class DataManager {
                 retry++;
             }
 
-            if (templateStore.hasData()) {
+            if (!forceFullSync && templateStore.hasData()) {
                 Log.w(TAG, "Utilisation du cache local (réseau indisponible)");
                 return new BundleLoadResult(
                         templateStore.loadEmployees(),
@@ -112,13 +194,9 @@ public class DataManager {
         }
     }
 
-    private BundleLoadResult fetchBundle(String since) throws Exception {
-        StringBuilder urlBuilder = new StringBuilder(configManager.getBackendUrl("/api/fingerprints/bundle"));
-        if (since != null && !since.isEmpty()) {
-            urlBuilder.append("?since=").append(URLEncoder.encode(since, "UTF-8"));
-        }
-        String urlString = urlBuilder.toString();
-        Log.d(TAG, "Chargement bundle: " + urlString);
+    private BundleLoadResult fetchBundle() throws Exception {
+        String urlString = configManager.getBackendUrl("/api/fingerprints/bundle");
+        Log.d(TAG, "Chargement bundle complet: " + urlString);
 
         HttpURLConnection connection = (HttpURLConnection) new URL(urlString).openConnection();
         connection.setRequestMethod("GET");
@@ -149,8 +227,8 @@ public class DataManager {
         }
 
         BundleLoadResult result = new BundleLoadResult();
+        result.status = json.optString("status", "");
         result.version = json.optString("version", null);
-        result.fullReplace = since == null || since.isEmpty();
 
         JSONArray employeesJson = json.optJSONArray("employees");
         if (employeesJson == null) {
@@ -163,15 +241,6 @@ public class DataManager {
             if (employeeId <= 0) {
                 continue;
             }
-
-            Employee employee = new Employee();
-            employee.setId(employeeId);
-            employee.setFirstName(empJson.optString("firstName", ""));
-            employee.setLastName(empJson.optString("lastName", ""));
-            employee.setMiddleName(empJson.optString("middleName", ""));
-            employee.setNin(empJson.optString("registrationNumber", ""));
-            employee.setBiometricEnrolled(true);
-            result.employees.add(employee);
 
             Map<String, byte[]> fingers = new HashMap<>();
             JSONArray fingersJson = empJson.optJSONArray("fingers");
@@ -187,6 +256,14 @@ public class DataManager {
                     fingers.put(fingerName, data);
                 }
             }
+            Employee employee = new Employee();
+            employee.setId(employeeId);
+            employee.setFirstName(empJson.optString("firstName", ""));
+            employee.setLastName(empJson.optString("lastName", ""));
+            employee.setMiddleName(empJson.optString("middleName", ""));
+            employee.setNin(empJson.optString("registrationNumber", ""));
+            employee.setBiometricEnrolled(!fingers.isEmpty());
+            result.employees.add(employee);
             if (!fingers.isEmpty()) {
                 result.templates.put(employeeId, fingers);
             }
@@ -209,7 +286,7 @@ public class DataManager {
         List<Employee> employees = new ArrayList<>();
         Map<Integer, Map<String, byte[]>> templates = new HashMap<>();
         String version;
-        boolean fullReplace;
+        String status;
         boolean fromCache;
 
         BundleLoadResult() {

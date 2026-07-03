@@ -3,6 +3,7 @@ package com.onip.biometric.services;
 import android.content.Context;
 import android.util.Log;
 import com.onip.biometric.models.EmployeeData;
+import com.onip.biometric.utils.ConfigManager;
 import org.json.JSONObject;
 import org.json.JSONException;
 import java.io.IOException;
@@ -12,250 +13,151 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Service pour l'envoi des données employé vers le backend RH
+ * Envoi des données employé vers l'API guichet RH.
  */
 public class EmployeeApiService {
-    
+
     private static final String TAG = "EmployeeApiService";
-    
-    // URL du backend RH (à configurer selon votre environnement)
-    private static final String BASE_URL = "http://192.168.1.73:8082/api/test";
-    
-    private Context context;
-    
+
+    private final Context context;
+    private final ConfigManager configManager;
+
     public EmployeeApiService(Context context) {
         this.context = context;
+        this.configManager = new ConfigManager(context);
     }
-    
-    /**
-     * Envoie les données de l'employé vers le backend
-     */
+
     public void saveEmployee(EmployeeData employeeData, ApiCallback callback) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // Sérialiser les données en JSON
-                    JSONObject jsonData = serializeEmployeeData(employeeData);
-                    Log.d(TAG, "Données à envoyer: " + jsonData.toString());
-                    
-                    // Envoyer vers l'API
-                    boolean success = sendToApi(jsonData);
-                    
-                    if (success) {
-                        Log.d(TAG, "Employé sauvegardé avec succès");
-                        callback.onSuccess("Employé enregistré avec succès !");
-                    } else {
-                        Log.e(TAG, "Erreur lors de la sauvegarde");
-                        callback.onError("Erreur lors de la sauvegarde");
-                    }
-                    
-                } catch (Exception e) {
-                    Log.e(TAG, "Erreur lors de l'envoi des données", e);
-                    callback.onError("Erreur: " + e.getMessage());
+        new Thread(() -> {
+            try {
+                JSONObject jsonData = buildGuichetPayload(employeeData);
+                Log.d(TAG, "Données guichet: " + jsonData);
+
+                String response = sendToApi(jsonData);
+                if (response != null) {
+                    callback.onSuccess("Employé enregistré avec succès !");
+                } else {
+                    callback.onError("Erreur lors de la sauvegarde");
                 }
+            } catch (Exception e) {
+                Log.e(TAG, "Erreur envoi", e);
+                callback.onError("Erreur: " + e.getMessage());
             }
         }).start();
     }
-    
-    /**
-     * Sérialise les données employé en JSON
-     */
-    private JSONObject serializeEmployeeData(EmployeeData employeeData) throws JSONException {
+
+    private JSONObject buildGuichetPayload(EmployeeData data) throws JSONException {
         JSONObject json = new JSONObject();
-        
-        // ========== IDENTITÉ ==========
-        json.put("nin", employeeData.getNin());
-        json.put("firstName", employeeData.getFirstName());
-        json.put("lastName", employeeData.getLastName());
-        // employeeNumber optionnel - généré seulement si nécessaire
-        if (employeeData.getFirstName() != null && !employeeData.getFirstName().isEmpty()) {
-            json.put("employeeNumber", "EMP" + System.currentTimeMillis());
+
+        String matricule = firstNonEmpty(data.getEmployeeId(), data.getNin());
+        putIfPresent(json, "registration_number", matricule);
+        putIfPresent(json, "first_name", data.getFirstName());
+        putIfPresent(json, "last_name", data.getLastName());
+        putIfPresent(json, "middle_name", data.getMiddleName());
+        putIfPresent(json, "gender", data.getGender());
+        putIfPresent(json, "date_of_birth", data.getBirthDate());
+        putIfPresent(json, "place_of_birth", data.getBirthPlace());
+        putIfPresent(json, "citizenship", data.getNationality());
+        putIfPresent(json, "email", data.getEmail());
+        putIfPresent(json, "mobile_number", data.getPhoneNumber());
+        putIfPresent(json, "physical_address", data.getPostalAddress());
+        putIfPresent(json, "marital_status", data.getMaritalStatus());
+        putIfPresent(json, "spouse", data.getSpouseName());
+        putIfPresent(json, "identity_number", data.getNationalIdNumber());
+        putIfPresent(json, "date_of_join", data.getHireDate());
+        putIfPresent(json, "emergency_contact", data.getEmergencyContactName());
+        putIfPresent(json, "emergency_phone", data.getEmergencyContactPhone());
+        putIfPresent(json, "payment_account", data.getBankAccountNumber());
+        putIfPresent(json, "payer_name", data.getBankName());
+        putIfPresent(json, "comment", data.getWorkStatus());
+
+        putIfPresent(json, "home_province", data.getOriginProvince());
+        putIfPresent(json, "home_territory", data.getOriginTerritory());
+        putIfPresent(json, "home_sector", data.getOriginCommune());
+        putIfPresent(json, "home_groupement", data.getOriginGroupement());
+        putIfPresent(json, "home_village", data.getOriginVillage());
+
+        if (data.getPhotoPath() != null && !data.getPhotoPath().isEmpty()) {
+            json.put("photo_base64", data.getPhotoPath());
         }
-        json.put("middleName", employeeData.getMiddleName());
-        json.put("otherNames", employeeData.getOtherNames());
-        json.put("gender", employeeData.getGender());
-        json.put("birthPlace", employeeData.getBirthPlace());
-        json.put("birthDate", employeeData.getBirthDate());
-        json.put("nationality", employeeData.getNationality());
-        json.put("eyeColor", employeeData.getEyeColor());
-        json.put("height", employeeData.getHeight());
-        json.put("email", employeeData.getEmail());
-        json.put("postalAddress", employeeData.getPostalAddress());
-        json.put("phoneNumber", employeeData.getPhoneNumber());
-        
-        // ========== ORIGINE ==========
-        json.put("originProvince", employeeData.getOriginProvince());
-        json.put("originTerritory", employeeData.getOriginTerritory());
-        json.put("originCommune", employeeData.getOriginCommune());
-        json.put("originGroupement", employeeData.getOriginGroupement());
-        json.put("originVillage", employeeData.getOriginVillage());
-        
-        // ========== ADRESSE ==========
-        json.put("currentProvince", employeeData.getCurrentProvince());
-        json.put("currentTerritory", employeeData.getCurrentTerritory());
-        json.put("currentCommune", employeeData.getCurrentCommune());
-        json.put("currentGroupement", employeeData.getCurrentGroupement());
-        json.put("currentVillage", employeeData.getCurrentVillage());
-        
-        // ========== SITUATION FAMILIALE ==========
-        json.put("maritalStatus", employeeData.getMaritalStatus());
-        json.put("spouseName", employeeData.getSpouseName());
-        json.put("spouseFirstName", employeeData.getSpouseFirstName());
-        json.put("spouseLastName", employeeData.getSpouseLastName());
-        json.put("spouseMiddleName", employeeData.getSpouseMiddleName());
-        json.put("spouseBirthPlace", employeeData.getSpouseBirthPlace());
-        json.put("spouseBirthDate", employeeData.getSpouseBirthDate());
-        json.put("numberOfChildren", employeeData.getNumberOfChildren());
-        json.put("marriageCertificate", employeeData.getMarriageCertificate());
-        
-        // ========== FORMATION ==========
-        json.put("educationLevel", employeeData.getEducationLevel());
-        json.put("educationCountry", employeeData.getEducationCountry());
-        json.put("educationInstitution", employeeData.getEducationInstitution());
-        json.put("educationCity", employeeData.getEducationCity());
-        json.put("educationStartYear", employeeData.getEducationStartYear());
-        json.put("educationEndYear", employeeData.getEducationEndYear());
-        json.put("educationField", employeeData.getEducationField());
-        json.put("educationSpecialization", employeeData.getEducationSpecialization());
-        json.put("educationResult", employeeData.getEducationResult());
-        json.put("educationDocumentNumber", employeeData.getEducationDocumentNumber());
-        json.put("educationDocument", employeeData.getEducationDocument());
-        
-        // ========== PROFESSIONNEL ==========
-        json.put("employeeId", employeeData.getEmployeeId());
-        json.put("hireDate", employeeData.getHireDate());
-        json.put("contractType", employeeData.getContractType());
-        json.put("jobTitle", employeeData.getJobTitle());
-        json.put("department", employeeData.getDepartment());
-        json.put("hierarchyLevel", employeeData.getHierarchyLevel());
-        json.put("supervisor", employeeData.getSupervisor());
-        json.put("professionalCategory", employeeData.getProfessionalCategory());
-        json.put("workLocation", employeeData.getWorkLocation());
-        json.put("workStatus", employeeData.getWorkStatus());
-        
-        // ========== DOCUMENTS ==========
-        json.put("nationalIdNumber", employeeData.getNationalIdNumber());
-        json.put("nationalIdDocument", employeeData.getNationalIdDocument());
-        json.put("inssNumber", employeeData.getInssNumber());
-        json.put("taxNumber", employeeData.getTaxNumber());
-        json.put("workPermit", employeeData.getWorkPermit());
-        json.put("voterCard", employeeData.getVoterCard());
-        json.put("criminalRecord", employeeData.getCriminalRecord());
-        json.put("identityPhoto", employeeData.getIdentityPhoto());
-        json.put("diplomas", employeeData.getDiplomas());
-        
-        // ========== URGENCE ==========
-        json.put("emergencyContactName", employeeData.getEmergencyContactName());
-        json.put("emergencyContactAddress", employeeData.getEmergencyContactAddress());
-        json.put("emergencyContactPhone", employeeData.getEmergencyContactPhone());
-        
-        // ========== BANCAIRE ==========
-        json.put("bankName", employeeData.getBankName());
-        json.put("bankAccountNumber", employeeData.getBankAccountNumber());
-        json.put("paymentCurrency", employeeData.getPaymentCurrency());
-        json.put("paymentMethod", employeeData.getPaymentMethod());
-        json.put("grossSalary", employeeData.getGrossSalary());
-        json.put("netSalary", employeeData.getNetSalary());
-        json.put("benefits", employeeData.getBenefits());
-        
-        // ========== MÉDICAL ==========
-        json.put("bloodType", employeeData.getBloodType());
-        json.put("allergies", employeeData.getAllergies());
-        json.put("disabilities", employeeData.getDisabilities());
-        json.put("medicalInsurance", employeeData.getMedicalInsurance());
-        json.put("doctorName", employeeData.getDoctorName());
-        
-        // ========== ÉQUIPEMENTS ==========
-        json.put("accessBadge", employeeData.getAccessBadge());
-        json.put("officeKeys", employeeData.getOfficeKeys());
-        json.put("workEquipment", employeeData.getWorkEquipment());
-        json.put("computerAccounts", employeeData.getComputerAccounts());
-        
-        // ========== BIOMÉTRIE ==========
-        json.put("photoPath", employeeData.getPhotoPath());
-        json.put("fingerprintTemplate", employeeData.getFingerprintTemplate());
-        json.put("fingerprintFinger", employeeData.getFingerprintFinger());
-        json.put("biometricEnrollmentDate", employeeData.getBiometricEnrollmentDate());
-        json.put("biometricEnrolled", employeeData.isBiometricEnrolled());
-        
+
         return json;
     }
-    
-    /**
-     * Envoie les données vers l'API backend
-     */
-    private boolean sendToApi(JSONObject jsonData) {
+
+    private static void putIfPresent(JSONObject json, String key, String value) throws JSONException {
+        if (value != null && !value.trim().isEmpty()) {
+            json.put(key, value.trim());
+        }
+    }
+
+    private static String firstNonEmpty(String... values) {
+        for (String value : values) {
+            if (value != null && !value.trim().isEmpty()) {
+                return value.trim();
+            }
+        }
+        return null;
+    }
+
+    private String sendToApi(JSONObject jsonData) {
+        String apiUrl = configManager.getGuichetUpsertUrl();
         try {
-            Log.d(TAG, "Tentative de connexion à: " + BASE_URL);
-            URL url = new URL(BASE_URL);
+            Log.d(TAG, "POST " + apiUrl);
+            URL url = new URL(apiUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            Log.d(TAG, "Connexion établie");
-            
-            // Configuration de la requête
+
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("X-Guichet-Internal-Key", configManager.getGuichetKey());
             connection.setDoOutput(true);
-            connection.setConnectTimeout(30000); // 30 secondes
-            connection.setReadTimeout(30000); // 30 secondes
-            
-            // Envoi des données
-            String jsonString = jsonData.toString();
-            byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
-            
+            connection.setConnectTimeout(30000);
+            connection.setReadTimeout(30000);
+
+            byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
             try (OutputStream os = connection.getOutputStream()) {
                 os.write(input, 0, input.length);
             }
-            
-            // Vérification de la réponse
+
             int responseCode = connection.getResponseCode();
-            Log.d(TAG, "Code de réponse: " + responseCode);
-            
-            // Lecture de la réponse pour debug
-            String response = "";
-            try {
-                if (responseCode >= 200 && responseCode < 300) {
-                    // Succès
-                    java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(connection.getInputStream()));
-                    StringBuilder responseBuilder = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        responseBuilder.append(line);
-                    }
-                    response = responseBuilder.toString();
-                    Log.d(TAG, "Réponse succès: " + response);
-                } else {
-                    // Erreur
-                    java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(connection.getErrorStream()));
-                    StringBuilder responseBuilder = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        responseBuilder.append(line);
-                    }
-                    response = responseBuilder.toString();
-                    Log.e(TAG, "Réponse erreur: " + response);
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Erreur lecture réponse: " + e.getMessage());
-            }
-            
+            Log.d(TAG, "Code réponse: " + responseCode);
+
+            String response = readStream(
+                    responseCode >= 200 && responseCode < 300
+                            ? connection.getInputStream()
+                            : connection.getErrorStream()
+            );
+            Log.d(TAG, "Réponse: " + response);
+
             if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
-                return true;
-            } else {
-                Log.e(TAG, "Erreur HTTP: " + responseCode + " - " + response);
-                return false;
+                return response;
             }
-            
+            return null;
         } catch (IOException e) {
-            Log.e(TAG, "Erreur de connexion", e);
-            return false;
+            Log.e(TAG, "Erreur connexion", e);
+            return null;
         }
     }
-    
-    /**
-     * Interface de callback pour les réponses API
-     */
+
+    private static String readStream(java.io.InputStream stream) {
+        if (stream == null) {
+            return "";
+        }
+        try {
+            java.io.BufferedReader reader = new java.io.BufferedReader(
+                    new java.io.InputStreamReader(stream, StandardCharsets.UTF_8));
+            StringBuilder builder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
+            }
+            return builder.toString();
+        } catch (Exception e) {
+            Log.e(TAG, "Erreur lecture réponse", e);
+            return "";
+        }
+    }
+
     public interface ApiCallback {
         void onSuccess(String message);
         void onError(String error);

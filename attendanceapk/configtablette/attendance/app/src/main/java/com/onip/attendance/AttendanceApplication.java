@@ -30,9 +30,8 @@ public class AttendanceApplication extends Application {
     private boolean deviceInitialized = false;
     private boolean isLoading = false;
     
-    // Timestamps pour cache
+    // Timestamps pour cache mémoire (session en cours)
     private long lastDataLoadTime = 0;
-    private static final long CACHE_VALIDITY_MS = 5 * 60 * 1000; // 5 minutes
     
     @Override
     public void onCreate() {
@@ -84,7 +83,7 @@ public class AttendanceApplication extends Application {
     // ========== Gestion des états ==========
     
     public boolean isDataLoaded() {
-        return dataLoaded && !isDataExpired();
+        return dataLoaded;
     }
     
     public void setDataLoaded(boolean loaded) {
@@ -115,16 +114,8 @@ public class AttendanceApplication extends Application {
     
     // ========== Vérification cache ==========
     
-    private boolean isDataExpired() {
-        if (lastDataLoadTime == 0) {
-            return true;
-        }
-        long elapsed = System.currentTimeMillis() - lastDataLoadTime;
-        return elapsed > CACHE_VALIDITY_MS;
-    }
-    
     public boolean needsDataRefresh() {
-        return !dataLoaded || isDataExpired();
+        return !dataLoaded;
     }
     
     // ========== Utilitaires ==========

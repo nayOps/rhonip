@@ -1,35 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Présence</string>
-    <string name="app_subtitle">Pointage empreinte — tablette Morpho</string>
-    
-    <!-- Loading -->
-    <string name="loading_title">Initialisation...</string>
-    <string name="loading_device">Initialisation du capteur...</string>
-    <string name="loading_data">Chargement des données...</string>
-    <string name="loading_ready">Application prête !</string>
-    
-    <!-- Attendance -->
+    <string name="app_subtitle">Pointage empreinte — ONIP</string>
+
+    <!-- Chargement -->
+    <string name="loading_simple">Chargement…</string>
+    <string name="loading_sync">Mise à jour des données…</string>
+    <string name="loading_ready_short">Prêt</string>
+    <string name="loading_offline_hint">Données indisponibles.\nUtilisez Paramètres.</string>
+    <string name="loading_sync_failed">Synchronisation impossible.\nVérifiez le réseau via Paramètres.</string>
+    <string name="loading_title">Chargement…</string>
+    <string name="loading_device">Préparation du capteur…</string>
+    <string name="loading_data">Chargement des données…</string>
+    <string name="loading_ready">Prêt</string>
+
+    <!-- Pointage -->
     <string name="attendance_title">Pointage présence</string>
     <string name="attendance_enter_matricule">Saisissez votre matricule</string>
     <string name="attendance_matricule_hint">Matricule</string>
     <string name="attendance_continue">Continuer</string>
-    <string name="attendance_matricule_empty">Veuillez saisir votre matricule</string>
-    <string name="attendance_matricule_not_found">Matricule introuvable</string>
-    <string name="attendance_no_fingerprint">Aucune empreinte enregistrée pour cet employé</string>
+    <string name="attendance_matricule_empty">Saisissez votre matricule</string>
+    <string name="attendance_matricule_not_found">Matricule inconnu</string>
+    <string name="attendance_no_fingerprint">Empreinte non enregistrée</string>
     <string name="attendance_place_finger">Placez votre doigt sur le capteur</string>
-    <string name="attendance_capturing">Capture en cours...</string>
-    <string name="attendance_matching">Recherche de correspondance...</string>
-    <string name="attendance_success">Empreinte reconnue</string>
+    <string name="attendance_capturing">Lecture en cours…</string>
+    <string name="attendance_matching">Vérification…</string>
+    <string name="attendance_success">Présence enregistrée</string>
     <string name="attendance_failed">Empreinte non reconnue</string>
-    
-    <!-- Common -->
+    <string name="attendance_sensor_unavailable">Capteur indisponible</string>
+    <string name="attendance_data_unavailable">Données indisponibles. Ouvrez Paramètres.</string>
+    <string name="attendance_recording">Enregistrement…</string>
+    <string name="attendance_cancelled">Annulé</string>
+    <string name="attendance_sensor_blocked">Capteur occupé. Réessayez.</string>
+    <string name="attendance_offline_saved">Enregistré. Synchronisation plus tard.</string>
+    <string name="attendance_error_generic">Échec. Réessayez.</string>
+
+    <!-- Admin -->
+    <string name="btn_settings">Paramètres</string>
+    <string name="btn_reload_data">Recharger</string>
+    <string name="admin_auth_title">Accès administrateur</string>
+    <string name="admin_auth_hint">Matricule administrateur</string>
+    <string name="admin_auth_confirm">Valider</string>
+    <string name="admin_auth_denied">Accès refusé</string>
+    <string name="admin_settings_title">Paramètres</string>
+    <string name="admin_settings_subtitle">Configuration tablette</string>
+    <string name="admin_server_section">Serveur RH</string>
+    <string name="admin_ip_hint">Adresse IP</string>
+    <string name="admin_port_hint">Port</string>
+    <string name="admin_save">Enregistrer</string>
+    <string name="admin_saved">Configuration enregistrée</string>
+    <string name="admin_fields_required">Renseignez l\'IP et le port</string>
+    <string name="admin_connection_hint">Enregistrer pour tester la connexion</string>
+    <string name="admin_testing_connection">Test de connexion…</string>
+    <string name="admin_connection_ok">Serveur OK — %1$d agent(s) avec empreinte / %2$d matricules</string>
+    <string name="admin_connection_failed">Serveur inaccessible. Vérifiez l\'IP et le port.</string>
+    <string name="reload_started">Rechargement en cours…</string>
+    <string name="reload_failed">Rechargement impossible. Vérifiez le serveur.</string>
+
+    <!-- Commun -->
     <string name="back">Retour</string>
     <string name="capture">Capturer</string>
     <string name="cancel">Annuler</string>
-    <string name="btn_refresh_app">Actualisation</string>
-    <string name="btn_reset_capture">Réinitialisation</string>
-    <string name="refresh_app_toast">Actualisation de l\'application...</string>
-    <string name="reset_capture_done">Capture réinitialisée — placez votre doigt</string>
+    <string name="btn_refresh_app">Recharger</string>
+    <string name="btn_reset_capture">Réinitialiser</string>
+    <string name="refresh_app_toast">Rechargement…</string>
+    <string name="reset_capture_done">Prêt pour une nouvelle capture</string>
     <string name="home_subtitle">Pointage empreinte — ONIP</string>
 </resources>

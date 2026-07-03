@@ -80,6 +80,7 @@ public class FingerprintEnrollActivity extends Activity {
         btnCapture.setOnClickListener(v -> onCaptureClicked());
         btnReinit.setOnClickListener(v -> initializeSensor(true));
         btnBack.setOnClickListener(v -> finish());
+        com.onip.enroll.utils.SettingsLauncher.wire(this, R.id.btn_settings_enroll);
 
         refreshUi();
         initializeSensor(false);

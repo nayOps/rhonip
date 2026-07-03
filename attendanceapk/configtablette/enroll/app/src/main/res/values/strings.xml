@@ -1,23 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Enrôlement</string>
-    <string name="app_subtitle">Enrôlement empreintes — tablette Morpho</string>
-    
-    <!-- Loading -->
+    <string name="app_subtitle">Enrôlement empreintes — ONIP</string>
+
+    <!-- Chargement -->
+    <string name="loading_simple">Chargement…</string>
+    <string name="loading_sync">Mise à jour des données…</string>
+    <string name="loading_ready_short">Prêt</string>
+    <string name="loading_sync_failed">Synchronisation impossible.\nVérifiez le réseau via Paramètres.</string>
     <string name="loading_title">Initialisation...</string>
     <string name="loading_device">Initialisation du capteur...</string>
     <string name="loading_data">Chargement des données...</string>
     <string name="loading_ready">Application prête !</string>
-    
-    <!-- Attendance -->
-    <string name="attendance_title">Pointage présence</string>
-    <string name="attendance_place_finger">Placez votre doigt sur le capteur</string>
-    <string name="attendance_capturing">Capture en cours...</string>
-    <string name="attendance_matching">Recherche de correspondance...</string>
-    <string name="attendance_success">Empreinte reconnue</string>
-    <string name="attendance_failed">Empreinte non reconnue</string>
-    
-    <!-- Common -->
+
+    <!-- Admin -->
+    <string name="btn_settings">Paramètres</string>
+    <string name="btn_reload_data">Recharger</string>
+    <string name="admin_auth_title">Accès administrateur</string>
+    <string name="admin_auth_hint">Matricule administrateur</string>
+    <string name="admin_auth_confirm">Valider</string>
+    <string name="admin_auth_denied">Accès refusé</string>
+    <string name="admin_settings_title">Paramètres</string>
+    <string name="admin_settings_subtitle">Configuration tablette</string>
+    <string name="admin_server_section">Serveur RH</string>
+    <string name="admin_ip_hint">Adresse IP</string>
+    <string name="admin_port_hint">Port</string>
+    <string name="admin_save">Enregistrer</string>
+    <string name="admin_saved">Configuration enregistrée</string>
+    <string name="admin_fields_required">Renseignez l\'IP et le port</string>
+    <string name="admin_connection_hint">Enregistrer pour tester la connexion</string>
+    <string name="admin_testing_connection">Test de connexion…</string>
+    <string name="admin_connection_ok">Serveur OK — %1$d agent(s) avec empreinte / %2$d matricules</string>
+    <string name="admin_connection_failed">Serveur inaccessible. Vérifiez l\'IP et le port.</string>
+    <string name="reload_started">Rechargement en cours…</string>
+    <string name="reload_failed">Rechargement impossible. Vérifiez le serveur.</string>
+
+    <!-- Commun -->
     <string name="back">Retour</string>
     <string name="capture">Capturer</string>
     <string name="cancel">Annuler</string>

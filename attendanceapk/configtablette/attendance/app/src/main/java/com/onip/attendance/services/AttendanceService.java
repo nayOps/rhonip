@@ -22,6 +22,12 @@ import java.util.Locale;
 public class AttendanceService {
     private static final String TAG = "AttendanceService";
 
+    static class PunchRejectedException extends Exception {
+        PunchRejectedException(String message) {
+            super(message);
+        }
+    }
+
     private final Context context;
     private final ConfigManager configManager;
     private final OfflinePunchQueue offlineQueue;
@@ -77,6 +83,10 @@ public class AttendanceService {
                 PunchResult result = postPunch(employeeId, currentDate, currentTime);
                 isSuccess = true;
                 return result;
+            } catch (PunchRejectedException e) {
+                errorMessage = e.getMessage();
+                isSuccess = false;
+                return null;
             } catch (Exception e) {
                 Log.w(TAG, "Pointage offline: " + e.getMessage());
                 offlineQueue.enqueue(employeeId, currentDate, currentTime);
@@ -152,11 +162,22 @@ public class AttendanceService {
         reader.close();
         connection.disconnect();
 
-        if (responseCode < 200 || responseCode >= 300) {
-            throw new Exception("HTTP " + responseCode + ": " + response);
+        String body = response.toString();
+        if (responseCode == 400) {
+            String message = body;
+            try {
+                JSONObject jsonObject = new JSONObject(body);
+                message = jsonObject.optString("message", body);
+            } catch (Exception ignored) {
+            }
+            throw new PunchRejectedException(message);
         }
 
-        JSONObject jsonObject = new JSONObject(response.toString());
+        if (responseCode < 200 || responseCode >= 300) {
+            throw new Exception("HTTP " + responseCode + ": " + body);
+        }
+
+        JSONObject jsonObject = new JSONObject(body);
         if (!"success".equals(jsonObject.optString("status"))) {
             throw new Exception(jsonObject.optString("message", response.toString()));
         }
