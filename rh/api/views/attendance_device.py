@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from employee.models import Attendance, Employee
 from employee.utils.roster import apply_roster_filter
 from employee.services.attendance_punch import (
+    PunchRejectedError,
     build_day_evaluation,
     import_attendance_payload,
     serialize_attendance_record,
@@ -68,6 +69,8 @@ class AttendanceDeviceAPI(APIView):
 
         try:
             result = import_attendance_payload(payload, source='fingerprint')
+        except PunchRejectedError as exc:
+            return Response({'status': 'error', 'message': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
         except ValueError as exc:
             return Response({'status': 'error', 'message': str(exc)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as exc:

@@ -4,7 +4,22 @@ from django.utils.dateparse import parse_datetime
 
 from employee.models import Attendance, Employee
 from employee.utils.attendance_schedule_config import get_total_slots
-from employee.utils.attendance_slots import _coerce_time, evaluate_day_slots
+from employee.utils.attendance_slots import (
+    PunchRejectedError,
+    _coerce_time,
+    evaluate_day_slots,
+    validate_punch_allowed,
+)
+
+__all__ = [
+    'PunchRejectedError',
+    'build_day_evaluation',
+    'import_attendance_payload',
+    'record_punch',
+    'resolve_employee_from_payload',
+    'serialize_attendance_record',
+    'serialize_employee_for_tablet',
+]
 
 
 def _parse_punch_datetime(payload):
@@ -105,6 +120,14 @@ def import_attendance_payload(payload, source='fingerprint'):
         raise ValueError('Employé introuvable pour ce pointage.')
 
     punched_at = _parse_punch_datetime(payload)
+    punch_date = punched_at.date()
+    punch_time = punched_at.time().replace(microsecond=0)
+    existing = _day_punch_times(employee, punch_date)
+
+    rejection = validate_punch_allowed(punch_date, punch_time, existing)
+    if rejection:
+        raise PunchRejectedError(rejection)
+
     attendance, created = record_punch(employee, punched_at, source=source)
     day_evaluation = build_day_evaluation(employee, punched_at.date())
 

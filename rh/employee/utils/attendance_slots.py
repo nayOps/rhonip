@@ -112,20 +112,106 @@ def _is_two_slot_mode():
     return get_total_slots() == 2 and not has_lunch_slots()
 
 
+class PunchRejectedError(ValueError):
+    """Pointage refusé (plage horaire ou règle métier)."""
+
+
+def get_two_slot_blocked_interval():
+    """Zone interdite entre fin plage entrée et début plage sortie (ex. 10h01–14h59)."""
+    if not _is_two_slot_mode():
+        return None
+    slots = get_presence_slots()
+    if len(slots) != 2:
+        return None
+    entry_slot, exit_slot = slots[0], slots[1]
+    return entry_slot['accept_until'], exit_slot['accept_from']
+
+
+def validate_punch_allowed(punch_date, punch_time, existing_punch_times):
+    """
+    Règles mode 2 plages :
+    - Entrée : première pointe dans la plage matin (ex. 08h–10h).
+    - Zone bloquée : après fin entrée jusqu'à début sortie (ex. 10h01–14h59) → refus.
+    - Sortie : uniquement à partir de la plage après-midi (ex. 15h+), si entrée déjà faite.
+    - Une seconde pointe le matin ne compte pas.
+    """
+    if not _is_two_slot_mode():
+        return None
+
+    slots = get_presence_slots()
+    if len(slots) != 2:
+        return None
+
+    entry_slot, exit_slot = slots[0], slots[1]
+    punch_time = _coerce_time(punch_time)
+    blocked = get_two_slot_blocked_interval()
+
+    if blocked:
+        blocked_after, blocked_before = blocked
+        if punch_time > blocked_after and punch_time < blocked_before:
+            return _(
+                'Pointage refusé : aucun pointage entre %(start)s et %(end)s.'
+            ) % {
+                'start': blocked_after.strftime('%H:%M'),
+                'end': blocked_before.strftime('%H:%M'),
+            }
+
+    assigned = assign_punches_to_slots(existing_punch_times or [])
+    entry_code = entry_slot['code']
+    exit_code = exit_slot['code']
+    has_entry = assigned.get(entry_code) is not None
+    has_exit = assigned.get(exit_code) is not None
+
+    if has_entry and has_exit:
+        return _('Pointage refusé : entrée et sortie déjà enregistrées aujourd\'hui.')
+
+    if not has_entry:
+        if punch_fits_slot(punch_time, entry_slot):
+            return None
+        if punch_time >= exit_slot['accept_from']:
+            return _('Pointage refusé : enregistrez d\'abord l\'entrée le matin.')
+        if punch_time < entry_slot['accept_from']:
+            return _(
+                'Pointage refusé : entrée à partir de %(time)s.'
+            ) % {'time': entry_slot['accept_from'].strftime('%H:%M')}
+        return _(
+            'Pointage refusé : entrée uniquement jusqu\'à %(time)s.'
+        ) % {'time': entry_slot['accept_until'].strftime('%H:%M')}
+
+    # Entrée déjà enregistrée — seule la sortie (plage après-midi) est acceptée
+    if punch_fits_slot(punch_time, entry_slot):
+        return _('Pointage refusé : entrée déjà enregistrée ce matin.')
+
+    if punch_time < exit_slot['accept_from']:
+        return _(
+            'Pointage refusé : sortie à partir de %(time)s.'
+        ) % {'time': exit_slot['accept_from'].strftime('%H:%M')}
+
+    return None
+
+
 def punch_fits_slot(punch_time, slot):
     """Vérifie si un pointage peut être affecté à cette plage (sans cascade)."""
     return slot['accept_from'] <= punch_time <= slot['accept_until']
 
 
 def _assign_two_slot_punches(punches, presence_slots):
-    entry_code = presence_slots[0]['code']
-    exit_code = presence_slots[1]['code']
+    entry_slot = presence_slots[0]
+    exit_slot = presence_slots[1]
+    entry_code = entry_slot['code']
+    exit_code = exit_slot['code']
     assigned = {entry_code: None, exit_code: None}
-    if not punches:
-        return assigned
-    assigned[entry_code] = punches[0]
-    if len(punches) >= 2:
-        assigned[exit_code] = punches[-1]
+    ordered = sorted(_coerce_time(t) for t in (punches or []) if t is not None)
+
+    for punch_time in ordered:
+        if assigned[entry_code] is None and punch_fits_slot(punch_time, entry_slot):
+            assigned[entry_code] = punch_time
+
+    for punch_time in reversed(ordered):
+        if punch_fits_slot(punch_time, exit_slot):
+            assigned[exit_code] = punch_time
+            break
+
     return assigned
 
 
