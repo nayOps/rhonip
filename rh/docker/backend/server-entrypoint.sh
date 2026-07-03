@@ -36,4 +36,18 @@ fi
 
 echo "==> static OK: $(find /app/backend/staticfiles -type f 2>/dev/null | wc -l) fichiers"
 
-exec gunicorn payday.wsgi --bind 0.0.0.0:8000 --workers 2 --timeout 120 --graceful-timeout 30
+WORKERS="${GUNICORN_WORKERS:-4}"
+THREADS="${GUNICORN_THREADS:-2}"
+TIMEOUT="${GUNICORN_TIMEOUT:-90}"
+WORKER_CLASS="${GUNICORN_WORKER_CLASS:-gthread}"
+
+echo "==> gunicorn workers=${WORKERS} class=${WORKER_CLASS} threads=${THREADS} timeout=${TIMEOUT}"
+
+exec gunicorn payday.wsgi --bind 0.0.0.0:8000 \
+  --workers "$WORKERS" \
+  --worker-class "$WORKER_CLASS" \
+  --threads "$THREADS" \
+  --timeout "$TIMEOUT" \
+  --graceful-timeout 30 \
+  --max-requests 1000 \
+  --max-requests-jitter 100

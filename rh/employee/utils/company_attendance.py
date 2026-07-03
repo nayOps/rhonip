@@ -50,6 +50,8 @@ def _morning_punch_on_day(attendance_by_date, day):
 
 
 def _has_marked_presence_on_day(attendance_by_date, day):
+    if attendance_by_date.get(day):
+        return True
     return _day_detail(attendance_by_date, day).get('validated_slots', 0) > 0
 
 
@@ -136,7 +138,7 @@ def _company_employees_queryset(request):
     return _filter_employees_by_search(queryset, request.GET.get('q'))
 
 
-def _paginate_rows(rows, request, page_size=25):
+def _paginate_rows(rows, request, page_size=10):
     try:
         page = max(1, int(request.GET.get('page', 1)))
     except (TypeError, ValueError):

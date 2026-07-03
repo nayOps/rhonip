@@ -20,6 +20,11 @@ x-rh-prod-env: &rh-prod-env
   SENTRY_DSN: ${SENTRY_DSN:-}
   SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
   SENTRY_PROFILES_SAMPLE_RATE: ${SENTRY_PROFILES_SAMPLE_RATE:-0}
+  GUNICORN_WORKERS: ${GUNICORN_WORKERS:-4}
+  GUNICORN_THREADS: ${GUNICORN_THREADS:-2}
+  GUNICORN_TIMEOUT: ${GUNICORN_TIMEOUT:-90}
+  GUNICORN_WORKER_CLASS: ${GUNICORN_WORKER_CLASS:-gthread}
+  WHITENOISE_USE_FINDERS: "0"
 
 services:
   onip_postgres:
@@ -38,6 +43,8 @@ services:
       - ./rh/static:/app/backend/static:ro
       - ./rh/template:/app/backend/template:ro
       - ./rh/payday:/app/backend/payday:ro
+      - ./rh/employee:/app/backend/employee:ro
+      - ./rh/core:/app/backend/core:ro
       - ./agents:/app/agents:ro
       - ./datas:/app/datas:ro
 

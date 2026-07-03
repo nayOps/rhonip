@@ -59,10 +59,20 @@
                                         <div class="col-md-3">
                                             <label class="form-label">{% trans 'Accepté dès' %}</label>
                                             <input type="time" name="slot_{{ forloop.counter0 }}_accept_from" class="form-control" value="{{ slot.accept_from }}">
+                                            {% if preset == '2_slots' and slot.code == 'MORNING_IN' %}
+                                            <div class="form-text">{% trans 'Début de la plage entrée (ex. 08h00). Arrivée avant = à l\'heure.' %}</div>
+                                            {% elif preset == '2_slots' and slot.code == 'EVENING_OUT' %}
+                                            <div class="form-text">{% trans 'Début de la plage sortie (ex. 15h00). Avant = sortie en avance.' %}</div>
+                                            {% endif %}
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">{% trans 'Accepté jusqu\'à' %}</label>
                                             <input type="time" name="slot_{{ forloop.counter0 }}_accept_until" class="form-control" value="{{ slot.accept_until }}">
+                                            {% if preset == '2_slots' and slot.code == 'MORNING_IN' %}
+                                            <div class="form-text">{% trans 'Fin plage entrée (ex. 10h00). Après = entrée ratée.' %}</div>
+                                            {% elif preset == '2_slots' and slot.code == 'EVENING_OUT' %}
+                                            <div class="form-text">{% trans 'Fin plage sortie (ex. 16h30). Après = hors plage (accepté).' %}</div>
+                                            {% endif %}
                                         </div>
                                         <div class="col-md-3{% if preset == '2_slots' and slot.code == 'EVENING_OUT' %} d-none{% endif %}">
                                             <label class="form-label">{% trans 'Référence retard' %}</label>
@@ -108,6 +118,21 @@
             </div>
 
             <div class="col-lg-4">
+                <div class="card mb-3" id="rules-2-slots"{% if preset != '2_slots' %} hidden{% endif %}>
+                    <div class="card-body p-4">
+                        <h6>{% trans 'Règles — 2 plages' %}</h6>
+                        <ul class="text-muted small mb-0">
+                            <li>{% trans 'Entrée : plage configurée ci-contre (ex. 08h00–10h00).' %}</li>
+                            <li>{% trans 'Avant l\'heure de référence (08h00) : à l\'heure.' %}</li>
+                            <li>{% trans 'Dans la plage après 08h00 : retard.' %}</li>
+                            <li>{% trans 'Après la fin de plage (ex. 10h01) : entrée ratée + retard.' %}</li>
+                            <li>{% trans 'Sortie : plage configurée (ex. 15h00–16h30).' %}</li>
+                            <li>{% trans 'Avant 15h00 : sortie en avance / sortie manquée dans la plage.' %}</li>
+                            <li>{% trans 'Après 16h30 : pointage accepté, mention « hors plage ».' %}</li>
+                            <li>{% trans 'Aucun pointage de sortie : sortie manquée.' %}</li>
+                        </ul>
+                    </div>
+                </div>
                 <div class="card">
                     <div class="card-body p-4">
                         <h6>{% trans 'À propos' %}</h6>
@@ -140,10 +165,14 @@
     });
 
     function toggleLunchFields() {
-        const show = presetSelect.value === '4_slots';
+        const isFour = presetSelect.value === '4_slots';
         document.querySelectorAll('.lunch-fields').forEach(function (el) {
-            el.style.display = show ? '' : 'none';
+            el.style.display = isFour ? '' : 'none';
         });
+        const rules2 = document.getElementById('rules-2-slots');
+        if (rules2) {
+            rules2.hidden = presetSelect.value !== '2_slots';
+        }
     }
     toggleLunchFields();
 })();

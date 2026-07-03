@@ -177,6 +177,11 @@
     </table>
 
     <div class="summary">
+        {% if has_date_filter %}
+        <p style="color:#64748b;font-size:7.5pt;margin:0 0 8px 0;">
+            {% trans 'Période enregistrement' %} : {{ date_range_label }}
+        </p>
+        {% endif %}
         <table class="summary-table">
             <tr>
                 <td>
@@ -207,8 +212,9 @@
                 <th style="width:16%;">{% trans 'Agent' %}</th>
                 <th style="width:14%;">{% trans 'Direction' %}</th>
                 <th style="width:8%;">{% trans 'Statut' %}</th>
-                <th style="width:7%;">{% trans 'Score' %}</th>
-                <th style="width:42%;">{% trans 'Empreintes (10 doigts)' %}</th>
+                <th style="width:8%;">{% trans 'Dernier enreg.' %}</th>
+                <th style="width:6%;">{% trans 'Score' %}</th>
+                <th style="width:36%;">{% trans 'Empreintes (10 doigts)' %}</th>
             </tr>
         </thead>
         <tbody>
@@ -233,6 +239,7 @@
                     <span class="status-none">{% trans 'Non enrôlé' %}</span>
                     {% endif %}
                 </td>
+                <td>{{ row.last_enrolled_label }}</td>
                 <td>{{ row.enrolled_count }}/{{ row.total_fingers }}</td>
                 <td>
                     <table class="finger-grid">
@@ -255,7 +262,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7">{% trans 'Aucun agent.' %}</td>
+                <td colspan="8">{% trans 'Aucun agent.' %}</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -21,8 +21,8 @@
                         <p class="text-muted mb-0">{{ report.title }}</p>
                     </div>
                     <div class="d-flex gap-2">
-                        <a href="{% url 'employee:biometric_enrollment_report' %}?filter={{ report.filter_status }}" class="btn btn-light">{% trans 'Retour' %}</a>
-                        <a href="{% url 'employee:biometric_enrollment_report_export' %}?filter={{ report.filter_status }}" class="btn btn-outline-primary">{% trans 'Exporter PDF' %}</a>
+                        <a href="{% url 'employee:biometric_enrollment_report' %}?{{ report.query_string }}" class="btn btn-light">{% trans 'Retour' %}</a>
+                        <a href="{% url 'employee:biometric_enrollment_report_export' %}?{{ report.query_string }}" class="btn btn-outline-primary">{% trans 'Exporter PDF' %}</a>
                     </div>
                 </div>
             </div>
@@ -38,6 +38,10 @@
                         <form method="post">
                             {% csrf_token %}
                             <input type="hidden" name="filter" value="{{ report.filter_status }}">
+                            <input type="hidden" name="situation" value="{{ report.situation_filter }}">
+                            <input type="hidden" name="q" value="{{ report.search_query }}">
+                            <input type="hidden" name="date_from" value="{{ report.date_from_value }}">
+                            <input type="hidden" name="date_to" value="{{ report.date_to_value }}">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">{% trans 'Rapport' %}</label>

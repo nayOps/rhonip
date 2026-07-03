@@ -1,15 +1,18 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views import View
 
+from employee.models import Employee
 from employee.utils.biometric_enrollment_report import (
-    FILTER_CHOICES,
     build_biometric_enrollment_report,
+    build_report_query_string,
+    paginate_report_rows,
+    parse_report_filters,
     render_biometric_enrollment_pdf,
 )
 from employee.utils.reports_registry import REPORT_CATALOG
@@ -19,6 +22,42 @@ class StaffReportsMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
         user = self.request.user
         return user.is_staff or user.is_superuser
+
+
+def _report_params(request):
+    if request.method == 'POST':
+        source = request.POST
+    else:
+        source = request.GET
+    return parse_report_filters(
+        filter_status=source.get('filter'),
+        situation_filter=source.get('situation'),
+        search_query=source.get('q'),
+        date_from=source.get('date_from'),
+        date_to=source.get('date_to'),
+    )
+
+
+def _report_build_kwargs(params):
+    return {
+        'filter_status': params['filter_status'],
+        'situation_filter': params['situation_filter'],
+        'search_query': params['search_query'],
+        'date_from': params['date_from_value'],
+        'date_to': params['date_to_value'],
+    }
+
+
+def _redirect_to_report(params, page=None):
+    query = build_report_query_string(
+        params['filter_status'],
+        params['situation_filter'],
+        params['search_query'],
+        date_from=params.get('date_from'),
+        date_to=params.get('date_to'),
+        page=page,
+    )
+    return redirect(f"{reverse('employee:biometric_enrollment_report')}?{query}")
 
 
 class ReportsHub(StaffReportsMixin, View):
@@ -42,21 +81,53 @@ class BiometricEnrollmentReport(StaffReportsMixin, View):
     template_name = 'employee/biometric_enrollment_report.html'
 
     def get(self, request):
-        filter_status = request.GET.get('filter', 'all')
-        valid_filters = {code for code, _ in FILTER_CHOICES}
-        if filter_status not in valid_filters:
-            filter_status = 'all'
-        report = build_biometric_enrollment_report(filter_status=filter_status)
-        return render(request, self.template_name, {'report': report})
+        params = _report_params(request)
+        report = build_biometric_enrollment_report(**_report_build_kwargs(params))
+        pagination = paginate_report_rows(report['rows'], request)
+        report['rows'] = pagination['items']
+        return render(
+            request,
+            self.template_name,
+            {'report': report, 'pagination': pagination},
+        )
+
+    def post(self, request):
+        params = _report_params(request)
+        employee_id = request.POST.get('employee_id')
+        action = (request.POST.get('action') or '').strip().lower()
+
+        if not employee_id or action not in {'accept', 'reject'}:
+            messages.error(request, _('Action invalide.'))
+            return _redirect_to_report(params)
+
+        employee = get_object_or_404(Employee, pk=employee_id)
+        if action == 'accept':
+            employee.agent_situation = 'active'
+            label = _('actif')
+        else:
+            employee.agent_situation = 'inactive'
+            label = _('inactif')
+        employee.save(update_fields=['agent_situation'])
+
+        messages.success(
+            request,
+            _('%(name)s est maintenant %(status)s.') % {
+                'name': employee.full_name(),
+                'status': label,
+            },
+        )
+        page = request.POST.get('page')
+        try:
+            page = max(1, int(page)) if page else None
+        except (TypeError, ValueError):
+            page = None
+        return _redirect_to_report(params, page=page)
 
 
 class BiometricEnrollmentReportExport(StaffReportsMixin, View):
     def get(self, request):
-        filter_status = request.GET.get('filter', 'all')
-        valid_filters = {code for code, _ in FILTER_CHOICES}
-        if filter_status not in valid_filters:
-            filter_status = 'all'
-        report = build_biometric_enrollment_report(filter_status=filter_status)
+        params = _report_params(request)
+        report = build_biometric_enrollment_report(**_report_build_kwargs(params))
         pdf_bytes = render_biometric_enrollment_pdf(report)
         filename = f'enregistrement-biometrique-{timezone.localtime():%Y%m%d-%H%M%S}.pdf'
         response = HttpResponse(pdf_bytes, content_type='application/pdf')
@@ -89,8 +160,8 @@ class BiometricEnrollmentReportSchedule(StaffReportsMixin, View):
         )
 
     def get(self, request):
-        filter_status = request.GET.get('filter', 'all')
-        report = build_biometric_enrollment_report(filter_status=filter_status)
+        params = _report_params(request)
+        report = build_biometric_enrollment_report(**_report_build_kwargs(params))
         return self._render(
             request,
             report,
@@ -100,20 +171,28 @@ class BiometricEnrollmentReportSchedule(StaffReportsMixin, View):
                 'send_day': '1',
                 'recipient': request.user.email or '',
                 'active': True,
-                'filter': filter_status,
+                'filter': params['filter_status'],
+                'situation': params['situation_filter'],
+                'q': params['search_query'],
+                'date_from': params['date_from_value'],
+                'date_to': params['date_to_value'],
             },
         )
 
     def post(self, request):
-        filter_status = request.POST.get('filter', 'all')
-        report = build_biometric_enrollment_report(filter_status=filter_status)
+        params = _report_params(request)
+        report = build_biometric_enrollment_report(**_report_build_kwargs(params))
         form_data = {
             'frequency': request.POST.get('frequency', 'monthly'),
             'format': request.POST.get('format', 'pdf'),
             'send_day': request.POST.get('send_day', '1'),
             'recipient': request.POST.get('recipient', '').strip(),
             'active': request.POST.get('active') == 'on',
-            'filter': filter_status,
+            'filter': params['filter_status'],
+            'situation': params['situation_filter'],
+            'q': params['search_query'],
+            'date_from': params['date_from_value'],
+            'date_to': params['date_to_value'],
         }
 
         if form_data['active'] and not form_data['recipient']:
@@ -124,6 +203,4 @@ class BiometricEnrollmentReportSchedule(StaffReportsMixin, View):
             request,
             _('Programmation du rapport « Enregistrement biométrique » enregistrée.'),
         )
-        return redirect(
-            reverse('employee:biometric_enrollment_report') + f'?filter={filter_status}'
-        )
+        return _redirect_to_report(params)

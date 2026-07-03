@@ -5,125 +5,365 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'assets/css/company-attendance.css' %}">
+<link rel="stylesheet" href="{% static 'assets/css/biometric-enrollment-report.css' %}">
 
-<div class="company-attendance-page">
-    <div class="page-heading no-print">
-        <div class="card">
-            <div class="card-body">
-                <ol class="breadcrumb mb-2">
-                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'employee:reports_hub' %}">{% trans 'Rapports' %}</a></li>
-                    <li class="breadcrumb-item active">{% trans 'Enregistrement biométrique' %}</li>
-                </ol>
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <div>
-                        <h3 class="page-title m-0">{{ report.title }}</h3>
-                        <p class="text-muted mb-0">{% trans 'Généré le' %} {{ report.generated_at_label }}</p>
-                    </div>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <a href="{% url 'employee:reports_hub' %}" class="btn btn-light">{% trans 'Retour' %}</a>
-                        <a href="{% url 'employee:biometric_enrollment_report_schedule' %}?filter={{ report.filter_status }}" class="btn btn-outline-primary">
-                            <i class="bi bi-calendar-check"></i> {% trans 'Programmer' %}
-                        </a>
-                        <a href="{% url 'employee:biometric_enrollment_report_export' %}?filter={{ report.filter_status }}" class="btn btn-primary">
-                            <i class="bi bi-file-earmark-pdf"></i> {% trans 'Exporter PDF' %}
-                        </a>
-                    </div>
+<div class="company-attendance-page bio-report-page">
+    <nav class="bio-breadcrumb no-print" aria-label="{% trans 'Fil d\'Ariane' %}">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'employee:reports_hub' %}">{% trans 'Rapports' %}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{% trans 'Enregistrement biométrique' %}</li>
+        </ol>
+    </nav>
+
+    <header class="ca-page-header">
+        <div class="ca-page-title">
+            <h1>{{ report.title }}</h1>
+            <span class="ca-page-divider" aria-hidden="true"></span>
+            <span class="ca-page-date">{% trans 'Généré le' %} {{ report.generated_at_label }}</span>
+        </div>
+        <div class="bio-page-actions no-print">
+            <a href="{% url 'employee:reports_hub' %}" class="btn btn-light">
+                <i class="bi bi-arrow-left"></i> {% trans 'Retour' %}
+            </a>
+            <a href="{% url 'employee:biometric_enrollment_report_schedule' %}?{{ report.query_string }}" class="btn btn-outline-primary">
+                <i class="bi bi-calendar-check"></i> {% trans 'Programmer' %}
+            </a>
+            <a href="{% url 'employee:biometric_enrollment_report_export' %}?{{ report.query_string }}" class="btn btn-primary">
+                <i class="bi bi-file-earmark-pdf"></i> {% trans 'Exporter PDF' %}
+            </a>
+        </div>
+    </header>
+
+    <form method="get" class="ca-filters-panel no-print" id="bio-filters-form">
+        <input type="hidden" name="page" value="1" id="bio-page-reset">
+        <div class="ca-filters-panel__top">
+            <div class="ca-filters-panel__title">
+                <i class="bi bi-sliders2" aria-hidden="true"></i>
+                <span>{% trans 'Filtres & recherche' %}</span>
+            </div>
+            <div class="ca-filter-chips" aria-label="{% trans 'Filtres actifs' %}">
+                {% for code, label in report.filter_choices %}
+                    {% if report.filter_status == code and code != 'all' %}
+                    <span class="ca-filter-chip ca-filter-chip--period"><i class="bi bi-fingerprint"></i> {{ label }}</span>
+                    {% endif %}
+                {% endfor %}
+                {% for code, label in report.situation_filter_choices %}
+                    {% if report.situation_filter == code and code != 'all' %}
+                    <span class="ca-filter-chip"><i class="bi bi-person-badge"></i> {{ label }}</span>
+                    {% endif %}
+                {% endfor %}
+                {% if report.search_query %}
+                <span class="ca-filter-chip ca-filter-chip--search"><i class="bi bi-search"></i> « {{ report.search_query }} »</span>
+                {% endif %}
+                {% if report.has_date_filter %}
+                <span class="ca-filter-chip ca-filter-chip--period"><i class="bi bi-calendar-range"></i> {{ report.date_range_label }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="bio-filters-grid bio-filters-grid--dates">
+            <div class="ca-filter-block bio-filter-block--enroll">
+                <span class="ca-filter-label">{% trans 'Enregistrement du' %}</span>
+                <input
+                    type="date"
+                    name="date_from"
+                    id="bio-date-from"
+                    class="form-control bio-date-input"
+                    value="{{ report.date_from_value }}"
+                >
+            </div>
+
+            <div class="ca-filter-block bio-filter-block--enroll">
+                <span class="ca-filter-label">{% trans 'Au' %}</span>
+                <input
+                    type="date"
+                    name="date_to"
+                    id="bio-date-to"
+                    class="form-control bio-date-input"
+                    value="{{ report.date_to_value }}"
+                >
+            </div>
+
+            <div class="ca-filter-block bio-filter-block--enroll-actions">
+                <span class="ca-filter-label ca-filter-label--invisible">{% trans 'Dates' %}</span>
+                {% if report.has_date_filter %}
+                <a href="?{{ report.clear_dates_query }}" class="btn btn-light bio-clear-dates-btn w-100">
+                    <i class="bi bi-x-circle"></i> {% trans 'Effacer dates' %}
+                </a>
+                {% else %}
+                <span class="bio-date-hint">{% trans 'Au moins une empreinte capturée sur la période' %}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="bio-filters-grid bio-filters-grid--main">
+            <div class="ca-filter-block">
+                <span class="ca-filter-label">{% trans 'Enrôlement' %}</span>
+                <div class="bio-enroll-tabs" role="group" aria-label="{% trans 'Filtre enrôlement' %}">
+                    {% for tab in report.filter_tabs %}
+                    <a class="bio-enroll-tab{% if report.filter_status == tab.code %} active{% endif %}"
+                       href="?{{ tab.query }}">
+                        {% if tab.code == 'complete' %}<i class="bi bi-check-circle"></i>
+                        {% elif tab.code == 'partial' %}<i class="bi bi-exclamation-circle"></i>
+                        {% elif tab.code == 'none' %}<i class="bi bi-x-circle"></i>
+                        {% else %}<i class="bi bi-people"></i>{% endif %}
+                        {{ tab.label }}
+                    </a>
+                    {% endfor %}
                 </div>
             </div>
+
+            <div class="ca-filter-block">
+                <span class="ca-filter-label">{% trans 'Situation agent' %}</span>
+                <label class="bio-situation-select">
+                    <i class="bi bi-person-badge" aria-hidden="true"></i>
+                    <select name="situation" onchange="this.form.submit()">
+                        {% for code, label in report.situation_filter_choices %}
+                        <option value="{{ code }}"{% if report.situation_filter == code %} selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <i class="bi bi-chevron-down ca-select-caret" aria-hidden="true"></i>
+                </label>
+                <input type="hidden" name="filter" value="{{ report.filter_status }}">
+            </div>
+
+            <div class="ca-filter-block bio-filter-block--search">
+                <span class="ca-filter-label">{% trans 'Rechercher' %}</span>
+                <div class="ca-page-search">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    <input
+                        type="search"
+                        name="q"
+                        id="bio-search"
+                        value="{{ report.search_query }}"
+                        placeholder="{% trans 'Matricule, nom, direction…' %}"
+                        autocomplete="off"
+                    >
+                    {% if report.search_query %}
+                    <a href="?{{ report.clear_search_query }}" class="ca-search-clear" title="{% trans 'Effacer la recherche' %}">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="ca-filter-block bio-filter-block--submit">
+                <span class="ca-filter-label ca-filter-label--invisible">{% trans 'Rechercher' %}</span>
+                <button type="submit" class="btn btn-primary bio-search-btn w-100">
+                    <i class="bi bi-search"></i> {% trans 'Rechercher' %}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="bio-kpi-grid" aria-label="{% trans 'Indicateurs' %}">
+        <div class="ca-kpi-card ca-kpi-total">
+            <i class="bi bi-people bio-kpi-icon text-primary" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Agents affichés' %}</span>
+            <strong>{{ report.total_count }}</strong>
+            <small>{% trans 'Résultat filtre' %}</small>
+        </div>
+        <div class="ca-kpi-card ca-kpi-active">
+            <i class="bi bi-person-check bio-kpi-icon text-primary" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Actifs' %}</span>
+            <strong>{{ report.active_count }}</strong>
+            <small>{% trans 'Situation active' %}</small>
+        </div>
+        <div class="ca-kpi-card ca-kpi-inactive">
+            <i class="bi bi-person-dash bio-kpi-icon" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Inactifs' %}</span>
+            <strong>{{ report.inactive_count }}</strong>
+            <small>{% trans 'Situation inactive' %}</small>
+        </div>
+        <div class="ca-kpi-card ca-kpi-complete">
+            <i class="bi bi-check2-all bio-kpi-icon text-success" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Complet' %}</span>
+            <strong>{{ report.complete_count }}</strong>
+            <small>10/10 {% trans 'empreintes' %}</small>
+        </div>
+        <div class="ca-kpi-card ca-kpi-partial">
+            <i class="bi bi-hourglass-split bio-kpi-icon text-warning" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Partiel' %}</span>
+            <strong>{{ report.partial_count }}</strong>
+            <small>{% trans 'En cours' %}</small>
+        </div>
+        <div class="ca-kpi-card ca-kpi-none">
+            <i class="bi bi-slash-circle bio-kpi-icon text-danger" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Sans empreinte' %}</span>
+            <strong>{{ report.none_count }}</strong>
+            <small>{% trans 'Non enrôlé' %}</small>
         </div>
     </div>
 
-    <div class="page-content">
-        <div class="company-attendance-filters mb-3 no-print">
-            {% for code, label in report.filter_choices %}
-            <a class="company-attendance-filter{% if report.filter_status == code %} active{% endif %}" href="?filter={{ code }}">{{ label }}</a>
-            {% endfor %}
+    <div class="bio-table-card">
+        <div class="bio-table-card__header">
+            <h2 class="bio-table-card__title">
+                <i class="bi bi-table" aria-hidden="true"></i>
+                {% trans 'Liste des agents' %}
+            </h2>
+            <span class="bio-table-card__meta">
+                {% if pagination.total %}
+                {% blocktrans with start=pagination.start end=pagination.end total=pagination.total %}
+                {{ start }}-{{ end }} sur {{ total }} agent(s)
+                {% endblocktrans %}
+                {% else %}
+                {{ report.total_count }} {% trans 'agent(s)' %}
+                {% endif %}
+                {% if report.search_query or report.filter_status != 'all' or report.situation_filter != 'all' or report.has_date_filter %}
+                · {% trans 'filtres appliqués' %}
+                {% endif %}
+            </span>
         </div>
-
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <div class="company-attendance-card text-center">
-                    <div class="text-muted small">{% trans 'Agents affichés' %}</div>
-                    <div class="fs-3 fw-bold">{{ report.total_count }}</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="company-attendance-card text-center">
-                    <div class="text-muted small">{% trans 'Enrôlement complet' %}</div>
-                    <div class="fs-3 fw-bold text-success">{{ report.complete_count }}</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="company-attendance-card text-center">
-                    <div class="text-muted small">{% trans 'Enrôlement partiel' %}</div>
-                    <div class="fs-3 fw-bold text-warning">{{ report.partial_count }}</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="company-attendance-card text-center">
-                    <div class="text-muted small">{% trans 'Sans empreinte' %}</div>
-                    <div class="fs-3 fw-bold text-danger">{{ report.none_count }}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="company-attendance-card">
-            <div class="table-responsive">
-                <table class="table onip-table align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th>{% trans 'Photo' %}</th>
-                            <th>{% trans 'Matricule' %}</th>
-                            <th>{% trans 'Agent' %}</th>
-                            <th>{% trans 'Direction' %}</th>
-                            <th>{% trans 'Statut' %}</th>
-                            <th>{% trans 'Empreintes' %}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in report.rows %}
-                        <tr>
-                            <td>
+        <div class="table-responsive">
+            <table class="table onip-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Agent' %}</th>
+                        <th>{% trans 'Direction' %}</th>
+                        <th>{% trans 'Situation' %}</th>
+                        <th>{% trans 'Enrôlement' %}</th>
+                        <th>{% trans 'Dernier enreg.' %}</th>
+                        <th>{% trans 'Empreintes' %}</th>
+                        <th class="no-print">{% trans 'Actions' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report.rows %}
+                    <tr>
+                        <td>
+                            <div class="bio-agent-cell">
                                 {% if row.photo_url %}
-                                <img src="{{ row.photo_url }}" alt="" class="rounded" style="width:48px;height:48px;object-fit:cover;">
+                                <img src="{{ row.photo_url }}" alt="" class="bio-agent-avatar">
                                 {% else %}
-                                <span class="text-muted">—</span>
+                                <span class="bio-agent-avatar bio-agent-avatar--empty" aria-hidden="true">
+                                    <i class="bi bi-person"></i>
+                                </span>
                                 {% endif %}
-                            </td>
-                            <td><code>{{ row.employee.registration_number|default:"—" }}</code></td>
-                            <td><strong>{{ row.employee.full_name }}</strong></td>
-                            <td>{{ row.employee.direction.name|default:"—" }}</td>
-                            <td>
-                                {% if row.is_complete %}
-                                <span class="badge bg-success">{{ row.status_label }}</span>
-                                {% elif row.has_any %}
-                                <span class="badge bg-warning text-dark">{{ row.status_label }}</span>
-                                {% else %}
-                                <span class="badge bg-secondary">{{ row.status_label }}</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span class="fw-semibold">{{ row.enrolled_count }}/{{ row.total_fingers }}</span>
-                                <div class="d-flex flex-wrap gap-1 mt-1" style="max-width:320px;">
-                                    {% for finger in row.fingers %}
-                                    <span class="badge {% if finger.captured %}bg-success{% else %}bg-light text-muted border{% endif %}" title="{{ finger.label }}">
-                                        {% if finger.captured %}<i class="bi bi-check2"></i>{% else %}<i class="bi bi-dash"></i>{% endif %}
-                                        {{ finger.label }}
-                                    </span>
-                                    {% endfor %}
+                                <div>
+                                    <span class="bio-agent-name">{{ row.employee.full_name }}</span>
+                                    <span class="bio-agent-matricule">{{ row.employee.registration_number|default:"—" }}</span>
                                 </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" class="text-muted">{% trans 'Aucun agent pour ce filtre.' %}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                            </div>
+                        </td>
+                        <td><span class="bio-direction">{{ row.employee.direction.name|default:"—" }}</span></td>
+                        <td>
+                            {% if row.is_active %}
+                            <span class="badge bg-primary bio-situation-badge">{{ row.agent_situation_label }}</span>
+                            {% else %}
+                            <span class="badge bg-secondary bio-situation-badge">{{ row.agent_situation_label }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if row.is_complete %}
+                            <span class="bio-enroll-status bio-enroll-status--complete">
+                                <i class="bi bi-check-circle-fill"></i> {{ row.status_label }}
+                            </span>
+                            {% elif row.has_any %}
+                            <span class="bio-enroll-status bio-enroll-status--partial">
+                                <i class="bi bi-exclamation-circle-fill"></i> {{ row.status_label }}
+                            </span>
+                            {% else %}
+                            <span class="bio-enroll-status bio-enroll-status--none">
+                                <i class="bi bi-dash-circle"></i> {{ row.status_label }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="bio-enrolled-date">{{ row.last_enrolled_label }}</span>
+                            {% if row.first_enrolled_label != row.last_enrolled_label and row.first_enrolled_label != '—' %}
+                            <span class="bio-enrolled-date-sub">{% trans 'Depuis' %} {{ row.first_enrolled_label }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="bio-progress">
+                                <div class="bio-progress__label">
+                                    <span>{{ row.enrolled_count }}/{{ row.total_fingers }}</span>
+                                    {% widthratio row.enrolled_count row.total_fingers 100 as pct %}
+                                    <span class="text-muted">{{ pct }}%</span>
+                                </div>
+                                <div class="bio-progress__bar" role="progressbar" aria-valuenow="{{ row.enrolled_count }}" aria-valuemin="0" aria-valuemax="{{ row.total_fingers }}">
+                                    <div class="bio-progress__fill{% if not row.has_any %} bio-progress__fill--none{% elif not row.is_complete %} bio-progress__fill--partial{% endif %}" style="width: {{ pct }}%;"></div>
+                                </div>
+                            </div>
+                            <div class="bio-finger-grid" aria-label="{% trans 'Détail des doigts' %}">
+                                {% for finger in row.fingers %}
+                                <span class="bio-finger-cell{% if finger.captured %} bio-finger-cell--ok{% else %} bio-finger-cell--missing{% endif %}" title="{{ finger.label }}">
+                                    {% if finger.captured %}<i class="bi bi-check2"></i>{% else %}<i class="bi bi-dash"></i>{% endif %}
+                                    <span>{{ finger.label|truncatechars:8 }}</span>
+                                </span>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td class="no-print">
+                            <form method="post" class="bio-actions">
+                                {% csrf_token %}
+                                <input type="hidden" name="employee_id" value="{{ row.employee.pk }}">
+                                <input type="hidden" name="filter" value="{{ report.filter_status }}">
+                                <input type="hidden" name="situation" value="{{ report.situation_filter }}">
+                                <input type="hidden" name="q" value="{{ report.search_query }}">
+                                <input type="hidden" name="date_from" value="{{ report.date_from_value }}">
+                                <input type="hidden" name="date_to" value="{{ report.date_to_value }}">
+                                <input type="hidden" name="page" value="{{ pagination.page }}">
+                                <button
+                                    type="submit"
+                                    name="action"
+                                    value="accept"
+                                    class="btn btn-success bio-confirm-action"
+                                    data-bio-confirm="{% filter escapejs %}{% trans "Confirmer l'activation de cet agent ?" %}{% endfilter %}"
+                                    {% if row.is_active %}disabled{% endif %}
+                                >
+                                    <i class="bi bi-check-lg"></i> {% trans 'Accepter' %}
+                                </button>
+                                <button
+                                    type="submit"
+                                    name="action"
+                                    value="reject"
+                                    class="btn btn-outline-danger bio-confirm-action"
+                                    data-bio-confirm="{% filter escapejs %}{% trans "Confirmer la désactivation de cet agent ?" %}{% endfilter %}"
+                                    {% if not row.is_active %}disabled{% endif %}
+                                >
+                                    <i class="bi bi-x-lg"></i> {% trans 'Rejeter' %}
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr class="bio-empty-row">
+                        <td colspan="7">
+                            <i class="bi bi-inbox" aria-hidden="true"></i>
+                            {% trans 'Aucun agent ne correspond à ces critères.' %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+        {% include 'employee/includes/company_attendance_pagination.html' %}
     </div>
 </div>
+
+<script>
+(function () {
+    var form = document.getElementById('bio-filters-form');
+    var searchInput = document.getElementById('bio-search');
+    if (form && searchInput) {
+        searchInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                form.submit();
+            }
+        });
+    }
+
+    document.querySelectorAll('.bio-confirm-action').forEach(function (button) {
+        button.addEventListener('click', function (event) {
+            var message = button.getAttribute('data-bio-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
+})();
+</script>
 {% endblock %}

@@ -85,17 +85,11 @@ services:
         - CMD-SHELL
         - >
           python -c "import urllib.request;
-          urllib.request.urlopen(
-            urllib.request.Request(
-              'http://127.0.0.1:8000/api/guichet/refs/',
-              headers={'X-Guichet-Internal-Key': '${GUICHET_INTERNAL_API_KEY:-fgp_guichet_internal_dev}'}
-            ),
-            timeout=5
-          )"
-      interval: 15s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
+          urllib.request.urlopen('http://127.0.0.1:8000/static/assets/css/main/app.css', timeout=8)"
+      interval: 30s
+      timeout: 12s
+      retries: 3
+      start_period: 90s
     restart: unless-stopped
 
   rh_worker:
