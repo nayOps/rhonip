@@ -649,11 +649,29 @@ class EnrollmentSessionViewSet(viewsets.ModelViewSet):
             update_fields.append('payload')
 
         session.save(update_fields=update_fields)
-        if status_value == 'completed' and session.registration_number:
-            try:
-                EnrollmentOrchestrator()._persist_enrollment_media(session)
-            except Exception:
-                pass
+        if status_value == 'completed':
+            session.sync_registration_number_from_payload(save=True)
+            if session.registration_number:
+                try:
+                    orchestrator = EnrollmentOrchestrator()
+                    orchestrator._persist_enrollment_media(session)
+                    photo_sync = orchestrator._sync_employee_photo_to_rh(session)
+                    if photo_sync.get('success'):
+                        EnrollmentEvent.objects.create(
+                            session=session,
+                            event_type='employee_photo_synced',
+                            event_data={'trigger': 'face_modality'},
+                            message='Photo RH synchronisée (capture)',
+                        )
+                    elif not photo_sync.get('skipped'):
+                        EnrollmentEvent.objects.create(
+                            session=session,
+                            event_type='employee_photo_sync_failed',
+                            event_data={'trigger': 'face_modality'},
+                            message=photo_sync.get('error', 'Photo RH non synchronisée'),
+                        )
+                except Exception:
+                    pass
         EnrollmentEvent.objects.create(
             session=session,
             event_type='payload_received',

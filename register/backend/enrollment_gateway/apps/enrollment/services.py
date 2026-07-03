@@ -323,13 +323,13 @@ class EnrollmentOrchestrator:
 
     def _sync_employee_photo_to_rh(self, session):
         """Envoie la photo biométrique vers employee.photo (RH) après capture."""
-        matricule = session.registration_number
+        from .enrollment_storage import load_session_face_photo_base64
+
+        matricule = session.registration_number or session.resolve_registration_number()
         if not matricule:
             return {'skipped': True}
 
-        payload = dict(session.payload or {})
-        face = (payload.get('biometrics') or {}).get('face') or {}
-        photo_b64 = face.get('icao_image_base64') or face.get('image_base64')
+        photo_b64 = load_session_face_photo_base64(session)
         if not photo_b64:
             return {'skipped': True}
 
@@ -346,7 +346,7 @@ class EnrollmentOrchestrator:
                     'photo_base64': photo_b64,
                 },
                 headers=headers,
-                timeout=30,
+                timeout=60,
             )
             if response.status_code in (200, 201):
                 return {'success': True}
@@ -356,6 +356,154 @@ class EnrollmentOrchestrator:
             }
         except Exception as exc:
             return {'success': False, 'error': str(exc)}
+
+    def finalize_session_with_photo(self, session, *, dry_run=False):
+        """
+        Finalise une session ayant une photo : sync RH + statut COMPLETED.
+        Utilisé pour rattraper les sessions FAILED / PENDING avec photo capturée.
+        """
+        from .enrollment_storage import session_has_face_photo
+
+        session.sync_registration_number_from_payload(save=True)
+        matricule = session.registration_number
+        if not matricule:
+            return {
+                'session_id': session.session_id,
+                'ok': False,
+                'error': 'matricule manquant',
+            }
+        if not session_has_face_photo(session):
+            return {
+                'session_id': session.session_id,
+                'ok': False,
+                'error': 'photo introuvable',
+            }
+        if dry_run:
+            return {
+                'session_id': session.session_id,
+                'ok': True,
+                'dry_run': True,
+                'matricule': matricule,
+                'status': session.status,
+            }
+
+        self._persist_enrollment_media(session)
+        photo_sync = self._sync_employee_photo_to_rh(session)
+        if not photo_sync.get('success'):
+            err = photo_sync.get('error') or 'photo non synchronisée'
+            if photo_sync.get('skipped'):
+                err = 'photo non synchronisée (données absentes)'
+            return {
+                'session_id': session.session_id,
+                'matricule': matricule,
+                'ok': False,
+                'error': err,
+            }
+
+        session.set_modality_status('face', 'completed')
+        session.error_message = None
+        session.validation_errors = []
+        session.mark_completed(matricule)
+        self._create_event(
+            session,
+            'backfill_photo_completed',
+            f'Rattrapage photo — matricule {matricule}',
+        )
+        return {
+            'session_id': session.session_id,
+            'matricule': matricule,
+            'ok': True,
+        }
+
+    def resync_completed_session_photo(self, session, *, dry_run=False):
+        """Re-synchronise la photo RH pour une session déjà COMPLETED."""
+        from .enrollment_storage import session_has_face_photo
+
+        if session.status != 'COMPLETED':
+            return {
+                'session_id': session.session_id,
+                'ok': False,
+                'error': 'session non terminée',
+            }
+        session.sync_registration_number_from_payload(save=True)
+        matricule = session.registration_number
+        if not matricule or not session_has_face_photo(session):
+            return {
+                'session_id': session.session_id,
+                'ok': False,
+                'error': 'matricule ou photo manquant',
+            }
+        if dry_run:
+            return {
+                'session_id': session.session_id,
+                'ok': True,
+                'dry_run': True,
+                'matricule': matricule,
+            }
+
+        photo_sync = self._sync_employee_photo_to_rh(session)
+        if not photo_sync.get('success'):
+            err = photo_sync.get('error') or 'sync échouée'
+            return {
+                'session_id': session.session_id,
+                'matricule': matricule,
+                'ok': False,
+                'error': err,
+            }
+        self._create_event(
+            session,
+            'employee_photo_synced',
+            f'Photo RH re-synchronisée — {matricule}',
+        )
+        return {
+            'session_id': session.session_id,
+            'matricule': matricule,
+            'ok': True,
+        }
+
+    def backfill_sessions_with_photos(
+        self,
+        *,
+        dry_run=False,
+        statuses=None,
+        resync_completed=False,
+    ):
+        """Finalise ou re-synchronise toutes les sessions éligibles avec photo."""
+        from .enrollment_storage import session_has_face_photo
+
+        if statuses is None:
+            statuses = [
+                'PENDING', 'FAILED', 'REVIEW',
+                'VALIDATING', 'PROCESSING', 'ABIS_CHECK',
+            ]
+
+        results = []
+        for session in EnrollmentSession.objects.filter(status__in=statuses).order_by('updated_at'):
+            if not session_has_face_photo(session):
+                continue
+            results.append(self.finalize_session_with_photo(session, dry_run=dry_run))
+
+        if resync_completed:
+            for session in EnrollmentSession.objects.filter(status='COMPLETED').order_by('-updated_at'):
+                if not session_has_face_photo(session):
+                    continue
+                matricule = session.registration_number or session.resolve_registration_number()
+                if matricule and self._rh_employee_has_photo(matricule):
+                    continue
+                results.append(self.resync_completed_session_photo(session, dry_run=dry_run))
+
+        return results
+
+    def _rh_employee_has_photo(self, matricule: str) -> bool:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT photo FROM employee_employee WHERE registration_number = %s LIMIT 1",
+                [matricule],
+            )
+            row = cursor.fetchone()
+        if not row or not row[0]:
+            return False
+        return bool(str(row[0]).strip())
 
     def _persist_enrollment_media(self, session):
         """Écrit les fichiers biométriques et les promeut vers le service biométrique."""

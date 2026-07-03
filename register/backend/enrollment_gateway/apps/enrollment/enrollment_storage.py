@@ -309,3 +309,46 @@ def persist_session_fingerprints(session, registration_number: str, fgp_core_url
             errors.append(f'{position}: {exc}')
 
     return {'saved': saved, 'errors': errors}
+
+
+def _path_from_file_uri(uri: str) -> Optional[Path]:
+    if not uri or not str(uri).startswith('file:'):
+        return None
+    from urllib.parse import unquote, urlparse
+
+    parsed = urlparse(uri)
+    path = unquote(parsed.path)
+    if not path:
+        return None
+    return Path(path)
+
+
+def load_session_face_photo_base64(session) -> Optional[str]:
+    """Photo visage : payload base64 ou fichier persisted_media / disque."""
+    payload = session.payload or {}
+    face = (payload.get('biometrics') or {}).get('face') or {}
+    for key in ('icao_image_base64', 'image_base64'):
+        val = face.get(key)
+        if val:
+            return strip_data_url(str(val))
+
+    persisted = payload.get('persisted_media') or {}
+    uri = persisted.get('photo_uri')
+    if uri:
+        path = _path_from_file_uri(str(uri))
+        if path and path.is_file():
+            return base64.b64encode(path.read_bytes()).decode('ascii')
+
+    sid = session.session_id
+    if sid:
+        for candidate in (
+            _media_root() / 'enrollments' / sid / 'face' / 'photo.jpg',
+            _media_root() / 'enrollments' / sid / 'face' / 'photo.png',
+        ):
+            if candidate.is_file():
+                return base64.b64encode(candidate.read_bytes()).decode('ascii')
+    return None
+
+
+def session_has_face_photo(session) -> bool:
+    return load_session_face_photo_base64(session) is not None
