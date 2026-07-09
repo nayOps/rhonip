@@ -1,0 +1,50 @@
+<table class="hdr-table" cellpadding="0" cellspacing="0">
+    <tr>
+        <td width="68%" valign="top">
+            <p class="hdr-country">République Démocratique du Congo</p>
+            <p class="hdr-org">Office National d'Identification de la Population (ONIP)</p>
+            <p class="hdr-dept">Direction des Ressources Humaines</p>
+        </td>
+        <td width="32%" valign="top" align="right">
+            {% if logo_uri %}
+            <img src="{{ logo_uri }}" alt="ONIP" class="hdr-logo">
+            {% endif %}
+        </td>
+    </tr>
+</table>
+
+<table class="hero-wrap" cellpadding="0" cellspacing="0">
+    <tr>
+        <td class="hero-left" valign="top">
+            <span class="hero-badge">Document Officiel</span>
+            <p class="hero-title">
+                RAPPORT D'ENREGISTREMENT<br>BIOMÉTRIQUE
+            </p>
+            <p class="hero-meta">
+                <span class="hero-meta-item">Données Sécurisées</span>
+                <span class="hero-meta-item">Standard AFIS/ABIS</span>
+            </p>
+        </td>
+    </tr>
+</table>
+
+<table class="stats-wrap" cellpadding="0" cellspacing="0">
+    <tr>
+        <td class="stats-cell alt">
+            <span class="stat-label">Date du rapport</span>
+            <span class="stat-value">{{ report_day_label|default:"—" }}</span>
+        </td>
+        <td class="stats-cell">
+            <span class="stat-label">Enrôlements</span>
+            <span class="stat-value">{{ total_count|default:"0" }}</span>
+        </td>
+        <td class="stats-cell alt">
+            <span class="stat-label">Agents ACTIFS</span>
+            <span class="stat-value">{{ active_count|default:"0" }}</span>
+        </td>
+        <td class="stats-cell last">
+            <span class="stat-label">Période de référence</span>
+            <span class="stat-value">{{ period_label|default:"—" }}</span>
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+{% load core %}
+{% load i18n %}
+
+{% block content %}
+<div class="onip-list-page">
+    {% include 'components/list_page_header.html' %}
+
+    <div class="page-content">
+        <section class="emp-dash-intro mb-3">
+            <div class="emp-dash-intro__icon">
+                <i class="bi bi-speedometer2"></i>
+            </div>
+            <div>
+                <h2 class="emp-dash-intro__title mb-1">{% trans 'Dashboard des employés' %}</h2>
+                <p class="emp-dash-intro__subtitle mb-0">
+                    {% trans 'Suivi en temps réel des effectifs, segmentation et recherche avancée.' %}
+                </p>
+            </div>
+        </section>
+
+        <div class="row g-3 mb-3">
+            <div class="col-6 col-lg-2">
+                <div class="card h-100 emp-kpi-card">
+                    <div class="card-body">
+                        <div class="emp-kpi-head">
+                            <small class="text-muted d-block">{% trans 'Total' %}</small>
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h3 class="mb-0">{{ dashboard_counts.total|default:0 }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-2">
+                <div class="card h-100 emp-kpi-card emp-kpi-card--success">
+                    <div class="card-body">
+                        <div class="emp-kpi-head">
+                            <small class="text-muted d-block">{% trans 'Actifs' %}</small>
+                            <i class="bi bi-person-check"></i>
+                        </div>
+                        <h3 class="mb-0 text-success">{{ dashboard_counts.active|default:0 }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-2">
+                <div class="card h-100 emp-kpi-card emp-kpi-card--muted">
+                    <div class="card-body">
+                        <div class="emp-kpi-head">
+                            <small class="text-muted d-block">{% trans 'Inactifs' %}</small>
+                            <i class="bi bi-person-x"></i>
+                        </div>
+                        <h3 class="mb-0 text-secondary">{{ dashboard_counts.inactive|default:0 }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-2">
+                <div class="card h-100 emp-kpi-card">
+                    <div class="card-body">
+                        <div class="emp-kpi-head">
+                            <small class="text-muted d-block">{% trans 'Masculin' %}</small>
+                            <i class="bi bi-gender-male"></i>
+                        </div>
+                        <h3 class="mb-0">{{ dashboard_counts.male|default:0 }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-2">
+                <div class="card h-100 emp-kpi-card">
+                    <div class="card-body">
+                        <div class="emp-kpi-head">
+                            <small class="text-muted d-block">{% trans 'Féminin' %}</small>
+                            <i class="bi bi-gender-female"></i>
+                        </div>
+                        <h3 class="mb-0">{{ dashboard_counts.female|default:0 }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-2">
+                <div class="card h-100 emp-kpi-card emp-kpi-card--info">
+                    <div class="card-body">
+                        <div class="emp-kpi-head">
+                            <small class="text-muted d-block">{% trans 'Tranche d’âge' %}</small>
+                            <i class="bi bi-bar-chart"></i>
+                        </div>
+                        <h6 class="mb-0 text-info">
+                            {% if dashboard_counts.age_range_label %}
+                                {{ dashboard_counts.age_range_label }} ({{ dashboard_counts.age_range_total|default:0 }})
+                            {% else %}
+                                —
+                            {% endif %}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if request.user.is_superuser or request.user.is_staff %}
+        <div class="card mb-3 emp-filter-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-funnel me-2"></i>{% trans 'Filtres du dashboard' %}
+                    </h5>
+                    <a href="{% url 'core:list' app='employee' model='employee' %}" class="btn btn-sm btn-light border">
+                        {% trans 'Réinitialiser' %}
+                    </a>
+                </div>
+                <form method="get" class="row g-2 align-items-end">
+                    <div class="col-12 col-lg-3">
+                        <label class="form-label mb-1">{% trans 'Recherche' %}</label>
+                        <input type="text" name="q" value="{{ request.GET.q }}" class="form-control"
+                               placeholder="{% trans 'Nom, matricule, email…' %}">
+                    </div>
+                    <div class="col-6 col-lg-2">
+                        <label class="form-label mb-1">{% trans 'Âge' %}</label>
+                        <select name="age_range" class="form-select">
+                            <option value="">{% trans 'Tous' %}</option>
+                            {% for item in age_ranges %}
+                            <option value="{{ item.key }}" {% if request.GET.age_range == item.key %}selected{% endif %}>
+                                {{ item.label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-6 col-lg-2">
+                        <label class="form-label mb-1">{% trans 'Sexe' %}</label>
+                        <select name="gender" class="form-select">
+                            <option value="">{% trans 'Tous' %}</option>
+                            <option value="male" {% if request.GET.gender == 'male' %}selected{% endif %}>{% trans 'Masculin' %}</option>
+                            <option value="female" {% if request.GET.gender == 'female' %}selected{% endif %}>{% trans 'Féminin' %}</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-lg-2">
+                        <label class="form-label mb-1">{% trans 'Niveau d’étude' %}</label>
+                        <select name="study_level" class="form-select onip-uppercase-select">
+                            <option value="">{% trans 'Tous' %}</option>
+                            {% for level in study_levels %}
+                            <option value="{{ level.id }}" {% if request.GET.study_level == level.id|stringformat:'s' %}selected{% endif %}>{{ level.name|upper }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-6 col-lg-2">
+                        <label class="form-label mb-1">{% trans 'Domaine' %}</label>
+                        <select name="field_of_study" class="form-select onip-uppercase-select">
+                            <option value="">{% trans 'Tous' %}</option>
+                            {% for field in field_of_studies %}
+                            <option value="{{ field.id }}" {% if request.GET.field_of_study == field.id|stringformat:'s' %}selected{% endif %}>{{ field.name|upper }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-6 col-lg-2">
+                        <label class="form-label mb-1">{% trans 'Province' %}</label>
+                        <select name="home_province" class="form-select">
+                            <option value="">{% trans 'Toutes' %}</option>
+                            {% for province in provinces %}
+                            <option value="{{ province.id|stringformat:'s' }}" {% if request.GET.home_province == province.id|stringformat:'s' %}selected{% endif %}>
+                                {{ province.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-6 col-lg-2">
+                        <label class="form-label mb-1">{% trans 'Statut' %}</label>
+                        <select name="agent_situation" class="form-select">
+                            <option value="">{% trans 'Tous' %}</option>
+                            <option value="active" {% if request.GET.agent_situation == 'active' %}selected{% endif %}>{% trans 'Actif' %}</option>
+                            <option value="inactive" {% if request.GET.agent_situation == 'inactive' %}selected{% endif %}>{% trans 'Inactif' %}</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-lg-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-funnel me-1"></i>{% trans 'Appliquer' %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if request.user.is_superuser or request.user.is_staff %}
+        {% if active_filter_labels %}
+        <div class="emp-active-filters mb-3">
+            <span class="emp-active-filters__label">{% trans 'Filtres actifs :' %}</span>
+            {% for key, value in active_filter_labels %}
+            <span class="badge rounded-pill bg-light text-dark border">{{ key }} : {{ value }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <div class="onip-data-card">
+            <div class="onip-data-card-header">
+                <h2 class="onip-data-card-title">{% trans 'Liste des employés' %}</h2>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                    {{ page_obj.paginator.count }} {% trans 'résultats' %}
+                </span>
+            </div>
+            <div class="onip-data-card-body">
+                <div class="table-responsive">
+                    <table class="table onip-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>{% trans 'ID' %}</th>
+                                <th>{% trans 'Employé' %}</th>
+                                <th>{% trans 'Sexe' %}</th>
+                                <th>{% trans 'Naissance' %}</th>
+                                <th>{% trans 'Province' %}</th>
+                                <th>{% trans 'Position / Service' %}</th>
+                                <th>{% trans 'Statut' %}</th>
+                                <th class="onip-col-actions">{% trans 'Actions' %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for obj in page_obj %}
+                            <tr data-id="{{ obj.id }}">
+                                <td><a href="{{ obj.get_absolute_url }}" class="onip-cell-id">#{{ obj.pk }}</a></td>
+                                <td>
+                                    <div class="onip-employee-cell">
+                                        <span class="onip-avatar">
+                                            {% if obj.photo %}
+                                            <img src="{{ obj.photo.url }}" alt="">
+                                            {% else %}
+                                            {{ obj|employee_initials }}
+                                            {% endif %}
+                                        </span>
+                                        <div>
+                                            <div class="onip-employee-name">{{ obj.full_name }}</div>
+                                            <div class="onip-employee-sub">{{ obj|employee_email }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if obj.gender == 'male' %}{% trans 'Masculin' %}
+                                    {% elif obj.gender == 'female' %}{% trans 'Féminin' %}
+                                    {% else %}—{% endif %}
+                                </td>
+                                <td>{{ obj.date_of_birth|date:'d/m/Y'|default:'—' }}</td>
+                                <td>{{ obj.home_province|default:'—' }}</td>
+                                <td>
+                                    <div class="onip-cell-stack">
+                                        <strong>{{ obj.designation|default:'—' }}</strong>
+                                        <span>{{ obj.service|default:obj.direction|default:'—' }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if obj.agent_situation == 'active' %}
+                                    <span class="badge bg-success">{% trans 'Actif' %}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{% trans 'Inactif' %}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="onip-row-actions">
+                                    {% include 'components/onip_table_actions.html' with obj=obj show_edit=True employee_row=True %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr class="onip-empty-row">
+                                <td colspan="8">{% trans 'Aucun résultat trouvé.' %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% include 'components/data_table_pagination.html' %}
+        </div>
+    </div>
+</div>
+
+<style>
+.emp-dash-intro {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    border-radius: 14px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, rgba(13,110,253,.08), rgba(13,110,253,.02));
+    border: 1px solid rgba(13,110,253,.16);
+}
+.emp-dash-intro__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #0d6efd;
+    color: #fff;
+}
+.emp-dash-intro__title {
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+.emp-dash-intro__subtitle {
+    color: #6c757d;
+    font-size: .92rem;
+}
+.emp-kpi-card {
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .04);
+}
+.emp-kpi-card--success { border-left: 4px solid #198754; }
+.emp-kpi-card--muted { border-left: 4px solid #6c757d; }
+.emp-kpi-card--info { border-left: 4px solid #0dcaf0; }
+.emp-kpi-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: .3rem;
+}
+.emp-kpi-head i {
+    font-size: 1rem;
+    color: #64748b;
+}
+.emp-filter-card {
+    border-radius: 12px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+.emp-active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .45rem;
+}
+.emp-active-filters__label {
+    font-weight: 600;
+    color: #334155;
+}
+@media (max-width: 991px) {
+    .emp-dash-intro {
+        align-items: flex-start;
+    }
+}
+</style>
+{% endblock %}

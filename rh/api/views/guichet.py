@@ -170,16 +170,23 @@ def _sync_children(employee, rows):
 def _sync_educations(employee, rows):
     if rows is None:
         return
+    from employee.models.education_references import Degree, FieldOfStudy, Institution, StudyLevel
+    from employee.utils.education_references import resolve_reference
+
     Education.objects.filter(employee=employee).delete()
     for row in rows or []:
-        institution = (row.get('institution') or '').strip()
-        degree = (row.get('degree') or '').strip()
-        if not institution and not degree:
+        institution_raw = (row.get('institution') or '').strip()
+        degree_raw = (row.get('degree') or '').strip()
+        study_level_raw = (row.get('study_level') or row.get('niveauEtude') or '').strip()
+        field_raw = (row.get('field_of_study') or row.get('domaine') or row.get('domaineEtude') or '').strip()
+        if not any((institution_raw, degree_raw, study_level_raw, field_raw)):
             continue
         Education.objects.create(
             employee=employee,
-            institution=institution or None,
-            degree=degree or None,
+            institution=resolve_reference(Institution, institution_raw) if institution_raw else None,
+            degree=resolve_reference(Degree, degree_raw) if degree_raw else None,
+            study_level=resolve_reference(StudyLevel, study_level_raw) if study_level_raw else None,
+            field_of_study=resolve_reference(FieldOfStudy, field_raw) if field_raw else None,
             start_date=row.get('start_date') or None,
             end_date=row.get('end_date') or None,
         )

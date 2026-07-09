@@ -12,6 +12,7 @@ RUN pip install --upgrade pip
 RUN pip install gunicorn
 ADD ./requirements.txt /app/
 RUN pip install -r requirements.txt
+RUN playwright install --with-deps chromium
 
 ADD . /app/backend
 ADD ./docker /app/docker

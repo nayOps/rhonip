@@ -1,0 +1,99 @@
+{% load i18n %}
+
+<div class="employee-inline-formset education-inline-formset" id="formset-education-{{ formset.prefix }}">
+    {{ formset.management_form }}
+
+    <div class="employee-inline-rows education-inline-rows">
+        {% for form in formset %}
+        <div class="employee-inline-card education-inline-card border rounded-3 p-3 mb-3">
+            {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-12 education-ref-field onip-select2-field">
+                    <label class="form-label onip-step-label" for="{{ form.institution.id_for_label }}">{{ form.institution.label }}</label>
+                    <div class="onip-select2-wrap">{{ form.institution }}</div>
+                    {% if form.institution_other %}{{ form.institution_other }}{% endif %}
+                    {% if form.institution.errors %}<div class="invalid-feedback d-block">{{ form.institution.errors|striptags }}</div>{% endif %}
+                    {% if form.institution_other.errors %}<div class="invalid-feedback d-block">{{ form.institution_other.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4 education-ref-field onip-select2-field">
+                    <label class="form-label onip-step-label" for="{{ form.study_level.id_for_label }}">{{ form.study_level.label }}</label>
+                    <div class="onip-select2-wrap">{{ form.study_level }}</div>
+                    {% if form.study_level_other %}{{ form.study_level_other }}{% endif %}
+                    {% if form.study_level.errors %}<div class="invalid-feedback d-block">{{ form.study_level.errors|striptags }}</div>{% endif %}
+                    {% if form.study_level_other.errors %}<div class="invalid-feedback d-block">{{ form.study_level_other.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4 education-ref-field onip-select2-field">
+                    <label class="form-label onip-step-label" for="{{ form.field_of_study.id_for_label }}">{{ form.field_of_study.label }}</label>
+                    <div class="onip-select2-wrap">{{ form.field_of_study }}</div>
+                    {% if form.field_of_study_other %}{{ form.field_of_study_other }}{% endif %}
+                    {% if form.field_of_study.errors %}<div class="invalid-feedback d-block">{{ form.field_of_study.errors|striptags }}</div>{% endif %}
+                    {% if form.field_of_study_other.errors %}<div class="invalid-feedback d-block">{{ form.field_of_study_other.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4 education-ref-field onip-select2-field">
+                    <label class="form-label onip-step-label" for="{{ form.degree.id_for_label }}">{{ form.degree.label }}</label>
+                    <div class="onip-select2-wrap">{{ form.degree }}</div>
+                    {% if form.degree_other %}{{ form.degree_other }}{% endif %}
+                    {% if form.degree.errors %}<div class="invalid-feedback d-block">{{ form.degree.errors|striptags }}</div>{% endif %}
+                    {% if form.degree_other.errors %}<div class="invalid-feedback d-block">{{ form.degree_other.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label class="form-label onip-step-label" for="{{ form.diploma_year.id_for_label }}">{{ form.diploma_year.label }}</label>
+                    {{ form.diploma_year }}
+                    {% if form.diploma_year.errors %}<div class="invalid-feedback d-block">{{ form.diploma_year.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label class="form-label onip-step-label" for="{{ form.start_date.id_for_label }}">{{ form.start_date.label }}</label>
+                    {{ form.start_date }}
+                    {% if form.start_date.errors %}<div class="invalid-feedback d-block">{{ form.start_date.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label class="form-label onip-step-label" for="{{ form.end_date.id_for_label }}">{{ form.end_date.label }}</label>
+                    {{ form.end_date }}
+                    {% if form.end_date.errors %}<div class="invalid-feedback d-block">{{ form.end_date.errors|striptags }}</div>{% endif %}
+                </div>
+            </div>
+
+            {% if form.DELETE %}
+            <div class="form-check mt-3 mb-0">
+                {{ form.DELETE }}
+                <label class="form-check-label" for="{{ form.DELETE.id_for_label }}">{% trans 'Supprimer cette formation' %}</label>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+$(function () {
+    var $rows = $('#formset-education-{{ formset.prefix }} .education-inline-rows .education-inline-card');
+    if (!$rows.length || typeof $rows.formset !== 'function') {
+        return;
+    }
+    $rows.formset({
+        prefix: '{{ formset.prefix }}',
+        formCssClass: 'education-inline-card',
+        addText: '{% trans "Ajouter une formation" %}',
+        deleteText: '',
+        added: function () {
+            if (typeof window.onipSyncEmployeeFormSelect2 === 'function') {
+                window.onipSyncEmployeeFormSelect2();
+            }
+            if (typeof initEducationReferenceFields === 'function') {
+                initEducationReferenceFields();
+            }
+        }
+    });
+});
+</script>

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'assets/css/employee-detail.css' %}">
+<link rel="stylesheet" href="{% static 'assets/css/employee-profile-dossier.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="employee-detail-page epd-page epd-page--attendance-only">
+    <div class="epd-topbar">
+        <a href="{% url 'core:home' %}" class="epd-back" aria-label="{% trans 'Retour' %}">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <h1 class="epd-topbar-title">{% trans 'Mes présences' %}</h1>
+    </div>
+
+    <div class="epd-attendance-only">
+        <div class="employee-step-card">
+            <div class="employee-step-header">
+                <div>
+                    <h2 class="employee-step-title">{% trans 'Suivi des présences' %}</h2>
+                    <p class="employee-step-subtitle">{% trans 'Consultez votre calendrier, vos retards et vos absences.' %}</p>
+                </div>
+            </div>
+            <div class="employee-step-body">
+                {% include 'components/employee_attendance_section.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'assets/js/employee-detail.js' %}"></script>
+{% endblock %}

@@ -7,74 +7,50 @@
 <form method="post" enctype="multipart/form-data" class="onip-form" id="form-{{ model_name }}">
     {% csrf_token %}
 
-    <div class="tab-content onip-form-tab-content">
-        <div class="tab-pane fade show active employee-tab-pane" id="attendance" role="tabpanel">
-            <div class="employee-summary-card border-0 shadow-none mb-0">
-                <div class="card-body px-0 pt-0">
-                    <div class="row align-items-start mb-3">
-                        <div class="col-lg-5">
-                            <div class="employee-month-nav">
-                                <a class="btn-nav" href="?year={{ attendance_summary.prev.year }}&month={{ attendance_summary.prev.month }}&week={{ attendance_week.week_start|date:'Y-m-d' }}" aria-label="{% trans 'Mois précédent' %}">
-                                    <i class="bi bi-chevron-left"></i>
-                                </a>
-                                <div>
-                                    <div class="employee-month-label">{{ attendance_summary.month_label }} {{ attendance_summary.year }}</div>
-                                    {% if attendance_summary.is_current_month %}
-                                    <div class="employee-month-sub">{% trans 'Mois en cours' %}</div>
-                                    {% endif %}
-                                </div>
-                                <a class="btn-nav" href="?year={{ attendance_summary.next.year }}&month={{ attendance_summary.next.month }}&week={{ attendance_week.week_start|date:'Y-m-d' }}" aria-label="{% trans 'Mois suivant' %}">
-                                    <i class="bi bi-chevron-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="employee-metrics">
-                        <div class="employee-metric">
-                            <div>
-                                <div class="employee-metric-label">{% trans 'Taux de présence' %}</div>
-                                <div class="employee-metric-value">{{ attendance_summary.presence_rate }}%</div>
-                            </div>
-                            <span class="employee-metric-icon success"><i class="bi bi-check-circle-fill"></i></span>
-                        </div>
-                        <div class="employee-metric">
-                            <div>
-                                <div class="employee-metric-label">{% trans 'Retards' %}</div>
-                                <div class="employee-metric-value">{{ attendance_summary.late_count }}</div>
-                            </div>
-                            <span class="employee-metric-icon warning"><i class="bi bi-clock-fill"></i></span>
-                        </div>
-                        <div class="employee-metric">
-                            <div>
-                                <div class="employee-metric-label">{% trans 'Absences' %}</div>
-                                <div class="employee-metric-value">{{ attendance_summary.absence_count }}</div>
-                            </div>
-                            <span class="employee-metric-icon danger"><i class="bi bi-exclamation-circle-fill"></i></span>
-                        </div>
-                    </div>
+    <div class="tab-content onip-form-tab-content employee-step-panels" id="employee-form-step-panels">
+        {% for step in employee_form_steps %}
+        <div class="tab-pane fade employee-tab-pane employee-step-pane{% if forloop.first %} show active{% endif %}" id="{{ step.id }}" role="tabpanel" data-step-index="{{ forloop.counter0 }}">
+            <div class="employee-step-header">
+                <div>
+                    <h2 class="employee-step-title">{{ step.title }}</h2>
+                    {% if step.subtitle %}<p class="employee-step-subtitle">{{ step.subtitle }}</p>{% endif %}
                 </div>
+                {% if step.add_label %}
+                <button type="button" class="employee-step-add-btn">
+                    <i class="bi bi-plus-lg"></i> {{ step.add_label }}
+                </button>
+                {% endif %}
             </div>
-            {% include 'components/employee_attendance_panel.html' %}
-        </div>
-
-        <div class="tab-pane fade employee-tab-pane employee-form-pane" id="{{ model_name }}" role="tabpanel">
-            {% crispy form %}
-            {{ form.media.css }}
-        </div>
-
-        {% for formset in formsets %}
-        <div class="tab-pane fade employee-tab-pane" id="{{ formset.model|getattr:'_meta'|getattr:'model_name' }}" role="tabpanel">
-            <div id="formset-{{ forloop.counter }}">
-                {{ formset.non_form_errors }}
-                {% crispy formset inline_formset_helper %}
+            <div class="employee-step-body{% if step.id == model_name %} employee-form-pane{% endif %}">
+                {% if step.id == model_name %}
+                    {% crispy form %}
+                {% else %}
+                    {% for formset in formsets %}
+                        {% if formset.model|getattr:'_meta'|getattr:'model_name' == step.id %}
+                        <div id="formset-wrap-{{ step.id }}">
+                            {{ formset.non_form_errors }}
+                            {% if step.id == 'education' %}
+                                {% include 'components/education_inline_formset.html' %}
+                            {% elif step.id == 'child' %}
+                                {% include 'components/child_inline_formset.html' %}
+                            {% elif step.id == 'experience' %}
+                                {% include 'components/experience_inline_formset.html' %}
+                            {% elif step.id == 'document' %}
+                                {% include 'components/document_inline_formset.html' %}
+                            {% else %}
+                                {% crispy formset inline_formset_helper %}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
             </div>
-            {% if not formset.fk.unique %}
-            <script>$(function(){$('#formset-{{ forloop.counter }} tbody tr').formset({prefix: '{{ formset.prefix }}'});})</script>
-            {% endif %}
         </div>
         {% endfor %}
     </div>
 </form>
+
+{{ form.media.css }}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.formset/1.2.2/jquery.formset.js" integrity="sha512-Tsdobfrx6IMRPi8d5z3AtjWNSbZxGm58IZFnblaRaepw562ZITlRhUM2Zu87vbvZjQxGmmto+31zEBLZ4wjs+w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type="text/javascript">

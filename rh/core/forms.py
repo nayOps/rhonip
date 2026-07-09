@@ -51,7 +51,7 @@ def strip_dal_media_js(form_class):
     return FormWithoutDalJs
 
 
-def modelform_factory(model, fields, layout=Layout()):
+def modelform_factory(model, fields, layout=Layout(), *, wrap_employee_form=True):
     flow = Flow.objects.filter(content_type__model=model._meta.model_name)
     #if flow.exists(): fields.remove('approvers', None)
     
@@ -71,7 +71,7 @@ def modelform_factory(model, fields, layout=Layout()):
     form_class = type(class_name, (forms.ModelForm,), attrs)
     form_class = strip_dal_media_js(form_class)
 
-    if model._meta.label_lower == 'employee.employee':
+    if wrap_employee_form and model._meta.label_lower == 'employee.employee':
         from employee.forms import make_all_fields_optional
         form_class = make_all_fields_optional(form_class)
 

@@ -17,6 +17,7 @@ from .overtime import Overtime
 
 from .experience import Experience
 from .education import Education
+from .education_references import StudyLevel, Degree, FieldOfStudy, Institution
 from .geography import Province, Territory, Sector, Groupement, Village
 
 from .request_for_info import RequestForInfo, ReplyWithInfo

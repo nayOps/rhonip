@@ -11,8 +11,9 @@
         <div class="card">
             <div class="card-body">
                 <ol class="breadcrumb mb-2">
-                    <li class="breadcrumb-item"><a href="{% url 'employee:reports_hub' %}">{% trans 'Rapports' %}</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'employee:biometric_enrollment_report' %}?filter={{ report.filter_status }}">{% trans 'Enregistrement biométrique' %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employee:reports_hub' %}">{% trans 'Programmation des rapports' %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employee:biometric_enrollment_report' %}?{{ report.query_string }}">{% trans 'Enregistrement biométrique' %}</a></li>
                     <li class="breadcrumb-item active">{% trans 'Programmation' %}</li>
                 </ol>
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -21,8 +22,9 @@
                         <p class="text-muted mb-0">{{ report.title }}</p>
                     </div>
                     <div class="d-flex gap-2">
-                        <a href="{% url 'employee:biometric_enrollment_report' %}?{{ report.query_string }}" class="btn btn-light">{% trans 'Retour' %}</a>
-                        <a href="{% url 'employee:biometric_enrollment_report_export' %}?{{ report.query_string }}" class="btn btn-outline-primary">{% trans 'Exporter PDF' %}</a>
+                        <a href="{% url 'employee:reports_hub' %}" class="btn btn-light">{% trans 'Retour au hub' %}</a>
+                        <a href="{% url 'employee:biometric_enrollment_report' %}?{{ report.query_string }}" class="btn btn-outline-primary">{% trans 'Visualiser' %}</a>
+                        <a href="{% url 'employee:biometric_enrollment_report_export' %}?{{ report.query_string }}" class="btn btn-primary">{% trans 'Télécharger PDF' %}</a>
                     </div>
                 </div>
             </div>

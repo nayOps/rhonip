@@ -25,6 +25,23 @@
     padding: 0.5rem 0.95rem;
 }
 
+.bio-page-actions .btn-primary {
+    background: var(--ca-primary);
+    border-color: var(--ca-primary);
+}
+
+.reports-hub-link-btn {
+    background: rgba(15, 39, 68, 0.06);
+    border-color: rgba(15, 39, 68, 0.18);
+    color: var(--ca-primary);
+}
+
+.reports-hub-link-btn:hover {
+    background: var(--ca-primary);
+    border-color: var(--ca-primary);
+    color: #fff;
+}
+
 /* ——— Filtres enrôlement (onglets) ——— */
 
 .bio-enroll-tabs {

@@ -54,10 +54,10 @@ PRESET_2_SLOTS_CONFIG = [
     {
         'code': 'MORNING_IN',
         'label': _t('Entrée'),
-        'target': '08:00',
-        'accept_from': '08:00',
+        'target': '08:30',
+        'accept_from': '06:00',
         'accept_until': '10:00',
-        'reference': '08:00',
+        'reference': '08:30',
         'ui_header': _t('Entrée'),
     },
     {

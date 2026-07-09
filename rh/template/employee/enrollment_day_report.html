@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/company-attendance.css' %}">
+<link rel="stylesheet" href="{% static 'assets/css/reports-hub.css' %}">
+<link rel="stylesheet" href="{% static 'assets/css/biometric-enrollment-report.css' %}">
+
+<div class="company-attendance-page bio-report-page">
+    <nav class="bio-breadcrumb no-print" aria-label="{% trans 'Fil d\'Ariane' %}">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'employee:reports_hub' %}">{% trans 'Programmation des rapports' %}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{% trans 'Enregistrement journalier 10/10' %}</li>
+        </ol>
+    </nav>
+
+    <header class="ca-page-header">
+        <div class="ca-page-title">
+            <h1>{{ report.title }}</h1>
+            <span class="ca-page-divider" aria-hidden="true"></span>
+            <span class="ca-page-date">{% trans 'Journée du' %} {{ report.report_day_label }}</span>
+        </div>
+        <div class="bio-page-actions no-print">
+            <a href="{% url 'employee:reports_hub' %}" class="btn btn-light btn-sm">
+                <i class="bi bi-arrow-left"></i> {% trans 'Programmation' %}
+            </a>
+            <a href="{% url 'employee:enrollment_day_report_export' %}?{{ report.query_string }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-download"></i> {% trans 'Télécharger PDF' %}
+            </a>
+        </div>
+    </header>
+
+    <form method="get" class="ca-filters-panel no-print">
+        <div class="ca-filters-panel__top">
+            <div class="ca-filters-panel__title">
+                <i class="bi bi-calendar-day" aria-hidden="true"></i>
+                <span>{% trans 'Paramètres du rapport journalier' %}</span>
+            </div>
+        </div>
+        <div class="bio-filters-grid bio-filters-grid--dates">
+            <div class="ca-filter-block">
+                <span class="ca-filter-label">{% trans 'Date du rapport' %}</span>
+                <input type="date" name="date" class="form-control bio-date-input" value="{{ report.target_date_value }}">
+            </div>
+            <div class="ca-filter-block">
+                <span class="ca-filter-label">{% trans 'Période — du' %}</span>
+                <input type="date" name="period_from" class="form-control bio-date-input" value="{{ report.period_from_value }}">
+            </div>
+            <div class="ca-filter-block">
+                <span class="ca-filter-label">{% trans 'Au' %}</span>
+                <input type="date" name="period_to" class="form-control bio-date-input" value="{{ report.period_to_value }}">
+            </div>
+            <div class="ca-filter-block d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i> {% trans 'Actualiser' %}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="bio-kpi-grid no-print" aria-label="{% trans 'Indicateurs' %}">
+        <div class="ca-kpi-card ca-kpi-complete">
+            <i class="bi bi-check2-all bio-kpi-icon text-success" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Agents ACTIF 10/10' %}</span>
+            <strong>{{ report.total_count }}</strong>
+            <small>{{ report.report_day_label }}</small>
+        </div>
+        <div class="ca-kpi-card ca-kpi-total">
+            <i class="bi bi-hash bio-kpi-icon text-primary" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Référence' %}</span>
+            <strong style="font-size:0.95rem;">{{ report.report_ref }}</strong>
+            <small>{% trans 'Document officiel' %}</small>
+        </div>
+        {% if report.has_period_filter %}
+        <div class="ca-kpi-card ca-kpi-active">
+            <i class="bi bi-calendar-range bio-kpi-icon text-primary" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Période' %}</span>
+            <strong style="font-size:0.95rem;">{{ report.period_label }}</strong>
+            <small>{% trans 'Dernière capture' %}</small>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="company-attendance-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:4%;">N°</th>
+                        <th style="width:8%;">{% trans 'Photo' %}</th>
+                        <th style="width:12%;">{% trans 'Matricule' %}</th>
+                        <th>{% trans 'Nom · Postnom · Prénom' %}</th>
+                        <th style="width:10%;">{% trans 'Statut' %}</th>
+                        <th>{% trans 'Fonction' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report.rows %}
+                    <tr>
+                        <td>{{ row.numero }}</td>
+                        <td>
+                            {% if row.photo_url %}
+                            <img src="{{ row.photo_url }}" alt="" class="rounded" style="width:44px;height:44px;object-fit:cover;">
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td><code>{{ row.matricule|default:"—" }}</code></td>
+                        <td><strong>{{ row.full_name }}</strong></td>
+                        <td><span class="badge bg-success">{{ row.statut }}</span></td>
+                        <td>{{ row.fonction }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-muted text-center py-4">{% trans 'Aucun agent pour cette journée.' %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

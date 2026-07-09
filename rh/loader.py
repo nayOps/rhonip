@@ -119,14 +119,22 @@ for obj in qs:
     Child.objects.bulk_create(children)
 
     # Education
-    study_level = (obj.get('niveauEtude') or '').strip() or None
-    field_of_study = (obj.get('domaineEtude') or '').strip() or None
-    edu, created = Education.objects.get_or_create(**{
-        'employee': obj,
-        'institution': None,
-        'study_level': study_level,
-        'field_of_study': field_of_study,
-        'degree': study_level,
-    })
+    meta = obj.metadata or {}
+    study_level_raw = (meta.get('niveauEtude') or '').strip() or None
+    field_of_study_raw = (meta.get('domaineEtude') or meta.get('domaine') or '').strip() or None
+    from employee.models.education_references import FieldOfStudy, StudyLevel
+    from employee.utils.education_references import resolve_reference
+
+    study_level = resolve_reference(StudyLevel, study_level_raw) if study_level_raw else None
+    field_of_study = resolve_reference(FieldOfStudy, field_of_study_raw) if field_of_study_raw else None
+    edu, created = Education.objects.get_or_create(
+        employee=obj,
+        defaults={
+            'institution': None,
+            'study_level': study_level,
+            'field_of_study': field_of_study,
+            'degree': None,
+        },
+    )
 
 print('Loaded')

@@ -45,6 +45,15 @@
             <span class="epd-actions-title">{% trans 'Actions de Dossier' %}</span>
         </div>
         <ul class="epd-action-list">
+            {% if show_employee_attendance_nav %}
+            <li class="epd-action-item{% if request.resolver_match.url_name == 'my_attendance' %} is-active{% endif %}">
+                <a href="{% url 'employee:my_attendance' %}">
+                    <i class="bi bi-calendar-check"></i>
+                    {% trans 'Présences' %}
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
             <li class="epd-action-item{% if not can_edit %} is-disabled{% endif %}">
                 <a href="{% if can_edit and edit_url %}{{ edit_url }}#document{% else %}#{% endif %}">
                     <i class="bi bi-file-earmark-plus"></i>

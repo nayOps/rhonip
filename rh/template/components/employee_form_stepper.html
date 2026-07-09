@@ -1,0 +1,17 @@
+{% load i18n %}
+
+<nav class="employee-form-stepper" aria-label="{% trans 'Étapes du dossier employé' %}">
+    <ol class="employee-form-stepper__list">
+        {% for step in employee_form_steps %}
+        <li class="employee-form-stepper__item{% if forloop.first %} is-active{% endif %}" data-step-index="{{ forloop.counter0 }}" data-step-target="#{{ step.id }}">
+            <button type="button" class="employee-form-stepper__btn" data-step-target="#{{ step.id }}">
+                <span class="employee-form-stepper__marker">
+                    <span class="employee-form-stepper__number">{{ forloop.counter }}</span>
+                    <i class="bi bi-check-lg employee-form-stepper__check" aria-hidden="true"></i>
+                </span>
+                <span class="employee-form-stepper__label">{{ step.label }}</span>
+            </button>
+        </li>
+        {% endfor %}
+    </ol>
+</nav>

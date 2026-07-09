@@ -552,13 +552,13 @@
 
                         <div>
 
-                            <p class="epd-list-title">{{ item.institution|default:'—' }}</p>
+                            <p class="epd-list-title">{% if item.institution %}{{ item.institution.name|upper }}{% else %}—{% endif %}</p>
 
                             <p class="epd-list-meta">
 
-                                {{ item.study_level|default:'' }}{% if item.field_of_study %} — {{ item.field_of_study }}{% endif %}
+                                {{ item.study_level.name|default:''|upper }}{% if item.field_of_study %} — {{ item.field_of_study.name|upper }}{% endif %}
 
-                                {% if item.degree %} · {{ item.degree }}{% endif %}
+                                {% if item.degree %} · {{ item.degree.name|upper }}{% endif %}
 
                                 {% if item.diploma_year %} · {{ item.diploma_year }}{% endif %}
 

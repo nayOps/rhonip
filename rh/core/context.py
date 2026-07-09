@@ -48,7 +48,14 @@ def _is_agent_user(request):
 
 
 def _employee_agent_menus(request):
-    menus = []
+    menus = [
+        {
+            'title': _('Présences'),
+            'href': reverse_lazy('employee:my_attendance'),
+            'icon': 'bi-calendar-check',
+            'forced': True,
+        },
+    ]
     if request.user.has_perm('leave.view_leave'):
         menus.append({
             'title': _('Congés'),
@@ -141,7 +148,7 @@ def base(request):
         next_forced_index += 1
         menu.insert(next_forced_index, dict({
             'title': _('Rapports'),
-            'href': reverse_lazy('employee:reports_hub'),
+            'href': reverse_lazy('employee:biometric_enrollment_report'),
             'icon': 'bi-file-earmark-bar-graph-fill',
             'forced': True,
         }))

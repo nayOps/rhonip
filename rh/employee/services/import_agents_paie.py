@@ -12,6 +12,7 @@ from employee.utils.agents_paie import (
     parse_nom_postnom,
     period_code_from_label,
 )
+from employee.services.sync_positions_from_paie import resolve_designation
 
 
 def import_agents_paie(
@@ -75,7 +76,7 @@ def import_agents_paie(
 
             designation = None
             if fonction:
-                designation, created = Designation.objects.get_or_create(name=fonction)
+                designation, created = resolve_designation(fonction)
                 if created:
                     stats['designations_created'] += 1
 
@@ -124,9 +125,14 @@ def import_agents_paie(
                 if not employee.last_name and last_name:
                     employee.last_name = last_name
                     changed = True
-                if designation and employee.designation_id != designation.id:
-                    employee.designation = designation
-                    changed = True
+                if fonction:
+                    if designation is None:
+                        designation, created = resolve_designation(fonction)
+                        if created:
+                            stats['designations_created'] += 1
+                    if employee.designation_id != designation.id:
+                        employee.designation = designation
+                        changed = True
                 if not employee.payer_name:
                     employee.payer_name = metadata.get('banque') or 'SOFIBANQUE'
                     changed = True

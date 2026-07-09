@@ -302,11 +302,19 @@ def create_employees(base_data):
                 )
         
         # Ajouter une éducation
+        from employee.models.education_references import Degree, FieldOfStudy, Institution, StudyLevel
+        from employee.utils.education_references import resolve_reference
+
+        institution = resolve_reference(Institution, choice(['Université de Kinshasa', 'Université Pédagogique Nationale', 'ISTA']))
+        degree = resolve_reference(Degree, choice(['Licence', 'Master', 'Doctorat']))
+        field_of_study = resolve_reference(FieldOfStudy, choice(['Informatique', 'Gestion', 'Droit', 'Communication']))
         Education.objects.get_or_create(
             employee=employee,
             defaults={
-                'institution': choice(['Université de Kinshasa', 'Université Pédagogique', 'ISTA']),
-                'degree': choice(['Licence', 'Master', 'Doctorat']) + ' en ' + choice(['Informatique', 'Gestion', 'Droit', 'Communication']),
+                'institution': institution,
+                'degree': degree,
+                'field_of_study': field_of_study,
+                'study_level': resolve_reference(StudyLevel, 'Licence (Bac+5)'),
             }
         )
         

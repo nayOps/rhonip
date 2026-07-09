@@ -5,58 +5,123 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'assets/css/company-attendance.css' %}">
+<link rel="stylesheet" href="{% static 'assets/css/biometric-enrollment-report.css' %}">
 
-<div class="company-attendance-page">
-    <div class="page-heading">
-        <div class="card">
-            <div class="card-body">
-                <ol class="breadcrumb mb-2">
-                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
-                    <li class="breadcrumb-item active">{% trans 'Rapports' %}</li>
-                </ol>
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <div>
-                        <h3 class="page-title m-0">{% trans 'Rapports RH' %}</h3>
-                        <p class="text-muted mb-0">{% trans 'Génération et programmation des rapports' %}</p>
-                    </div>
-                </div>
-            </div>
+<div class="company-attendance-page bio-report-page rh-reports-page">
+    <nav class="bio-breadcrumb" aria-label="{% trans 'Fil d\'Ariane' %}">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'employee:biometric_enrollment_report' %}">{% trans 'Enregistrement biométrique' %}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{% trans 'Programmation des rapports' %}</li>
+        </ol>
+    </nav>
+
+    <header class="ca-page-header rh-reports-header">
+        <div class="ca-page-title">
+            <h1>{% trans 'Programmation des rapports' %}</h1>
+            <span class="ca-page-divider" aria-hidden="true"></span>
+            <span class="ca-page-date">{% trans 'Ressources Humaines ONIP' %}</span>
+        </div>
+        <div class="bio-page-actions">
+            <a href="{{ main_report_url }}" class="btn btn-light">
+                <i class="bi bi-fingerprint"></i> {% trans 'Rapport biométrique' %}
+            </a>
+        </div>
+    </header>
+
+    <div class="bio-kpi-grid rh-reports-kpi" aria-label="{% trans 'Indicateurs rapports' %}">
+        <div class="ca-kpi-card ca-kpi-total">
+            <i class="bi bi-journal-text bio-kpi-icon text-primary" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Rapports disponibles' %}</span>
+            <strong>{{ reports|length }}</strong>
+            <small>{% trans 'Catalogue RH actif' %}</small>
+        </div>
+        <div class="ca-kpi-card ca-kpi-active">
+            <i class="bi bi-file-earmark-pdf bio-kpi-icon text-primary" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Format export' %}</span>
+            <strong>PDF</strong>
+            <small>{% trans 'Document officiel ONIP' %}</small>
+        </div>
+        <div class="ca-kpi-card ca-kpi-complete">
+            <i class="bi bi-calendar-check bio-kpi-icon text-success" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Programmation' %}</span>
+            <strong>{% trans 'Auto' %}</strong>
+            <small>{% trans 'Envoi planifié par email' %}</small>
+        </div>
+        <div class="ca-kpi-card ca-kpi-partial">
+            <i class="bi bi-tag bio-kpi-icon text-warning" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Nommage' %}</span>
+            <strong class="rh-kpi-code">rapport-rh-onip</strong>
+            <small>{% trans 'Convention fichiers PDF' %}</small>
         </div>
     </div>
 
-    <div class="page-content">
+    <div class="ca-filters-panel rh-reports-tip">
+        <div class="ca-filters-panel__top mb-0">
+            <div class="ca-filters-panel__title">
+                <i class="bi bi-lightbulb" aria-hidden="true"></i>
+                <span>{% trans 'Comment utiliser ce module' %}</span>
+            </div>
+        </div>
+        <p class="rh-reports-tip__text mb-0">
+            {% trans 'Visualisez un rapport à l’écran, téléchargez le PDF officiel ou configurez une programmation automatique (périodicité et destinataire email).' %}
+        </p>
+    </div>
+
+    <section class="rh-reports-section" aria-labelledby="rh-reports-catalog-title">
+        <div class="bio-table-card__header px-0 pt-0 border-0 bg-transparent">
+            <div>
+                <h2 id="rh-reports-catalog-title" class="rh-reports-section__title">{% trans 'Catalogue des rapports' %}</h2>
+                <p class="rh-reports-section__subtitle">{% trans 'Sélectionnez un rapport pour agir' %}</p>
+            </div>
+        </div>
+
         <div class="row g-4">
             {% for report in reports %}
-            <div class="col-lg-6">
-                <div class="company-attendance-card h-100">
-                    <div class="d-flex align-items-start gap-3 mb-3">
-                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
-                            <i class="bi {{ report.icon }} fs-4"></i>
+            <div class="col-xl-6">
+                <article class="rh-report-card">
+                    <div class="rh-report-card__accent" aria-hidden="true"></div>
+                    <div class="rh-report-card__inner">
+                        <header class="rh-report-card__head">
+                            <div class="rh-report-card__icon">
+                                <i class="bi {{ report.icon }}" aria-hidden="true"></i>
+                            </div>
+                            <div class="rh-report-card__titles">
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <h3>{{ report.title }}</h3>
+                                    <span class="rh-report-badge">{{ report.badge }}</span>
+                                </div>
+                                <p>{{ report.description }}</p>
+                            </div>
+                        </header>
+
+                        <div class="rh-report-card__meta">
+                            <span class="rh-report-meta-label">{% trans 'Fichier PDF' %}</span>
+                            <code>{{ report.filename_hint }}</code>
                         </div>
-                        <div>
-                            <h5 class="mb-1">{{ report.title }}</h5>
-                            <p class="text-muted mb-0">{{ report.description }}</p>
-                        </div>
+
+                        <footer class="rh-report-card__actions">
+                            <a href="{{ report.preview_url }}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye"></i> {% trans 'Visualiser' %}
+                            </a>
+                            <a href="{{ report.export_url }}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-download"></i> {% trans 'Télécharger PDF' %}
+                            </a>
+                            <a href="{{ report.schedule_url }}" class="btn btn-light btn-sm">
+                                <i class="bi bi-calendar-check"></i> {% trans 'Programmer' %}
+                            </a>
+                        </footer>
                     </div>
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="{{ report.preview_url }}" class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-eye"></i> {% trans 'Aperçu' %}
-                        </a>
-                        <a href="{{ report.export_url }}" class="btn btn-primary btn-sm">
-                            <i class="bi bi-file-earmark-pdf"></i> {% trans 'Exporter PDF' %}
-                        </a>
-                        <a href="{{ report.schedule_url }}" class="btn btn-light btn-sm">
-                            <i class="bi bi-calendar-check"></i> {% trans 'Programmer' %}
-                        </a>
-                    </div>
-                </div>
+                </article>
             </div>
             {% empty %}
             <div class="col-12">
-                <div class="company-attendance-card text-muted">{% trans 'Aucun rapport configuré.' %}</div>
+                <div class="rh-report-card rh-report-card--empty">
+                    <p class="mb-0 text-muted">{% trans 'Aucun rapport configuré.' %}</p>
+                </div>
             </div>
             {% endfor %}
         </div>
-    </div>
+    </section>
 </div>
 {% endblock %}

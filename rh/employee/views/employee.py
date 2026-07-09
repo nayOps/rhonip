@@ -8,8 +8,8 @@ from django.utils.translation import gettext
 from core.forms import InlineFormSetHelper
 from employee.forms import employee_modelform_factory, optional_inline_formset_factory
 from core.views import Change
-from employee.utils.attendance_stats import get_employee_attendance_context
 from employee.utils.employee_form import get_employee_form_config, is_employee_admin
+from employee.utils.employee_form_steps import build_employee_form_steps
 from employee.utils.profile_dossier import build_profile_dossier
 
 
@@ -28,8 +28,13 @@ class Employee(Change):
         layout, fields = get_employee_form_config(model, request.user)
         return model, fields, layout
 
+    def _is_self_employee_profile(self, request, obj):
+        employee = getattr(request.user, 'employee', None)
+        return bool(employee and employee.pk == obj.pk)
+
     def _render(self, request, obj, form, formsets):
         model = obj._meta.model
+        model_name = model._meta.model_name
         context = {
             'app': 'employee',
             'model': model,
@@ -42,8 +47,9 @@ class Employee(Change):
             'edit_url': None,
             'full_dossier_url': None,
             'is_employee_admin': is_employee_admin(request.user),
+            'show_employee_attendance_nav': self._is_self_employee_profile(request, obj),
+            'employee_form_steps': build_employee_form_steps(model_name, formsets),
             'inline_formset_helper': self.inline_formset_helper,
-            **get_employee_attendance_context(request, obj),
         }
         return render(request, self.template_name, context)
 
@@ -56,7 +62,10 @@ class Employee(Change):
         obj = get_object_or_404(model, pk=pk)
         model, fields, layout = self._build_form_context(request, obj)
 
-        form = employee_modelform_factory(model, fields=fields, layout=layout)(instance=obj)
+        form = employee_modelform_factory(model, fields=fields, layout=layout, user=request.user)(
+            instance=obj,
+            user=request.user,
+        )
 
         inline_models = [
             apps.get_model(inline.split('.')[0], model_name=inline.split('.')[-1])
@@ -82,10 +91,11 @@ class Employee(Change):
         obj = get_object_or_404(model, pk=pk)
         model, fields, layout = self._build_form_context(request, obj)
 
-        form = employee_modelform_factory(model, fields=fields, layout=layout)(
+        form = employee_modelform_factory(model, fields=fields, layout=layout, user=request.user)(
             request.POST or None,
             request.FILES or None,
             instance=obj,
+            user=request.user,
         )
 
         inline_models = [

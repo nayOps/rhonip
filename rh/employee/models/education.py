@@ -1,5 +1,6 @@
 from core.utils import upload_directory_file
 from .employee import Employee
+from .education_references import Degree, FieldOfStudy, Institution, StudyLevel
 from core.models import Base
 
 from django.utils.translation import gettext as _
@@ -11,10 +12,10 @@ from django.db import models
 class Education(Base):
     employee = ModelSelect(Employee, verbose_name=_('employé'), null=True, on_delete=models.SET_NULL)
 
-    institution = models.CharField(_('institution'), max_length=100, blank=True, null=True, default=None)
-    degree = models.CharField(_('diplôme'), max_length=100, blank=True, null=True, default=None)
-    study_level = models.CharField(_('niveau d\'étude'), max_length=100, blank=True, null=True, default=None)
-    field_of_study = models.CharField(_('domaine'), max_length=255, blank=True, null=True, default=None)
+    institution = ModelSelect(Institution, verbose_name=_('établissement'), null=True, blank=True, on_delete=models.SET_NULL)
+    degree = ModelSelect(Degree, verbose_name=_('diplôme'), null=True, blank=True, on_delete=models.SET_NULL)
+    study_level = ModelSelect(StudyLevel, verbose_name=_('niveau d\'étude'), null=True, blank=True, on_delete=models.SET_NULL)
+    field_of_study = ModelSelect(FieldOfStudy, verbose_name=_('domaine'), null=True, blank=True, on_delete=models.SET_NULL)
     diploma_year = models.PositiveSmallIntegerField(
         _('année d\'obtention du diplôme'),
         blank=True,
@@ -50,7 +51,7 @@ class Education(Base):
     @property
     def name(self):
         parts = [self.study_level, self.field_of_study, self.degree]
-        label = ' — '.join(part for part in parts if part)
+        label = ' — '.join(str(part) for part in parts if part)
         return label or str(self.institution or self.pk)
 
     class Meta:

@@ -70,6 +70,8 @@ class MyProfile(LoginRequiredMixin, View):
 
             'full_dossier_url': edit_url,
 
+            'show_employee_attendance_nav': True,
+
         })
 
 

@@ -127,12 +127,21 @@ def get_two_slot_blocked_interval():
     return entry_slot['accept_until'], exit_slot['accept_from']
 
 
+def _in_blocked_interval(punch_time, blocked):
+    if not blocked:
+        return False
+    blocked_after, blocked_before = blocked
+    return punch_time > blocked_after and punch_time < blocked_before
+
+
 def validate_punch_allowed(punch_date, punch_time, existing_punch_times):
     """
     Règles mode 2 plages :
-    - Entrée : première pointe dans la plage matin (ex. 08h–10h).
-    - Zone bloquée : après fin entrée jusqu'à début sortie (ex. 10h01–14h59) → refus.
-    - Sortie : uniquement à partir de la plage après-midi (ex. 15h+), si entrée déjà faite.
+    - Entrée : première pointe dans la plage matin (ex. 06h–10h), référence officielle 08h30.
+    - Zone bloquée (ex. 10h01–14h59) : refus seulement si une entrée est déjà
+      enregistrée (matin ou unique entrée de secours dans cette zone).
+    - Sans entrée matin : une seule pointe autorisée entre 10h et 15h.
+    - Sortie : plage après-midi (ex. 15h+) ; autorisée même sans entrée matin.
     - Une seconde pointe le matin ne compte pas.
     """
     if not _is_two_slot_mode():
@@ -146,16 +155,6 @@ def validate_punch_allowed(punch_date, punch_time, existing_punch_times):
     punch_time = _coerce_time(punch_time)
     blocked = get_two_slot_blocked_interval()
 
-    if blocked:
-        blocked_after, blocked_before = blocked
-        if punch_time > blocked_after and punch_time < blocked_before:
-            return _(
-                'Pointage refusé : aucun pointage entre %(start)s et %(end)s.'
-            ) % {
-                'start': blocked_after.strftime('%H:%M'),
-                'end': blocked_before.strftime('%H:%M'),
-            }
-
     assigned = assign_punches_to_slots(existing_punch_times or [])
     entry_code = entry_slot['code']
     exit_code = exit_slot['code']
@@ -165,11 +164,26 @@ def validate_punch_allowed(punch_date, punch_time, existing_punch_times):
     if has_entry and has_exit:
         return _('Pointage refusé : entrée et sortie déjà enregistrées aujourd\'hui.')
 
+    if _in_blocked_interval(punch_time, blocked) and has_entry:
+        blocked_after, blocked_before = blocked
+        return _(
+            'Pointage refusé : aucun pointage entre %(start)s et %(end)s.'
+        ) % {
+            'start': blocked_after.strftime('%H:%M'),
+            'end': blocked_before.strftime('%H:%M'),
+        }
+
     if not has_entry:
         if punch_fits_slot(punch_time, entry_slot):
             return None
+        if _in_blocked_interval(punch_time, blocked):
+            return None
+        if punch_fits_slot(punch_time, exit_slot):
+            return None
         if punch_time >= exit_slot['accept_from']:
-            return _('Pointage refusé : enregistrez d\'abord l\'entrée le matin.')
+            return _(
+                'Pointage refusé : sortie uniquement jusqu\'à %(time)s.'
+            ) % {'time': exit_slot['accept_until'].strftime('%H:%M')}
         if punch_time < entry_slot['accept_from']:
             return _(
                 'Pointage refusé : entrée à partir de %(time)s.'
@@ -203,9 +217,18 @@ def _assign_two_slot_punches(punches, presence_slots):
     assigned = {entry_code: None, exit_code: None}
     ordered = sorted(_coerce_time(t) for t in (punches or []) if t is not None)
 
+    blocked = get_two_slot_blocked_interval()
+
     for punch_time in ordered:
         if assigned[entry_code] is None and punch_fits_slot(punch_time, entry_slot):
             assigned[entry_code] = punch_time
+
+    if assigned[entry_code] is None and blocked:
+        blocked_after, blocked_before = blocked
+        for punch_time in ordered:
+            if punch_time > blocked_after and punch_time < blocked_before:
+                assigned[entry_code] = punch_time
+                break
 
     for punch_time in reversed(ordered):
         if punch_fits_slot(punch_time, exit_slot):

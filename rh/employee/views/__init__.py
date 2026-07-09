@@ -1,5 +1,6 @@
 from .request_for_info import RequestForInfo
 from .employee import Employee
+from .my_attendance import MyAttendance
 from .my_profile import MyProfile
 from .payroll import PayrollList
 from .attendance_report import AttendanceReport, AttendanceReportSchedule
@@ -13,4 +14,7 @@ from .reports import (
     BiometricEnrollmentReport,
     BiometricEnrollmentReportExport,
     BiometricEnrollmentReportSchedule,
+    EnrollmentDayReport,
+    EnrollmentDayReportExport,
+    EnrollmentDayReportSchedule,
 )

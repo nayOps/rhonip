@@ -11,7 +11,6 @@
     <nav class="bio-breadcrumb no-print" aria-label="{% trans 'Fil d\'Ariane' %}">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'employee:reports_hub' %}">{% trans 'Rapports' %}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{% trans 'Enregistrement biométrique' %}</li>
         </ol>
     </nav>
@@ -23,14 +22,11 @@
             <span class="ca-page-date">{% trans 'Généré le' %} {{ report.generated_at_label }}</span>
         </div>
         <div class="bio-page-actions no-print">
-            <a href="{% url 'employee:reports_hub' %}" class="btn btn-light">
-                <i class="bi bi-arrow-left"></i> {% trans 'Retour' %}
-            </a>
-            <a href="{% url 'employee:biometric_enrollment_report_schedule' %}?{{ report.query_string }}" class="btn btn-outline-primary">
+            <a href="{% url 'employee:reports_hub' %}" class="btn reports-hub-link-btn">
                 <i class="bi bi-calendar-check"></i> {% trans 'Programmer' %}
             </a>
             <a href="{% url 'employee:biometric_enrollment_report_export' %}?{{ report.query_string }}" class="btn btn-primary">
-                <i class="bi bi-file-earmark-pdf"></i> {% trans 'Exporter PDF' %}
+                <i class="bi bi-file-earmark-pdf"></i> {% trans 'Télécharger PDF' %}
             </a>
         </div>
     </header>

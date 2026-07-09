@@ -17,6 +17,7 @@ from core.models import Organization
 from employee.models import Employee
 from employee.services.fingerprint_enrollment import get_enrollment_status
 from employee.services.fingerprint_tablet import FINGER_POSITION_TO_TABLET
+from employee.utils.report_pdf_common import build_pdf_filename, logo_data_uri, photo_data_uri
 from employee.utils.roster import apply_roster_filter
 
 FINGER_LABELS_FR = {
@@ -401,7 +402,7 @@ def build_biometric_enrollment_report(
     generated_at = timezone.localtime()
 
     return {
-        'title': _('Rapport enregistrement biométrique'),
+        'title': _('Enregistrement biométrique'),
         'rows': rows,
         'filter_status': filter_status,
         'filter_choices': FILTER_CHOICES,
@@ -457,8 +458,31 @@ def build_biometric_enrollment_report(
         'active_count': active_count,
         'inactive_count': inactive_count,
         'logo_uri': _logo_file_uri(),
-        'report_ref': f'REF-RH-BIO-{generated_at:%Y%m%d}',
+        'report_ref': f'REF-ONIP-RH-{generated_at:%Y%m%d}',
+        'pdf_filename': (
+            build_pdf_filename('enregistrement', date_from=date_from, date_to=date_to)
+            if date_from and date_to
+            else build_pdf_filename('enregistrement', day=generated_at.date())
+        ),
     }
+
+
+def _prepare_biometric_report_for_pdf(report: dict) -> dict:
+    prepared = dict(report)
+    prepared['logo_uri'] = logo_data_uri()
+    prepared['doc_subtitle'] = (
+        _('Période : %(period)s') % {'period': report.get('date_range_label', '')}
+        if report.get('has_date_filter')
+        else _('État global des enregistrements — %(count)s agent(s)') % {'count': report.get('total_count', 0)}
+    )
+    rows = []
+    for row in report['rows']:
+        row_copy = dict(row)
+        row_copy['photo_uri'] = photo_data_uri(row['employee'].photo)
+        rows.append(row_copy)
+    prepared['rows'] = rows
+    prepared['pdf_filename'] = report.get('pdf_filename', '')
+    return prepared
 
 
 def render_biometric_enrollment_html(report: dict | None = None) -> str:
@@ -469,7 +493,8 @@ def render_biometric_enrollment_html(report: dict | None = None) -> str:
 def render_biometric_enrollment_pdf(report: dict | None = None) -> bytes:
     from xhtml2pdf import pisa
 
-    html = render_biometric_enrollment_html(report)
+    source = report or build_biometric_enrollment_report()
+    html = render_biometric_enrollment_html(_prepare_biometric_report_for_pdf(source))
     buffer = BytesIO()
     result = pisa.CreatePDF(html, dest=buffer, encoding='utf-8')
     if result.err:

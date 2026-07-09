@@ -6,60 +6,52 @@
 {% load crispy_forms_filters %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'assets/css/employee-detail.css' %}">
-<link rel="stylesheet" href="{% static 'assets/css/employee-profile-dossier.css' %}">
+<link rel="stylesheet" href="{% static 'assets/css/employee-detail.css' %}?v=20260709-5">
+<link rel="stylesheet" href="{% static 'assets/css/employee-profile-dossier.css' %}?v=20260709-5">
 {% endblock %}
 
 {% block content %}
-<div class="employee-detail-page onip-form-page epd-page">
+<div class="employee-detail-page onip-form-page epd-page employee-edit-page">
     <div class="epd-topbar">
         <a href="{% url 'core:list' app model|getattr:'_meta'|getattr:'model_name' %}" class="epd-back" aria-label="{% trans 'Retour' %}">
             <i class="bi bi-arrow-left"></i>
         </a>
-        <h1 class="epd-topbar-title">{% trans "Dossier de l'Agent" %}</h1>
+        <h1 class="epd-topbar-title">{% trans "Profil de l'Agent" %} <span class="epd-topbar-sep">|</span> {% trans 'Modification du dossier' %}</h1>
     </div>
 
-    {% include 'components/employee_dossier_header.html' with can_edit=True profile_mode='edit' employee=obj %}
+    {% include 'components/employee_dossier_header.html' with can_edit=True profile_mode='edit' employee=obj show_employee_attendance_nav=show_employee_attendance_nav %}
 
-    <div class="page-content">
-        <section>
+    <div class="page-content employee-edit-page__content">
+        <section class="employee-form-layout employee-form-layout--full">
             {% if obj.approvers %}
                 {% include 'components/approvals.html' %}
             {% endif %}
 
-            <div class="onip-form-card employee-tabs-card">
-                <ul class="nav nav-tabs onip-form-tabs employee-tabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link active" data-bs-toggle="tab" href="#attendance" role="tab">{% trans 'Présences' %}</a>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link" data-bs-toggle="tab" href="#{{ model|getattr:'_meta'|getattr:'model_name' }}" role="tab">{% trans 'Informations' %}</a>
-                    </li>
-                    {% for formset in formsets %}
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link" data-bs-toggle="tab" href="#{{ formset.model|getattr:'_meta'|getattr:'model_name' }}" role="tab">
-                            {{ formset.model|getattr:'_meta'|getattr:'verbose_name_plural'|title }}
-                        </a>
-                    </li>
-                    {% endfor %}
-                </ul>
-
-                {% include 'components/employee_change_form.html' %}
+            <div class="employee-form-main">
+                <div class="onip-form-card employee-stepper-card">
+                    {% include 'components/employee_form_stepper.html' %}
+                    {% include 'components/employee_change_form.html' %}
+                    <div class="employee-stepper-footer">
+                        <button type="button" class="employee-stepper-nav-btn" id="employee-step-prev" disabled>
+                            <i class="bi bi-arrow-left"></i> {% trans 'Précédent' %}
+                        </button>
+                        <button type="submit" form="form-{{ model|getattr:'_meta'|getattr:'model_name' }}" class="employee-stepper-draft-btn">
+                            {% trans 'Enregistrer le brouillon' %}
+                        </button>
+                        <button type="button" class="employee-stepper-nav-btn employee-stepper-nav-btn--primary" id="employee-step-next">
+                            {% trans 'Suivant' %} <i class="bi bi-arrow-right"></i>
+                        </button>
+                        <button type="submit" form="form-{{ model|getattr:'_meta'|getattr:'model_name' }}" class="employee-stepper-nav-btn employee-stepper-save-btn" id="employee-step-save" hidden>
+                            <i class="bi bi-floppy me-1"></i>{% trans 'Sauvegarder le dossier' %}
+                        </button>
+                    </div>
+                </div>
             </div>
         </section>
-    </div>
-
-    <div class="onip-form-footer">
-        <div class="onip-form-footer-inner">
-            <a href="{% url 'core:list' app model|getattr:'_meta'|getattr:'model_name' %}" class="onip-btn-cancel">{% trans 'Annuler les modifications' %}</a>
-            <button type="submit" form="form-{{ model|getattr:'_meta'|getattr:'model_name' }}" class="onip-btn-save">
-                <i class="bi bi-floppy me-1"></i>{% trans 'Sauvegarder le dossier' %}
-            </button>
-        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'assets/js/employee-detail.js' %}"></script>
+<script src="{% static 'assets/js/employee-detail.js' %}?v=20260709-5"></script>
 {% endblock %}

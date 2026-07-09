@@ -1,0 +1,66 @@
+{% load i18n %}
+
+<div class="employee-inline-formset" id="formset-experience-{{ formset.prefix }}">
+    {{ formset.management_form }}
+    <div class="employee-inline-rows">
+        {% for form in formset %}
+        <div class="employee-inline-card border rounded-3 p-3 mb-3">
+            {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+            {% if form.non_field_errors %}<div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>{% endif %}
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label onip-step-label" for="{{ form.organization.id_for_label }}">{{ form.organization.label }}</label>
+                    {{ form.organization }}
+                    {% if form.organization.errors %}<div class="invalid-feedback d-block">{{ form.organization.errors|striptags }}</div>{% endif %}
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label onip-step-label" for="{{ form.position.id_for_label }}">{{ form.position.label }}</label>
+                    {{ form.position }}
+                    {% if form.position.errors %}<div class="invalid-feedback d-block">{{ form.position.errors|striptags }}</div>{% endif %}
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label class="form-label onip-step-label" for="{{ form.start_date.id_for_label }}">{{ form.start_date.label }}</label>
+                    {{ form.start_date }}
+                    {% if form.start_date.errors %}<div class="invalid-feedback d-block">{{ form.start_date.errors|striptags }}</div>{% endif %}
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label class="form-label onip-step-label" for="{{ form.end_date.id_for_label }}">{{ form.end_date.label }}</label>
+                    {{ form.end_date }}
+                    {% if form.end_date.errors %}<div class="invalid-feedback d-block">{{ form.end_date.errors|striptags }}</div>{% endif %}
+                </div>
+                {% if form.photo %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label class="form-label onip-step-label" for="{{ form.photo.id_for_label }}">{{ form.photo.label }}</label>
+                    {{ form.photo }}
+                    {% if form.photo.errors %}<div class="invalid-feedback d-block">{{ form.photo.errors|striptags }}</div>{% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% if form.DELETE %}
+            <div class="form-check mt-3 mb-0">
+                {{ form.DELETE }}
+                <label class="form-check-label" for="{{ form.DELETE.id_for_label }}">{% trans 'Supprimer cette expérience' %}</label>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+$(function () {
+    var $rows = $('#formset-experience-{{ formset.prefix }} .employee-inline-rows .employee-inline-card');
+    if (!$rows.length || typeof $rows.formset !== 'function') return;
+    $rows.formset({
+        prefix: '{{ formset.prefix }}',
+        formCssClass: 'employee-inline-card',
+        addText: '{% trans "Ajouter une expérience" %}',
+        deleteText: '',
+        added: function () {
+            if (typeof window.onipSyncEmployeeFormSelect2 === 'function') {
+                window.onipSyncEmployeeFormSelect2();
+            }
+        },
+    });
+});
+</script>

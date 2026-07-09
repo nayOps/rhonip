@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/employee-detail.css' %}">
+<link rel="stylesheet" href="{% static 'assets/css/reports-hub.css' %}">
+
+<div class="employee-detail-page">
+    <div class="page-heading">
+        <div class="card">
+            <div class="card-body">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employee:reports_hub' %}">{% trans 'Programmation des rapports' %}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employee:enrollment_day_report' %}?{{ report.query_string }}">{{ report.title }}</a></li>
+                    <li class="breadcrumb-item active">{% trans 'Programmation' %}</li>
+                </ol>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h3 class="m-0">{% trans 'Programmer le rapport' %}</h3>
+                        <p class="text-muted mb-0">{{ report.title }} — {{ report.report_day_label }}</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'employee:reports_hub' %}" class="btn btn-light">{% trans 'Retour au hub' %}</a>
+                        <a href="{% url 'employee:enrollment_day_report' %}?{{ report.query_string }}" class="btn btn-outline-primary">{% trans 'Visualiser' %}</a>
+                        <a href="{% url 'employee:enrollment_day_report_export' %}?{{ report.query_string }}" class="btn btn-primary">{% trans 'Télécharger PDF' %}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card employee-tabs-card">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3">{% trans 'Paramètres de génération automatique' %}</h5>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="date" value="{{ report.target_date_value }}">
+                            <input type="hidden" name="period_from" value="{{ report.period_from_value }}">
+                            <input type="hidden" name="period_to" value="{{ report.period_to_value }}">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">{% trans 'Rapport' %}</label>
+                                    <input type="text" class="form-control" value="{{ report.title }}" disabled>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{% trans 'Journée' %}</label>
+                                    <input type="text" class="form-control" value="{{ report.report_day_label }}" disabled>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{% trans 'Périodicité' %}</label>
+                                    <select name="frequency" class="form-select">
+                                        {% for value, label in frequencies %}
+                                        <option value="{{ value }}"{% if form_data.frequency == value %} selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{% trans 'Format' %}</label>
+                                    <select name="format" class="form-select">
+                                        {% for value, label in formats %}
+                                        <option value="{{ value }}"{% if form_data.format == value %} selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">{% trans 'Destinataire email' %}</label>
+                                    <input type="email" name="recipient" class="form-control" value="{{ form_data.recipient }}">
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="active" id="day-schedule-active"{% if form_data.active %} checked{% endif %}>
+                                        <label class="form-check-label" for="day-schedule-active">{% trans 'Activer la programmation' %}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-4">
+                                <i class="bi bi-save"></i> {% trans 'Enregistrer la programmation' %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card employee-summary-card">
+                    <div class="card-body">
+                        <h6 class="text-uppercase text-muted mb-3">{% trans 'Aperçu du rapport' %}</h6>
+                        <ul class="attendance-summary-list">
+                            <li><span>{% trans 'Date' %}</span><strong>{{ report.report_day_label }}</strong></li>
+                            <li><span>{% trans 'Agents ACTIF 10/10' %}</span><strong>{{ report.total_count }}</strong></li>
+                            <li><span>{% trans 'Référence' %}</span><strong>{{ report.report_ref }}</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

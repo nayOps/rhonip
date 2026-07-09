@@ -1,0 +1,49 @@
+{% load i18n %}
+
+<div class="employee-inline-formset" id="formset-document-{{ formset.prefix }}">
+    {{ formset.management_form }}
+    <div class="employee-inline-rows">
+        {% for form in formset %}
+        <div class="employee-inline-card border rounded-3 p-3 mb-3">
+            {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+            {% if form.non_field_errors %}<div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>{% endif %}
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label onip-step-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<div class="invalid-feedback d-block">{{ form.name.errors|striptags }}</div>{% endif %}
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label onip-step-label" for="{{ form.document.id_for_label }}">{{ form.document.label }}</label>
+                    {{ form.document }}
+                    {% if form.document.errors %}<div class="invalid-feedback d-block">{{ form.document.errors|striptags }}</div>{% endif %}
+                </div>
+            </div>
+            {% if form.DELETE %}
+            <div class="form-check mt-3 mb-0">
+                {{ form.DELETE }}
+                <label class="form-check-label" for="{{ form.DELETE.id_for_label }}">{% trans 'Supprimer ce document' %}</label>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+$(function () {
+    var $rows = $('#formset-document-{{ formset.prefix }} .employee-inline-rows .employee-inline-card');
+    if (!$rows.length || typeof $rows.formset !== 'function') return;
+    $rows.formset({
+        prefix: '{{ formset.prefix }}',
+        formCssClass: 'employee-inline-card',
+        addText: '{% trans "Ajouter un document" %}',
+        deleteText: '',
+        added: function () {
+            if (typeof window.onipSyncEmployeeFormSelect2 === 'function') {
+                window.onipSyncEmployeeFormSelect2();
+            }
+        },
+    });
+});
+</script>

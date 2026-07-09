@@ -1,0 +1,49 @@
+{% load i18n %}
+
+<div class="employee-inline-formset" id="formset-child-{{ formset.prefix }}">
+    {{ formset.management_form }}
+    <div class="employee-inline-rows">
+        {% for form in formset %}
+        <div class="employee-inline-card border rounded-3 p-3 mb-3">
+            {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+            {% if form.non_field_errors %}<div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>{% endif %}
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label onip-step-label" for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }}</label>
+                    {{ form.full_name }}
+                    {% if form.full_name.errors %}<div class="invalid-feedback d-block">{{ form.full_name.errors|striptags }}</div>{% endif %}
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label onip-step-label" for="{{ form.date_of_birth.id_for_label }}">{{ form.date_of_birth.label }}</label>
+                    {{ form.date_of_birth }}
+                    {% if form.date_of_birth.errors %}<div class="invalid-feedback d-block">{{ form.date_of_birth.errors|striptags }}</div>{% endif %}
+                </div>
+            </div>
+            {% if form.DELETE %}
+            <div class="form-check mt-3 mb-0">
+                {{ form.DELETE }}
+                <label class="form-check-label" for="{{ form.DELETE.id_for_label }}">{% trans 'Supprimer cet enfant' %}</label>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+$(function () {
+    var $rows = $('#formset-child-{{ formset.prefix }} .employee-inline-rows .employee-inline-card');
+    if (!$rows.length || typeof $rows.formset !== 'function') return;
+    $rows.formset({
+        prefix: '{{ formset.prefix }}',
+        formCssClass: 'employee-inline-card',
+        addText: '{% trans "Ajouter un enfant" %}',
+        deleteText: '',
+        added: function () {
+            if (typeof window.onipSyncEmployeeFormSelect2 === 'function') {
+                window.onipSyncEmployeeFormSelect2();
+            }
+        },
+    });
+});
+</script>

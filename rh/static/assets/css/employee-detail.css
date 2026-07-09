@@ -1,3 +1,200 @@
+.onip-uppercase-select,
+.onip-uppercase-select option {
+    text-transform: uppercase;
+}
+
+.onip-education-ref-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.education-inline-formset .education-inline-card {
+    background: #fff;
+}
+
+.education-inline-formset .education-ref-field .onip-education-other-input {
+    margin-top: 0.35rem;
+}
+
+.education-inline-formset .form-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 0.35rem;
+}
+
+/* ——— Formulaire employé pleine largeur + champs inline ——— */
+.employee-edit-page .employee-edit-page__content,
+.employee-edit-page .employee-form-layout--full {
+    max-width: none;
+    width: 100%;
+}
+
+.employee-edit-page .employee-form-main,
+.employee-edit-page .employee-stepper-card {
+    width: 100%;
+}
+
+.employee-edit-page .page-content {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.onip-step-label,
+.employee-inline-formset .onip-step-label,
+.education-inline-formset .onip-step-label {
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+}
+
+.employee-inline-formset .employee-inline-card,
+.education-inline-formset .education-inline-card {
+    background: #fff;
+    border-color: #e2e8f0 !important;
+}
+
+.employee-inline-formset .add-row,
+.education-inline-formset .add-row {
+    border: 2px dashed #dbeafe;
+    border-radius: 12px;
+    display: block;
+    margin-top: 0.5rem;
+    padding: 0.85rem 1rem;
+    text-align: center;
+    width: 100%;
+}
+
+.employee-inline-formset .add-row a,
+.education-inline-formset .add-row a,
+.employee-inline-formset a.add-row,
+.education-inline-formset a.add-row {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.employee-inline-formset input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.employee-inline-formset select:not(.select2-hidden-accessible),
+.employee-inline-formset textarea,
+.education-inline-formset input.onip-step-field,
+.education-inline-formset select.onip-step-field:not(.select2-hidden-accessible),
+.education-inline-formset .onip-step-field:not(.select2-hidden-accessible) {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    color: #0f172a;
+    font-size: 0.92rem;
+    min-height: 42px;
+    padding: 0.55rem 0.85rem;
+    width: 100%;
+}
+
+.employee-inline-formset input[type="file"],
+.education-inline-formset input[type="file"] {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 0.65rem 0.85rem;
+    width: 100%;
+}
+
+.employee-inline-formset .onip-select2-wrap,
+.education-inline-formset .onip-select2-wrap {
+    width: 100%;
+}
+
+.employee-inline-formset .select2-container,
+.education-inline-formset .select2-container {
+    width: 100% !important;
+}
+
+.employee-inline-formset .select2-container--bootstrap-5 .select2-selection,
+.employee-inline-formset .select2-container--default .select2-selection--single,
+.education-inline-formset .select2-container--bootstrap-5 .select2-selection,
+.education-inline-formset .select2-container--default .select2-selection--single {
+    align-items: center;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    min-height: 42px;
+    padding: 0.35rem 0.65rem;
+}
+
+.employee-inline-formset .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered,
+.education-inline-formset .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered,
+.employee-inline-formset .select2-container--default .select2-selection--single .select2-selection__rendered,
+.education-inline-formset .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #0f172a;
+    line-height: 1.5;
+    padding-left: 0;
+}
+
+.employee-inline-formset .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow,
+.education-inline-formset .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    height: 40px;
+}
+
+/* Select2 : ne jamais afficher le <select> natif en double */
+.onip-form select.select2-hidden-accessible,
+.employee-inline-formset select.select2-hidden-accessible,
+.education-inline-formset select.select2-hidden-accessible,
+.employee-form-pane select.select2-hidden-accessible {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    min-height: 0 !important;
+    background: transparent !important;
+}
+
+.employee-step-pane:not(.active):not(.show),
+.employee-step-panels > .tab-pane:not(.active):not(.show) {
+    display: none !important;
+}
+
+.employee-step-pane .select2-container--open .select2-dropdown {
+    z-index: 1060;
+}
+
+.employee-form-pane .select2-container,
+.employee-step-body .select2-container {
+    width: 100% !important;
+}
+
+.employee-form-pane .select2-container--bootstrap-5 .select2-selection,
+.employee-form-pane .select2-container--default .select2-selection--single,
+.employee-step-body .select2-container--bootstrap-5 .select2-selection,
+.employee-step-body .select2-container--default .select2-selection--single {
+    align-items: center;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    min-height: 42px;
+    padding: 0.35rem 0.65rem;
+}
+
+.education-inline-formset select.onip-education-ref-select:not(.select2-hidden-accessible),
+.employee-step-body select.form-select.onip-step-field {
+    appearance: auto;
+    background-color: #f8fafc;
+    background-image: none;
+}
+
+.onip-education-other-input {
+    margin-top: 0;
+}
+
 .employee-detail-page {
     --ed-primary: #0f2744;
     --ed-success: #22c55e;
@@ -896,5 +1093,351 @@
     .attendance-week-strip,
     .attendance-month-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* ——— Stepper formulaire employé ——— */
+.epd-topbar-sep {
+    color: #cbd5e1;
+    font-weight: 400;
+    margin: 0 0.35rem;
+}
+
+.employee-stepper-card,
+.employee-step-card {
+    background: #fff;
+    border: 1px solid var(--ed-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    overflow: visible;
+}
+
+.employee-form-stepper {
+    border-bottom: 1px solid var(--ed-border);
+    padding: 1.25rem 1.5rem 1rem;
+}
+
+.employee-form-stepper__list {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.employee-form-stepper__item {
+    flex: 1 1 0;
+    position: relative;
+    text-align: center;
+}
+
+.employee-form-stepper__item:not(:last-child)::after {
+    background: #dbeafe;
+    content: '';
+    height: 2px;
+    left: calc(50% + 18px);
+    position: absolute;
+    right: calc(-50% + 18px);
+    top: 17px;
+    z-index: 0;
+}
+
+.employee-form-stepper__item.is-complete:not(:last-child)::after {
+    background: #2563eb;
+}
+
+.employee-form-stepper__btn {
+    background: transparent;
+    border: 0;
+    color: #94a3b8;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+    width: 100%;
+    z-index: 1;
+}
+
+.employee-form-stepper__marker {
+    align-items: center;
+    background: #fff;
+    border: 2px solid #cbd5e1;
+    border-radius: 50%;
+    color: #94a3b8;
+    display: inline-flex;
+    height: 34px;
+    justify-content: center;
+    width: 34px;
+}
+
+.employee-form-stepper__check {
+    display: none;
+    font-size: 1rem;
+}
+
+.employee-form-stepper__number {
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.employee-form-stepper__label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.2;
+    max-width: 92px;
+}
+
+.employee-form-stepper__item.is-active .employee-form-stepper__btn {
+    color: var(--ed-primary);
+}
+
+.employee-form-stepper__item.is-active .employee-form-stepper__marker {
+    background: #eff6ff;
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+.employee-form-stepper__item.is-active .employee-form-stepper__label {
+    font-weight: 700;
+}
+
+.employee-form-stepper__item.is-complete .employee-form-stepper__btn {
+    color: #2563eb;
+}
+
+.employee-form-stepper__item.is-complete .employee-form-stepper__marker {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+}
+
+.employee-form-stepper__item.is-complete .employee-form-stepper__number {
+    display: none;
+}
+
+.employee-form-stepper__item.is-complete .employee-form-stepper__check {
+    display: inline-block;
+}
+
+.employee-step-pane {
+    padding: 0;
+}
+
+.employee-step-header {
+    align-items: flex-start;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem 1rem;
+}
+
+.employee-step-title {
+    color: var(--ed-primary);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+}
+
+.employee-step-subtitle {
+    color: #64748b;
+    font-size: 0.92rem;
+    margin: 0;
+}
+
+.employee-step-add-btn {
+    align-items: center;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    color: #2563eb;
+    display: inline-flex;
+    font-size: 0.82rem;
+    font-weight: 600;
+    gap: 0.35rem;
+    padding: 0.55rem 0.9rem;
+    white-space: nowrap;
+}
+
+.employee-step-body {
+    padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.employee-stepper-footer {
+    align-items: center;
+    border-top: 1px solid var(--ed-border);
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr auto 1fr;
+    padding: 1rem 1.5rem 1.25rem;
+}
+
+.employee-stepper-nav-btn,
+.employee-stepper-draft-btn {
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--ed-border);
+    border-radius: 10px;
+    color: #334155;
+    display: inline-flex;
+    font-weight: 600;
+    gap: 0.35rem;
+    justify-self: start;
+    padding: 0.65rem 1rem;
+}
+
+.employee-stepper-nav-btn:disabled {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+.employee-stepper-nav-btn--primary {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+    justify-self: end;
+}
+
+.employee-stepper-save-btn {
+    background: #16a34a;
+    border-color: #16a34a;
+    color: #fff;
+    cursor: pointer;
+    justify-self: end;
+}
+
+.employee-stepper-save-btn:hover {
+    background: #15803d;
+    border-color: #15803d;
+    color: #fff;
+}
+
+.employee-stepper-draft-btn {
+    background: transparent;
+    border-color: transparent;
+    color: #64748b;
+    justify-self: center;
+}
+
+.epd-action-item.is-active a {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+@media (max-width: 992px) {
+    .employee-form-stepper__label {
+        font-size: 0.65rem;
+        max-width: 72px;
+    }
+
+    .employee-stepper-footer {
+        flex-wrap: wrap;
+    }
+
+    .employee-stepper-draft-btn {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .employee-form-stepper__list {
+        overflow-x: auto;
+        padding-bottom: 0.35rem;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .employee-form-stepper__item {
+        min-width: 88px;
+    }
+
+    .employee-step-header {
+        flex-direction: column;
+    }
+
+    .employee-step-add-btn {
+        align-self: stretch;
+        justify-content: center;
+        white-space: normal;
+    }
+
+    .employee-step-header,
+    .employee-step-body,
+    .employee-form-stepper {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .employee-stepper-footer {
+        grid-template-columns: 1fr 1fr;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .employee-stepper-draft-btn {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+    }
+
+    .employee-stepper-nav-btn--primary,
+    .employee-stepper-save-btn {
+        justify-self: stretch;
+    }
+
+    .employee-step-body .row > [class*="col-md"],
+    .employee-step-body .row > [class*="col-lg"],
+    .employee-form-pane .row > [class*="col-md"],
+    .employee-form-pane .row > [class*="col-lg"],
+    .employee-form-pane .row > .col-md-3,
+    .employee-form-pane .row > .col-md-4,
+    .employee-form-pane .row > .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .employee-form-pane .onip-form-section-photo {
+        margin-bottom: 1rem;
+    }
+
+    .employee-inline-formset .employee-inline-card,
+    .education-inline-formset .education-inline-card {
+        padding: 0.85rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .employee-form-stepper__label {
+        font-size: 0.58rem;
+        max-width: 64px;
+        line-height: 1.2;
+    }
+
+    .employee-form-stepper__marker {
+        height: 28px;
+        width: 28px;
+    }
+
+    .employee-step-title {
+        font-size: 1.15rem;
+    }
+
+    .employee-stepper-footer {
+        gap: 0.5rem;
+    }
+
+    .employee-stepper-nav-btn,
+    .employee-stepper-draft-btn {
+        font-size: 0.85rem;
+        justify-content: center;
+        padding: 0.6rem 0.75rem;
+        width: 100%;
     }
 }

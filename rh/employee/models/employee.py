@@ -231,6 +231,7 @@ class Employee(Base):
         'agreement', 'date_of_join', 'direction', 'branch', 'designation', 'gender',
         'marital_status', 'branch', 'agent_situation',
     )
+    change_list_template = 'employee/employee_dashboard_list.html'
     list_display = ('id', 'last_name', 'middle_name', 'designation', 'service', 'agent_situation')
     search_fields = (
         'registration_number',

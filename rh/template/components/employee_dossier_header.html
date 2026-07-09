@@ -26,6 +26,11 @@
             <button type="button" class="epd-btn-outline" onclick="window.print()">
                 <i class="bi bi-file-earmark-pdf"></i> {% trans 'Exporter le dossier (PDF)' %}
             </button>
+            {% if show_employee_attendance_nav %}
+            <a href="{% url 'employee:my_attendance' %}" class="epd-btn-outline">
+                <i class="bi bi-calendar-check"></i> {% trans 'Mes présences' %}
+            </a>
+            {% endif %}
             {% if profile_mode == 'edit' %}
             {% elif can_edit and edit_url %}
             <a href="{{ edit_url }}" class="epd-btn-primary">

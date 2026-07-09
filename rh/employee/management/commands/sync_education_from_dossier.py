@@ -1,28 +1,34 @@
 from django.core.management.base import BaseCommand
 
 from employee.models import Education, Employee
+from employee.utils.education_references import resolve_reference
 
 
 class Command(BaseCommand):
-    help = "Remplit les formations depuis metadata (niveauEtude, domaineEtude) du dossier agents."
+    help = "Synchronise les formations depuis metadata (niveauEtude, domaineEtude) du dossier agents."
 
     def handle(self, *args, **options):
+        from employee.models.education_references import FieldOfStudy, StudyLevel
+
         updated = 0
         created = 0
         for employee in Employee.objects.all().iterator():
             meta = employee.metadata or {}
-            study_level = (meta.get('niveauEtude') or '').strip() or None
-            field_of_study = (meta.get('domaineEtude') or '').strip() or None
-            if not study_level and not field_of_study:
+            study_level_raw = (meta.get('niveauEtude') or '').strip() or None
+            field_of_study_raw = (meta.get('domaineEtude') or meta.get('domaine') or '').strip() or None
+            if not study_level_raw and not field_of_study_raw:
                 continue
+
+            study_level = resolve_reference(StudyLevel, study_level_raw) if study_level_raw else None
+            field_of_study = resolve_reference(FieldOfStudy, field_of_study_raw) if field_of_study_raw else None
 
             education = Education.objects.filter(employee=employee).order_by('id').first()
             if education:
                 changed = False
-                if study_level and education.study_level != study_level:
+                if study_level and education.study_level_id != study_level.pk:
                     education.study_level = study_level
                     changed = True
-                if field_of_study and education.field_of_study != field_of_study:
+                if field_of_study and education.field_of_study_id != field_of_study.pk:
                     education.field_of_study = field_of_study
                     changed = True
                 if changed:
@@ -33,7 +39,6 @@ class Command(BaseCommand):
                     employee=employee,
                     study_level=study_level,
                     field_of_study=field_of_study,
-                    degree=study_level,
                 )
                 created += 1
 

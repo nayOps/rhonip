@@ -5,6 +5,13 @@ from crispy_forms.layout import Column, Div, Field, Fieldset, HTML, Layout, Row
 
 ADMIN_ONLY_EMPLOYEE_FIELDS = frozenset({'agent_situation'})
 
+# Modifiables uniquement par admin/staff sur fiche employé existante.
+ADMIN_ONLY_EDITABLE_EMPLOYEE_FIELDS = frozenset({
+    'registration_number',
+    'designation',
+    'email_professional',
+})
+
 
 def is_employee_admin(user) -> bool:
     return bool(user and (user.is_superuser or user.is_staff))
