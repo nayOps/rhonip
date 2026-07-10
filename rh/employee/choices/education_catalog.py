@@ -78,6 +78,7 @@ FIELDS_OF_STUDY = (
     ('LANGUES', 'Langues', 105),
     ('ENSEIGNEMENT', 'Enseignement', 106),
     ('GEOSCIENCES', 'Géosciences', 107),
+    ('ORIENTATION_SCOLAIRE_PEDAGOGIQUE', 'Orientation scolaire et pédagogique', 108),
     (AUTRES_CODE, 'Autres', 999),
 )
 
@@ -116,6 +117,18 @@ STUDY_LEVEL_ALIASES = {
     'graduat bac3': 'GRADUAT_BAC3',
     'licence': 'LICENCE_BAC5',
     'licence bac5': 'LICENCE_BAC5',
+    'bac 5': 'LICENCE_BAC5',
+    'bac+5': 'LICENCE_BAC5',
+    'bac +5': 'LICENCE_BAC5',
+    'licencie': 'LICENCE_BAC5',
+    'licenciee': 'LICENCE_BAC5',
+    'gradue': 'GRADUAT_BAC3',
+    'graduee': 'GRADUAT_BAC3',
+    'formation': 'FORMATION_PROFESSIONNELLE',
+    'basique': 'PRIMAIRE',
+    'l2': 'LICENCE_BAC5',
+    'g3 osp': 'GRADUAT_BAC3',
+    'g3': 'GRADUAT_BAC3',
     'master': 'MASTER',
     'dea': 'DEA',
     'doctorat': 'DOCTORAT_PHD',
@@ -140,6 +153,9 @@ DEGREE_ALIASES = {
     'medecin': 'MEDECIN',
     'pharmacien': 'PHARMACIEN',
     'architecte': 'ARCHITECTE',
+    'certificat': 'CERTIFICAT_ETUDES_PRIMAIRES',
+    'ingenieur en eaux et forets': 'INGENIEUR',
+    'gestion financiere': 'GESTION',
 }
 
 FIELD_OF_STUDY_ALIASES = {
@@ -192,6 +208,14 @@ FIELD_OF_STUDY_ALIASES = {
     'langues': 'LANGUES',
     'enseignement': 'ENSEIGNEMENT',
     'geosciences': 'GEOSCIENCES',
+    'sciences informatiques': 'INFORMATIQUE',
+    'eaux et forets': 'GEOSCIENCES',
+    'management': 'GESTION',
+    'anglais': 'LANGUES',
+    'droit international et relations internationales': 'RELATIONS_INTERNATIONALES',
+    'orientation scolaire et professionnel': 'ORIENTATION_SCOLAIRE_PEDAGOGIQUE',
+    'orientation scolaire et pedagogique': 'ORIENTATION_SCOLAIRE_PEDAGOGIQUE',
+    'orientation scolaire': 'ORIENTATION_SCOLAIRE_PEDAGOGIQUE',
 }
 
 INSTITUTION_ALIASES = {

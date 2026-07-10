@@ -63,9 +63,12 @@ def ensure_unique_code(model, base_code):
 
 
 def _get_model(model_or_label, apps=None):
-    if apps is not None and isinstance(model_or_label, str):
+    if isinstance(model_or_label, str):
         app_label, model_name = model_or_label.split('.')
-        return apps.get_model(app_label, model_name)
+        if apps is not None:
+            return apps.get_model(app_label, model_name)
+        from django.apps import apps as django_apps
+        return django_apps.get_model(app_label, model_name)
     return model_or_label
 
 
