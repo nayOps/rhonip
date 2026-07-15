@@ -129,20 +129,19 @@ def base(request):
         'badge': request.user.notifications.unread().count()
     }))
 
-    menu.insert(2, dict({
-        'title': _('Action requise'),
-        'href': reverse_lazy('core:action-required'),
-        'icon': 'bi-check-circle-fill',
-        'forced': True,
-        'badge': action_required(request).get('action_required_count', 0)
-    }))
-
-    next_forced_index = 3
+    next_forced_index = 2
     if request.user.is_staff or request.user.is_superuser:
         menu.insert(next_forced_index, dict({
             'title': _('Présences générale'),
             'href': reverse_lazy('employee:company_attendance'),
             'icon': 'bi-calendar2-check-fill',
+            'forced': True,
+        }))
+        next_forced_index += 1
+        menu.insert(next_forced_index, dict({
+            'title': _('Statistiques'),
+            'href': reverse_lazy('employee:presence_statistics'),
+            'icon': 'bi-graph-up-arrow',
             'forced': True,
         }))
         next_forced_index += 1
@@ -216,6 +215,8 @@ def base(request):
             'permission': 'core.view_job'
         }] if request.user.has_perm(item.get('permission'))]
     }))
+    _action_path = _href_path(reverse_lazy('core:action-required'))
+    menu = [item for item in menu if _href_path(item.get('href')) != _action_path]
     menu = _mark_menu_active(menu, request.path)
     return {'menus': menu, 'organization': Organization.objects.first(), 'PASSWORD_RESET_REDIRECT_URL': PASSWORD_RESET_REDIRECT_URL}
 

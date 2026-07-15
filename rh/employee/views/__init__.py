@@ -9,6 +9,7 @@ from .company_attendance import CompanyAttendance
 from .direction_attendance import DirectionReportHub, DirectionAttendanceReport, DirectionReportSchedule
 from .late_justification import LateJustificationCreate
 from .agents_directory import AgentsDirectoryExport
+from .presence_statistics import PresenceStatistics, PresenceStatisticsExport
 from .reports import (
     ReportsHub,
     BiometricEnrollmentReport,
@@ -17,4 +18,6 @@ from .reports import (
     EnrollmentDayReport,
     EnrollmentDayReportExport,
     EnrollmentDayReportSchedule,
+    DailyAttendanceReport,
+    DailyAttendanceReportExport,
 )

@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/company-attendance.css' %}">
+<link rel="stylesheet" href="{% static 'assets/css/presence-statistics.css' %}?v=20260715">
+
+<div class="company-attendance-page ps-page">
+    <header class="ca-page-header">
+        <div class="ca-page-title">
+            <h1>{{ report.title }}</h1>
+            <span class="ca-page-divider" aria-hidden="true"></span>
+            <span class="ca-page-date">{{ report.period_label }} · {{ report.working_days_count }} {% trans 'jours ouvrés' %}</span>
+        </div>
+        <div class="ps-page-actions no-print">
+            <a href="{% url 'employee:presence_statistics_export' %}?{{ report.query_string }}" class="btn btn-primary">
+                <i class="bi bi-download"></i> {% trans 'Export CSV' %}
+            </a>
+        </div>
+    </header>
+
+    <form method="get" class="ca-filters-panel no-print" id="ps-filters-form">
+        <input type="hidden" name="page" value="1">
+        <div class="ca-filters-grid">
+            <div class="ca-filter-block">
+                <span class="ca-filter-label">{% trans 'Mois' %}</span>
+                <div class="ps-month-nav">
+                    <input type="number" name="year" value="{{ report.year }}" min="2020" max="2100" class="form-control ps-month-input">
+                    <input type="number" name="month" value="{{ report.month }}" min="1" max="12" class="form-control ps-month-input">
+                </div>
+            </div>
+            <div class="ca-filter-block ca-filter-block--direction">
+                <span class="ca-filter-label">{% trans 'Direction' %}</span>
+                <select name="direction" class="form-select" onchange="this.form.submit()">
+                    <option value="">{% trans 'Toutes les directions' %}</option>
+                    {% for direction in report.directions %}
+                    <option value="{{ direction.pk }}"{% if report.selected_direction_id == direction.pk %} selected{% endif %}>{{ direction.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="ca-filter-block">
+                <span class="ca-filter-label">{% trans 'Segment' %}</span>
+                <select name="segment" class="form-select" onchange="this.form.submit()">
+                    {% for code, label in report.segment_choices %}
+                    <option value="{{ code }}"{% if report.segment == code %} selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="ca-filter-block ca-filter-block--search">
+                <span class="ca-filter-label">{% trans 'Rechercher' %}</span>
+                <input type="search" name="q" value="{{ report.search_query }}" placeholder="{% trans 'Matricule, nom…' %}" class="form-control">
+            </div>
+            <div class="ca-filter-block ca-filter-block--export">
+                <span class="ca-filter-label ca-filter-label--invisible">{% trans 'Filtrer' %}</span>
+                <button type="submit" class="ca-export-btn"><i class="bi bi-funnel"></i> {% trans 'Appliquer' %}</button>
+            </div>
+        </div>
+    </form>
+
+    <section class="ps-kpi-grid" aria-label="{% trans 'Indicateurs clés' %}">
+        <article class="ps-kpi-card">
+            <span class="ps-kpi-label">{% trans 'Actifs' %}</span>
+            <strong class="ps-kpi-value">{{ report.kpis.total_active }}</strong>
+        </article>
+        <article class="ps-kpi-card ps-kpi-card--success">
+            <span class="ps-kpi-label">{% trans 'Agents réels' %} (≥ {{ report.real_threshold }} %)</span>
+            <strong class="ps-kpi-value">{{ report.kpis.real_agents }}</strong>
+            <span class="ps-kpi-sub">{{ report.kpis.real_agents_rate }} %</span>
+        </article>
+        <article class="ps-kpi-card">
+            <span class="ps-kpi-label">{% trans 'Enrôlement 10/10' %}</span>
+            <strong class="ps-kpi-value">{{ report.kpis.enrolled_complete }}</strong>
+        </article>
+        <article class="ps-kpi-card">
+            <span class="ps-kpi-label">{% trans 'Enrôlement partiel' %}</span>
+            <strong class="ps-kpi-value">{{ report.kpis.enrolled_partial }}</strong>
+        </article>
+        <article class="ps-kpi-card ps-kpi-card--warn">
+            <span class="ps-kpi-label">{% trans 'Sans empreinte' %}</span>
+            <strong class="ps-kpi-value">{{ report.kpis.no_fingerprint }}</strong>
+        </article>
+        <article class="ps-kpi-card">
+            <span class="ps-kpi-label">{% trans 'Au moins 1 pointage' %}</span>
+            <strong class="ps-kpi-value">{{ report.kpis.punched_at_least_once }}</strong>
+        </article>
+        <article class="ps-kpi-card ps-kpi-card--danger">
+            <span class="ps-kpi-label">{% trans 'Jamais pointé' %}</span>
+            <strong class="ps-kpi-value">{{ report.kpis.never_punched }}</strong>
+        </article>
+        <article class="ps-kpi-card ps-kpi-card--info">
+            <span class="ps-kpi-label">{% trans 'Taux moyen' %}</span>
+            <strong class="ps-kpi-value">{{ report.projection.avg_presence_rate }} %</strong>
+            <span class="ps-kpi-sub">{{ report.projection.elapsed_working_days }} {% trans 'j. écoulés' %}</span>
+        </article>
+    </section>
+
+    <section class="ps-charts-grid no-print">
+        <article class="ps-chart-card">
+            <h2>{% trans 'Seuil agents réels' %}</h2>
+            <p class="ps-chart-help">{% trans 'Nombre d’agents selon le taux de présence minimum' %}</p>
+            <canvas id="ps-threshold-chart" height="220"></canvas>
+        </article>
+        <article class="ps-chart-card">
+            <h2>{% trans 'Répartition par segment' %}</h2>
+            <p class="ps-chart-help">{% trans 'Classification exclusive des agents actifs' %}</p>
+            <canvas id="ps-segment-chart" height="220"></canvas>
+        </article>
+    </section>
+
+    <section class="ps-direction-section">
+        <h2>{% trans 'Par direction' %}</h2>
+        <div class="table-responsive">
+            <table class="table ps-table">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Direction' %}</th>
+                        <th>{% trans 'Effectif' %}</th>
+                        <th>{% trans 'Agents réels' %}</th>
+                        <th>{% trans 'Fantômes' %}</th>
+                        <th>{% trans 'De nom' %}</th>
+                        <th>{% trans 'Jamais pointé' %}</th>
+                        <th>{% trans 'Taux moyen' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report.direction_breakdown %}
+                    <tr>
+                        <td>{{ row.direction }}</td>
+                        <td>{{ row.total }}</td>
+                        <td>{{ row.real_agents }}</td>
+                        <td>{{ row.ghosts }}</td>
+                        <td>{{ row.nominal }}</td>
+                        <td>{{ row.never_punched }}</td>
+                        <td>{{ row.avg_presence }} %</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-muted">{% trans 'Aucune donnée' %}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="ps-agents-section">
+        <div class="ps-agents-header">
+            <h2>{% trans 'Détail agents' %} ({{ report.pagination.total }})</h2>
+        </div>
+        <div class="table-responsive">
+            <table class="table ps-table ps-table--agents">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Matricule' %}</th>
+                        <th>{% trans 'Agent' %}</th>
+                        <th>{% trans 'Direction' %}</th>
+                        <th>{% trans 'Emp.' %}</th>
+                        <th>{% trans 'Présence' %}</th>
+                        <th>{% trans 'Matin' %}</th>
+                        <th>{% trans 'Soir' %}</th>
+                        <th>{% trans 'E+S' %}</th>
+                        <th>{% trans 'Segment' %}</th>
+                        <th>{% trans 'Score' %}</th>
+                        <th>{% trans 'Dernier ptg' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report.rows %}
+                    <tr class="{% if row.is_real_agent %}ps-row--real{% elif row.total_punches == 0 %}ps-row--ghost{% endif %}">
+                        <td><code>{{ row.matricule }}</code></td>
+                        <td>
+                            <a href="{% url 'employee:change' row.employee.pk %}">{{ row.full_name }}</a>
+                        </td>
+                        <td>{{ row.direction }}</td>
+                        <td>{{ row.enrollment_label }}</td>
+                        <td>
+                            <span class="ps-rate{% if row.presence_rate >= report.real_threshold %} ps-rate--ok{% elif row.presence_rate < 10 %} ps-rate--bad{% endif %}">
+                                {{ row.presence_rate }} %
+                            </span>
+                            <small class="text-muted d-block">{{ row.present_days }}/{{ row.working_days }}</small>
+                        </td>
+                        <td>{{ row.morning_days }}</td>
+                        <td>{{ row.evening_days }}</td>
+                        <td>{{ row.both_days }}</td>
+                        <td><span class="ps-segment-badge ps-segment-badge--{{ row.segment }}">{{ row.segment_label }}</span></td>
+                        <td>{{ row.real_score }}</td>
+                        <td>{{ row.last_punch_label }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="11" class="text-muted">{% trans 'Aucun agent pour ces filtres' %}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if report.pagination.total_pages > 1 %}
+        <nav class="ps-pagination no-print" aria-label="{% trans 'Pagination' %}">
+            {% if report.pagination.has_previous %}
+            <a href="?{{ report.query_string }}&page={{ report.pagination.previous_page }}" class="ps-page-link">← {% trans 'Précédent' %}</a>
+            {% endif %}
+            <span class="ps-page-info">{{ report.pagination.page }} / {{ report.pagination.total_pages }}</span>
+            {% if report.pagination.has_next %}
+            <a href="?{{ report.query_string }}&page={{ report.pagination.next_page }}" class="ps-page-link">{% trans 'Suivant' %} →</a>
+            {% endif %}
+        </nav>
+        {% endif %}
+    </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    var thresholdData = {{ report.threshold_curve_json|safe }};
+    var segmentData = {{ report.segment_donut_json|safe }};
+
+    var thresholdCtx = document.getElementById('ps-threshold-chart');
+    if (thresholdCtx && thresholdData.length) {
+        new Chart(thresholdCtx, {
+            type: 'line',
+            data: {
+                labels: thresholdData.map(function (item) { return item.threshold + ' %'; }),
+                datasets: [{
+                    label: '{% trans "Agents" %}',
+                    data: thresholdData.map(function (item) { return item.count; }),
+                    borderColor: '#0ea5e9',
+                    backgroundColor: 'rgba(14, 165, 233, 0.15)',
+                    fill: true,
+                    tension: 0.3,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+            }
+        });
+    }
+
+    var segmentCtx = document.getElementById('ps-segment-chart');
+    if (segmentCtx && segmentData.length) {
+        new Chart(segmentCtx, {
+            type: 'doughnut',
+            data: {
+                labels: segmentData.map(function (item) { return item.label; }),
+                datasets: [{
+                    data: segmentData.map(function (item) { return item.count; }),
+                    backgroundColor: segmentData.map(function (item) { return item.color; }),
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
+})();
+</script>
+{% endblock %}
