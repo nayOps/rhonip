@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'assets/css/company-attendance.css' %}">
+<link rel="stylesheet" href="{% static 'assets/css/reports-hub.css' %}">
+<link rel="stylesheet" href="{% static 'assets/css/biometric-enrollment-report.css' %}">
+
+<div class="company-attendance-page bio-report-page">
+    <nav class="bio-breadcrumb no-print" aria-label="{% trans 'Fil d\'Ariane' %}">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">{% trans 'Tableau de bord' %}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'employee:reports_hub' %}">{% trans 'Programmation des rapports' %}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ report.title }}</li>
+        </ol>
+    </nav>
+
+    <header class="ca-page-header">
+        <div class="ca-page-title">
+            <h1>{{ report.title }}</h1>
+            <span class="ca-page-divider" aria-hidden="true"></span>
+            <span class="ca-page-date">{{ report.weekday_label }} {{ report.report_day_label }}</span>
+        </div>
+        <div class="bio-page-actions no-print">
+            <a href="{% url 'employee:reports_hub' %}" class="btn btn-light btn-sm">
+                <i class="bi bi-arrow-left"></i> {% trans 'Programmation' %}
+            </a>
+            <a href="{% url 'employee:daily_attendance_report_export' %}?{{ report.query_string }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-download"></i> {% trans 'Télécharger PDF' %}
+            </a>
+        </div>
+    </header>
+
+    <form method="get" class="ca-filters-panel no-print">
+        <div class="ca-filters-panel__top">
+            <div class="ca-filters-panel__title">
+                <i class="bi bi-calendar-day" aria-hidden="true"></i>
+                <span>{% trans 'Paramètres du rapport journalier' %}</span>
+            </div>
+        </div>
+        <div class="bio-filters-grid bio-filters-grid--dates">
+            <div class="ca-filter-block">
+                <span class="ca-filter-label">{% trans 'Date du rapport' %}</span>
+                <input type="date" name="date" class="form-control bio-date-input" value="{{ report.target_date_value }}">
+            </div>
+            <div class="ca-filter-block">
+                <span class="ca-filter-label">{% trans 'Direction' %}</span>
+                <select name="direction" class="form-select">
+                    <option value="">{% trans 'Toutes directions' %}</option>
+                    {% for direction in report.directions %}
+                    <option value="{{ direction.id }}"{% if report.direction_value == direction.id|stringformat:"s" %} selected{% endif %}>{{ direction.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="ca-filter-block d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i> {% trans 'Actualiser' %}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="bio-kpi-grid no-print" aria-label="{% trans 'Indicateurs' %}">
+        <div class="ca-kpi-card ca-kpi-total">
+            <i class="bi bi-people bio-kpi-icon text-primary" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Effectif' %}</span>
+            <strong>{{ report.total_count }}</strong>
+            <small>{{ report.direction_label }}</small>
+        </div>
+        <div class="ca-kpi-card ca-kpi-complete">
+            <i class="bi bi-check2-circle bio-kpi-icon text-success" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Présents' %}</span>
+            <strong>{{ report.present_count }}</strong>
+            <small>{% trans '2 pointages' %}</small>
+        </div>
+        <div class="ca-kpi-card ca-kpi-active">
+            <i class="bi bi-exclamation-circle bio-kpi-icon text-warning" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Partiel' %}</span>
+            <strong>{{ report.partial_count }}</strong>
+            <small>{{ report.presence_rate_display }} {% trans 'taux' %}</small>
+        </div>
+        <div class="ca-kpi-card">
+            <i class="bi bi-x-circle bio-kpi-icon text-danger" aria-hidden="true"></i>
+            <span class="ca-kpi-label">{% trans 'Absents' %}</span>
+            <strong>{{ report.absent_count }}</strong>
+            <small>{{ report.registered_count }} {% trans 'pointages' %}</small>
+        </div>
+    </div>
+
+    <div class="company-attendance-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 onip-table">
+                <thead class="table-light">
+                    <tr>
+                        <th>N°</th>
+                        <th>{% trans 'Matricule' %}</th>
+                        <th>{% trans 'Agent' %}</th>
+                        <th>{% trans 'Direction' %}</th>
+                        {% for header in report.slot_headers %}
+                        <th>{{ header }}</th>
+                        {% endfor %}
+                        <th>{% trans 'Durée' %}</th>
+                        <th>{% trans 'Statut' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report.rows %}
+                    <tr>
+                        <td>{{ row.numero_display }}</td>
+                        <td><code>{{ row.matricule }}</code></td>
+                        <td><strong>{{ row.full_name }}</strong></td>
+                        <td>{{ row.direction }}</td>
+                        {% for slot in row.slot_values %}
+                        <td class="{% if slot.is_late %}text-danger fw-semibold{% endif %}">{{ slot.time }}</td>
+                        {% endfor %}
+                        <td>{{ row.duration_label }}</td>
+                        <td><span class="badge attendance-report-badge {{ row.status }}">{{ row.status_label }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="20" class="text-muted text-center py-4">{% trans 'Aucun pointage enregistré pour cette journée.' %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

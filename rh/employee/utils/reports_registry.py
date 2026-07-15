@@ -32,4 +32,19 @@ REPORT_CATALOG = (
         'export_name': 'employee:enrollment_day_report_export',
         'default_query': '',
     },
+    {
+        'code': 'presence-journalier',
+        'title': _('Présence journalière'),
+        'description': _(
+            'Registre des pointages pour une journée : effectif, présents, retards, '
+            'absences et détail des plages horaires par agent.'
+        ),
+        'icon': 'bi-clock-history',
+        'badge': _('Journalier'),
+        'filename_hint': 'rapport-rh-onip-presence-journalier-[date].pdf',
+        'preview_name': 'employee:daily_attendance_report',
+        'schedule_name': 'employee:daily_attendance_report',
+        'export_name': 'employee:daily_attendance_report_export',
+        'default_query': '',
+    },
 )

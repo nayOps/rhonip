@@ -19,6 +19,11 @@ from employee.utils.completed_enrollment_day_report import (
     parse_enrollment_day_filters,
     render_completed_enrollment_day_pdf,
 )
+from employee.utils.daily_attendance_report import (
+    build_daily_attendance_report,
+    parse_daily_attendance_filters,
+    render_daily_attendance_pdf,
+)
 from employee.utils.reports_registry import REPORT_CATALOG
 
 
@@ -80,6 +85,24 @@ def _day_report_build_kwargs(params):
         'target_date': params['target_date'],
         'period_from': params['period_from'],
         'period_to': params['period_to'],
+    }
+
+
+def _attendance_day_report_params(request):
+    if request.method == 'POST':
+        source = request.POST
+    else:
+        source = request.GET
+    return parse_daily_attendance_filters(
+        target_date=source.get('date'),
+        direction=source.get('direction'),
+    )
+
+
+def _attendance_day_report_build_kwargs(params):
+    return {
+        'target_date': params['target_date'],
+        'direction_id': params['direction_id'],
     }
 
 
@@ -308,3 +331,23 @@ class EnrollmentDayReportSchedule(StaffReportsMixin, View):
             _('Programmation du rapport « Enregistrement journalier 10/10 » enregistrée.'),
         )
         return redirect(reverse('employee:reports_hub'))
+
+
+class DailyAttendanceReport(StaffReportsMixin, View):
+    template_name = 'employee/daily_attendance_report.html'
+
+    def get(self, request):
+        params = _attendance_day_report_params(request)
+        report = build_daily_attendance_report(**_attendance_day_report_build_kwargs(params))
+        return render(request, self.template_name, {'report': report})
+
+
+class DailyAttendanceReportExport(StaffReportsMixin, View):
+    def get(self, request):
+        params = _attendance_day_report_params(request)
+        report = build_daily_attendance_report(**_attendance_day_report_build_kwargs(params))
+        pdf_bytes = render_daily_attendance_pdf(**_attendance_day_report_build_kwargs(params))
+        filename = report.get('pdf_filename') or 'rapport-rh-onip-presence-journalier.pdf'
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
