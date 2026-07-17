@@ -1,7 +1,8 @@
 import csv
+from pathlib import Path
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.http import HttpResponse
+from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import render
 from django.utils.translation import gettext as _
 from django.views import View
@@ -10,7 +11,10 @@ from employee.utils.presence_statistics import (
     _filter_rows,
     build_agent_rows,
     build_presence_statistics,
+    build_presence_statistics_pdf_context,
+    render_presence_statistics_pdf,
 )
+from employee.utils.report_pdf_common import default_reports_output_dir, save_report_pdf
 
 
 class StaffStatisticsMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -91,3 +95,28 @@ class PresenceStatisticsExport(StaffStatisticsMixin, View):
                 row['dominant_source'],
             ])
         return response
+
+
+class PresenceStatisticsPdfExport(StaffStatisticsMixin, View):
+    def get(self, request):
+        kwargs = _stats_kwargs(request)
+        report = build_presence_statistics_pdf_context(**kwargs)
+        pdf_bytes = render_presence_statistics_pdf(**kwargs)
+        filename = report.get('pdf_filename') or 'rapport-rh-onip-statistiques-presence.pdf'
+        save_report_pdf(pdf_bytes, filename)
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+
+class GeneratedReportDownload(StaffStatisticsMixin, View):
+    """Télécharge un PDF déjà généré depuis deploy/vps/reports."""
+
+    def get(self, request, filename):
+        safe_name = Path(filename).name
+        if not safe_name.startswith('rapport-rh-onip-') or not safe_name.endswith('.pdf'):
+            raise Http404
+        path = default_reports_output_dir() / safe_name
+        if not path.is_file():
+            raise Http404
+        return FileResponse(path.open('rb'), as_attachment=True, filename=safe_name)

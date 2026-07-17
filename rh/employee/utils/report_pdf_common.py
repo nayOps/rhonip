@@ -63,10 +63,14 @@ def build_pdf_filename(
     day: date | None = None,
     date_from: date | None = None,
     date_to: date | None = None,
+    year: int | None = None,
+    month: int | None = None,
 ) -> str:
     """Convention : rapport-rh-onip-{code}-{dates}.pdf"""
     parts = ['rapport-rh-onip', report_code]
-    if day:
+    if year and month:
+        parts.append(f'{int(year):04d}-{int(month):02d}')
+    elif day:
         parts.append(day.strftime('%Y-%m-%d'))
     elif date_from and date_to:
         parts.append(date_from.strftime('%Y-%m-%d'))
@@ -74,3 +78,42 @@ def build_pdf_filename(
     elif date_from:
         parts.append(date_from.strftime('%Y-%m-%d'))
     return '-'.join(parts) + '.pdf'
+
+
+def default_reports_output_dir() -> Path:
+    """Dossier local des PDF générés : deploy/vps/reports à la racine du dépôt."""
+    repo_root = Path(settings.BASE_DIR).parent
+    output_dir = repo_root / 'deploy' / 'vps' / 'reports'
+    output_dir.mkdir(parents=True, exist_ok=True)
+    return output_dir
+
+
+def list_generated_report_files(limit: int = 40) -> list[dict]:
+    """Liste les PDF générés dans deploy/vps/reports (plus récents d'abord)."""
+    output_dir = default_reports_output_dir()
+    files = sorted(
+        output_dir.glob('rapport-rh-onip-*.pdf'),
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
+    )
+    items = []
+    for path in files[:limit]:
+        stat = path.stat()
+        items.append(
+            {
+                'filename': path.name,
+                'size_bytes': stat.st_size,
+                'size_kb': max(1, round(stat.st_size / 1024)),
+                'modified_at': date.fromtimestamp(stat.st_mtime),
+                'modified_label': date.fromtimestamp(stat.st_mtime).strftime('%d/%m/%Y'),
+            }
+        )
+    return items
+
+
+def save_report_pdf(pdf_bytes: bytes, filename: str):
+    """Enregistre un PDF dans le dossier des rapports générés."""
+    output_dir = default_reports_output_dir()
+    output_path = output_dir / filename
+    output_path.write_bytes(pdf_bytes)
+    return output_path

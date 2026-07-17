@@ -15,7 +15,13 @@
             <span class="ca-page-date">{{ report.period_label }} · {{ report.working_days_count }} {% trans 'jours ouvrés' %}</span>
         </div>
         <div class="ps-page-actions no-print">
-            <a href="{% url 'employee:presence_statistics_export' %}?{{ report.query_string }}" class="btn btn-primary">
+            <a href="{% url 'employee:reports_hub' %}" class="btn reports-hub-link-btn">
+                <i class="bi bi-calendar-check"></i> {% trans 'Programmer' %}
+            </a>
+            <a href="{% url 'employee:presence_statistics_pdf' %}?{{ report.query_string }}" class="btn btn-primary">
+                <i class="bi bi-file-earmark-pdf"></i> {% trans 'Télécharger PDF' %}
+            </a>
+            <a href="{% url 'employee:presence_statistics_export' %}?{{ report.query_string }}" class="btn btn-light">
                 <i class="bi bi-download"></i> {% trans 'Export CSV' %}
             </a>
         </div>

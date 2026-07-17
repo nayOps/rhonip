@@ -15,6 +15,7 @@ from django.utils.translation import gettext as _
 from employee.models import Direction, Employee
 from employee.utils.attendance_slots import evaluate_day_slots
 from employee.utils.attendance_stats import MONTH_NAMES, bulk_punches_by_employee
+from employee.utils.report_pdf_common import build_pdf_filename, logo_data_uri
 from employee.utils.roster import apply_roster_filter
 
 REAL_AGENT_THRESHOLD = 60
@@ -652,4 +653,53 @@ def build_presence_statistics(
         'pagination': pagination,
         'query_string': query_string,
         'generated_at_label': date.today().strftime('%d/%m/%Y'),
+        'pdf_filename': build_pdf_filename(
+            'statistiques-presence',
+            year=filters['year'],
+            month=filters['month'],
+        ),
+        'segment_label': dict(SEGMENT_CHOICES).get(filters['segment'], filters['segment']),
+        'direction_label': (
+            next(
+                (str(d.name) for d in directions if d.pk == filters['direction_id']),
+                _('Toutes les directions'),
+            )
+            if filters['direction_id']
+            else _('Toutes les directions')
+        ),
+        'logo_uri': logo_data_uri(),
+        'report_title_line1': _('Statistiques de présence'),
+        'report_title_line2': period_label,
+        'report_ref': f"REF-RH-STATS-{filters['year']}{filters['month']:02d}",
     }
+
+
+def build_presence_statistics_pdf_context(**kwargs) -> dict:
+    """Contexte PDF : tous les agents filtrés (sans pagination)."""
+    report = build_presence_statistics(**{**kwargs, 'page': 1})
+    rows, _meta = build_agent_rows(
+        year=report['year'],
+        month=report['month'],
+        direction_id=report['selected_direction_id'],
+    )
+    filtered = _filter_rows(rows, report['segment'], report['search_query'])
+    for index, row in enumerate(filtered, start=1):
+        row['numero_display'] = f'{index:03d}'
+    report['rows'] = filtered
+    report['pdf_rows_count'] = len(filtered)
+    report['logo_uri'] = logo_data_uri()
+    return report
+
+
+def render_presence_statistics_html(**kwargs) -> str:
+    from django.template.loader import render_to_string
+
+    report = build_presence_statistics_pdf_context(**kwargs)
+    return render_to_string('employee/presence_statistics_pdf.html', report)
+
+
+def render_presence_statistics_pdf(**kwargs) -> bytes:
+    from employee.utils.html_pdf_renderer import render_html_to_pdf
+
+    html = render_presence_statistics_html(**kwargs)
+    return render_html_to_pdf(html)

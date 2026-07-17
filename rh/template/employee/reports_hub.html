@@ -123,5 +123,44 @@
             {% endfor %}
         </div>
     </section>
+
+    <section class="rh-reports-section mt-4" aria-labelledby="rh-generated-reports-title">
+        <div class="bio-table-card__header px-0 pt-0 border-0 bg-transparent">
+            <div>
+                <h2 id="rh-generated-reports-title" class="rh-reports-section__title">{% trans 'PDF générés' %}</h2>
+                <p class="rh-reports-section__subtitle">{% trans 'Fichiers enregistrés après téléchargement (dossier rapports)' %}</p>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table ps-table">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Fichier' %}</th>
+                        <th>{% trans 'Date' %}</th>
+                        <th>{% trans 'Taille' %}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in generated_reports %}
+                    <tr>
+                        <td><code>{{ file.filename }}</code></td>
+                        <td>{{ file.modified_label }}</td>
+                        <td>{{ file.size_kb }} Ko</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary" href="{% url 'employee:generated_report_download' file.filename %}">
+                                <i class="bi bi-download"></i> {% trans 'Télécharger' %}
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-muted">{% trans 'Aucun PDF généré pour le moment. Téléchargez un rapport pour le voir ici.' %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
 </div>
 {% endblock %}

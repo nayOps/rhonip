@@ -1,0 +1,206 @@
+<!DOCTYPE html><html class="light" lang="fr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#f7f9fb",
+                    "on-surface-variant": "#444651",
+                    "primary-container": "#253b80",
+                    "on-surface": "#191c1e",
+                    "primary": "#072369",
+                    "outline": "#757682",
+                    "on-primary-container": "#94a8f5",
+                    "surface-container": "#eceef0",
+                    "surface-container-high": "#e6e8ea",
+                    "outline-variant": "#c5c5d2",
+                    "error": "#ba1a1a"
+            },
+            "fontFamily": {
+                    "body-md": ["Hanken Grotesk"],
+                    "label-sm": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "label-bold": ["Hanken Grotesk"],
+                    "headline-md": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Hanken Grotesk', sans-serif; background-color: #f1f5f9; }
+        .a4-container {
+            width: 297mm;
+            min-height: 210mm;
+            padding: 14mm;
+            margin: 2rem auto;
+            background-color: #ffffff;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        @media print {
+            body { background-color: white; margin: 0; }
+            .a4-container { box-shadow: none; margin: 0; width: 100%; padding: 10mm; min-height: auto; }
+        }
+        @page { size: A4 landscape; margin: 10mm; }
+        .report-data-table thead { display: table-header-group; }
+        .report-data-table tbody tr { break-inside: avoid; page-break-inside: avoid; }
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-size: 1.25rem;
+            line-height: 1;
+            vertical-align: middle;
+        }
+        .rate-ok { color: #166534; font-weight: 700; }
+        .rate-bad { color: #991b1b; font-weight: 700; }
+</style>
+</head>
+<body class="text-on-surface">
+<div class="a4-container">
+<header class="flex justify-between items-start border-b border-outline-variant pb-6 mb-8">
+<div class="space-y-1">
+<h2 class="font-headline-md text-primary tracking-tight leading-tight uppercase font-extrabold">République Démocratique du Congo</h2>
+<p class="font-body-md text-on-surface-variant font-semibold">Office National d'Identification de la Population (ONIP)</p>
+<p class="font-label-sm text-outline uppercase tracking-widest">Direction des Ressources Humaines</p>
+</div>
+<div class="w-40 h-16 flex items-center justify-end">
+{% if logo_uri %}
+<img alt="ONIP Logo" class="max-h-full object-contain" src="{{ logo_uri }}">
+{% endif %}
+</div>
+</header>
+
+<section class="mb-8 relative overflow-hidden rounded-xl bg-primary-container p-8 text-on-primary-container">
+<div class="inline-flex items-center gap-2 bg-on-primary-container/20 px-3 py-1 rounded-full mb-3">
+<span class="material-symbols-outlined text-[14px]">analytics</span>
+<span class="text-[12px] font-bold uppercase tracking-wider">Document Officiel</span>
+</div>
+<h1 class="font-headline-lg text-on-primary tracking-tight leading-tight">
+{{ report_title_line1 }}<br>{{ report_title_line2 }}
+</h1>
+<p class="mt-4 font-body-md text-on-primary-container/90">
+{{ direction_label }} · {{ working_days_count }} jours ouvrés · Seuil réel {{ real_threshold }} %
+{% if segment and segment != 'all' %} · Segment : {{ segment_label }}{% endif %}
+</p>
+</section>
+
+<section class="grid grid-cols-8 gap-0 mb-8 rounded-xl border border-outline-variant overflow-hidden">
+<div class="p-3 border-r border-outline-variant bg-surface">
+<p class="font-label-sm text-on-surface-variant mb-1">Actifs</p>
+<p class="font-headline-md text-primary text-[16px]">{{ kpis.total_active }}</p>
+</div>
+<div class="p-3 border-r border-outline-variant">
+<p class="font-label-sm text-on-surface-variant mb-1">Agents réels</p>
+<p class="font-headline-md text-primary text-[16px]">{{ kpis.real_agents }}</p>
+</div>
+<div class="p-3 border-r border-outline-variant bg-surface">
+<p class="font-label-sm text-on-surface-variant mb-1">10/10</p>
+<p class="font-headline-md text-primary text-[16px]">{{ kpis.enrolled_complete }}</p>
+</div>
+<div class="p-3 border-r border-outline-variant">
+<p class="font-label-sm text-on-surface-variant mb-1">Partiel</p>
+<p class="font-headline-md text-primary text-[16px]">{{ kpis.enrolled_partial }}</p>
+</div>
+<div class="p-3 border-r border-outline-variant bg-surface">
+<p class="font-label-sm text-on-surface-variant mb-1">Sans emp.</p>
+<p class="font-headline-md text-primary text-[16px]">{{ kpis.no_fingerprint }}</p>
+</div>
+<div class="p-3 border-r border-outline-variant">
+<p class="font-label-sm text-on-surface-variant mb-1">≥ 1 ptg</p>
+<p class="font-headline-md text-primary text-[16px]">{{ kpis.punched_at_least_once }}</p>
+</div>
+<div class="p-3 border-r border-outline-variant bg-surface">
+<p class="font-label-sm text-on-surface-variant mb-1">Jamais ptg</p>
+<p class="font-headline-md text-primary text-[16px]">{{ kpis.never_punched }}</p>
+</div>
+<div class="p-3">
+<p class="font-label-sm text-on-surface-variant mb-1">Taux moyen</p>
+<p class="font-headline-md text-primary text-[16px]">{{ projection.avg_presence_rate }} %</p>
+</div>
+</section>
+
+<section class="mb-6 report-table-section">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-headline-md text-primary flex items-center gap-2 text-[18px]">
+<span class="material-symbols-outlined">groups</span>
+Détail agents
+</h3>
+<span class="font-label-sm text-on-surface-variant bg-surface-container px-3 py-1 rounded-full border border-outline-variant">
+{{ pdf_rows_count }} agents · {{ report_ref }}
+</span>
+</div>
+<div class="overflow-hidden rounded-xl border border-outline-variant">
+<table class="report-data-table w-full text-left border-collapse text-[10px]">
+<thead class="bg-surface-container-high border-b border-outline-variant">
+<tr>
+<th class="px-2 py-3 font-label-bold text-on-surface-variant uppercase text-[9px]">N°</th>
+<th class="px-2 py-3 font-label-bold text-on-surface-variant uppercase text-[9px]">Matricule</th>
+<th class="px-2 py-3 font-label-bold text-on-surface-variant uppercase text-[9px]">Agent</th>
+<th class="px-2 py-3 font-label-bold text-on-surface-variant uppercase text-[9px]">Direction</th>
+<th class="px-2 py-3 font-label-bold text-on-surface-variant uppercase text-[9px]">Emp.</th>
+<th class="px-2 py-3 font-label-bold text-on-surface-variant uppercase text-[9px]">Présence</th>
+<th class="px-2 py-3 font-label-bold text-on-surface-variant uppercase text-[9px]">Matin</th>
+<th class="px-2 py-3 font-label-bold text-on-surface-variant uppercase text-[9px]">Soir</th>
+<th class="px-2 py-3 font-label-bold text-on-surface-variant uppercase text-[9px]">E+S</th>
+<th class="px-2 py-3 font-label-bold text-on-surface-variant uppercase text-[9px]">Segment</th>
+<th class="px-2 py-3 font-label-bold text-on-surface-variant uppercase text-[9px]">Score</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+{% for row in rows %}
+<tr>
+<td class="px-2 py-2 text-on-surface-variant">{{ row.numero_display }}</td>
+<td class="px-2 py-2 font-label-bold text-primary">{{ row.matricule }}</td>
+<td class="px-2 py-2 font-semibold">{{ row.full_name }}</td>
+<td class="px-2 py-2 text-on-surface-variant">{{ row.direction }}</td>
+<td class="px-2 py-2">{{ row.enrollment_label }}</td>
+<td class="px-2 py-2 {% if row.presence_rate >= real_threshold %}rate-ok{% elif row.presence_rate < 10 %}rate-bad{% endif %}">
+{{ row.presence_rate }} % <span class="text-on-surface-variant font-normal">({{ row.present_days }}/{{ row.working_days }})</span>
+</td>
+<td class="px-2 py-2">{{ row.morning_days }}</td>
+<td class="px-2 py-2">{{ row.evening_days }}</td>
+<td class="px-2 py-2">{{ row.both_days }}</td>
+<td class="px-2 py-2">{{ row.segment_label }}</td>
+<td class="px-2 py-2 font-semibold">{{ row.real_score }}</td>
+</tr>
+{% empty %}
+<tr>
+<td class="px-4 py-4 text-on-surface-variant" colspan="11">Aucun agent pour ces filtres.</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</section>
+
+<section class="document-compliance grid grid-cols-2 gap-8 pt-6 border-t border-outline-variant">
+<div>
+<h4 class="font-label-bold text-primary uppercase mb-3 tracking-widest text-[10px]">Synthèse</h4>
+<p class="text-[10px] leading-snug text-on-surface-variant">
+Effectif actif : {{ kpis.total_active }} · Agents réels (≥ {{ real_threshold }} %) : {{ kpis.real_agents }}
+({{ kpis.real_agents_rate }} %) · Jamais pointé : {{ kpis.never_punched }} · Taux moyen : {{ projection.avg_presence_rate }} %.
+</p>
+<p class="text-[9px] text-on-surface-variant mt-2">Généré le {{ generated_at_label }}</p>
+</div>
+<div class="flex flex-col items-end">
+<div class="w-48 text-center border-b border-outline-variant pb-12">
+<p class="font-label-sm text-on-surface-variant mb-8">Signature &amp; Sceau</p>
+</div>
+<p class="font-label-bold text-primary mt-3">La Direction Générale</p>
+<p class="font-label-sm text-on-surface-variant">ONIP - Kinshasa, RDC</p>
+</div>
+</section>
+</div>
+</body></html>

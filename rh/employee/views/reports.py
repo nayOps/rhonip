@@ -25,6 +25,7 @@ from employee.utils.daily_attendance_report import (
     render_daily_attendance_pdf,
 )
 from employee.utils.reports_registry import REPORT_CATALOG
+from employee.utils.report_pdf_common import list_generated_report_files
 
 
 class StaffReportsMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -146,7 +147,9 @@ class ReportsHub(StaffReportsMixin, View):
             self.template_name,
             {
                 'reports': reports,
+                'generated_reports': list_generated_report_files(),
                 'main_report_url': reverse('employee:biometric_enrollment_report'),
+                'statistics_url': reverse('employee:presence_statistics'),
             },
         )
 

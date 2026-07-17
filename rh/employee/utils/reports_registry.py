@@ -47,4 +47,19 @@ REPORT_CATALOG = (
         'export_name': 'employee:daily_attendance_report_export',
         'default_query': '',
     },
+    {
+        'code': 'statistiques-presence',
+        'title': _('Statistiques de présence'),
+        'description': _(
+            'Analyse mensuelle des agents actifs : agents réels, fantômes, '
+            'matin seulement, segments et seuil de présence.'
+        ),
+        'icon': 'bi-graph-up-arrow',
+        'badge': _('Mensuel'),
+        'filename_hint': 'rapport-rh-onip-statistiques-presence-[AAAA-MM].pdf',
+        'preview_name': 'employee:presence_statistics',
+        'schedule_name': 'employee:reports_hub',
+        'export_name': 'employee:presence_statistics_pdf',
+        'default_query': '',
+    },
 )

@@ -9,7 +9,12 @@ from .company_attendance import CompanyAttendance
 from .direction_attendance import DirectionReportHub, DirectionAttendanceReport, DirectionReportSchedule
 from .late_justification import LateJustificationCreate
 from .agents_directory import AgentsDirectoryExport
-from .presence_statistics import PresenceStatistics, PresenceStatisticsExport
+from .presence_statistics import (
+    GeneratedReportDownload,
+    PresenceStatistics,
+    PresenceStatisticsExport,
+    PresenceStatisticsPdfExport,
+)
 from .reports import (
     ReportsHub,
     BiometricEnrollmentReport,
