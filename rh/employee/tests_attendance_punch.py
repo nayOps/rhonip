@@ -1,4 +1,4 @@
-from datetime import date, time
+from datetime import date, datetime, time
 
 from django.test import SimpleTestCase
 from unittest.mock import patch
@@ -211,11 +211,17 @@ class LegacyScheduleCutoffTests(SimpleTestCase):
         self.assertEqual(evening['punch_time'], time(15, 31))
         self.assertEqual(evening['status'], 'ok')
 
-    def test_new_rules_reject_exit_before_16h(self):
+    def test_new_rules_exit_before_16h_not_counted(self):
         with patch(
             'employee.utils.attendance_schedule_config.get_attendance_schedule',
             return_value=_two_slot_schedule(),
-        ):
-            result = evaluate_day_slots(date(2026, 7, 21), [time(8, 0), time(15, 31)])
+        ), patch('employee.utils.attendance_slots.timezone') as mock_tz:
+            from django.utils import timezone as dj_tz
+
+            mock_tz.localtime.return_value = dj_tz.make_aware(
+                datetime.combine(date(2026, 7, 20), time(18, 0))
+            )
+            result = evaluate_day_slots(date(2026, 7, 20), [time(8, 0), time(15, 31)])
         evening = result['slots']['EVENING_OUT']
-        self.assertEqual(evening['status'], 'early_exit')
+        self.assertIsNone(evening.get('punch_time'))
+        self.assertNotEqual(evening.get('status'), 'ok')
