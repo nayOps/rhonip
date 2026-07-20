@@ -107,7 +107,7 @@ def build_day_evaluation(employee, day=None):
         'dayStatus': evaluation.get('status'),
         'dayStatusLabel': str(evaluation.get('status_label', '')),
         'validatedSlots': evaluation.get('validated_slots', 0),
-        'totalSlots': evaluation.get('total_slots', get_total_slots()),
+        'totalSlots': evaluation.get('total_slots', get_total_slots(day)),
         'missingSlots': [str(label) for label in evaluation.get('missing_slots', [])],
         'note': evaluation.get('note', ''),
         'slots': slot_summary,

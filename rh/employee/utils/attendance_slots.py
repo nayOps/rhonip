@@ -108,19 +108,19 @@ def _coerce_time(value):
     raise TypeError(f'Heure de pointage invalide: {value!r}')
 
 
-def _is_two_slot_mode():
-    return get_total_slots() == 2 and not has_lunch_slots()
+def _is_two_slot_mode(day=None):
+    return get_total_slots(day) == 2 and not has_lunch_slots(day)
 
 
 class PunchRejectedError(ValueError):
     """Pointage refusé (plage horaire ou règle métier)."""
 
 
-def get_two_slot_blocked_interval():
+def get_two_slot_blocked_interval(day=None):
     """Zone interdite entre fin plage entrée et début plage sortie (ex. 10h01–14h59)."""
-    if not _is_two_slot_mode():
+    if not _is_two_slot_mode(day):
         return None
-    slots = get_presence_slots()
+    slots = get_presence_slots(day)
     if len(slots) != 2:
         return None
     entry_slot, exit_slot = slots[0], slots[1]
@@ -145,18 +145,18 @@ def validate_punch_allowed(punch_date, punch_time, existing_punch_times):
     - Une seconde pointe le matin ne compte pas.
     - Avant 08h00 : entrée refusée.
     """
-    if not _is_two_slot_mode():
+    if not _is_two_slot_mode(punch_date):
         return None
 
-    slots = get_presence_slots()
+    slots = get_presence_slots(punch_date)
     if len(slots) != 2:
         return None
 
     entry_slot, exit_slot = slots[0], slots[1]
     punch_time = _coerce_time(punch_time)
-    blocked = get_two_slot_blocked_interval()
+    blocked = get_two_slot_blocked_interval(punch_date)
 
-    assigned = assign_punches_to_slots(existing_punch_times or [])
+    assigned = assign_punches_to_slots(existing_punch_times or [], day=punch_date)
     entry_code = entry_slot['code']
     exit_code = exit_slot['code']
     has_entry = assigned.get(entry_code) is not None
@@ -210,7 +210,7 @@ def punch_fits_slot(punch_time, slot):
     return slot['accept_from'] <= punch_time <= slot['accept_until']
 
 
-def _assign_two_slot_punches(punches, presence_slots):
+def _assign_two_slot_punches(punches, presence_slots, day=None):
     entry_slot = presence_slots[0]
     exit_slot = presence_slots[1]
     entry_code = entry_slot['code']
@@ -218,7 +218,7 @@ def _assign_two_slot_punches(punches, presence_slots):
     assigned = {entry_code: None, exit_code: None}
     ordered = sorted(_coerce_time(t) for t in (punches or []) if t is not None)
 
-    blocked = get_two_slot_blocked_interval()
+    blocked = get_two_slot_blocked_interval(day)
 
     for punch_time in ordered:
         if assigned[entry_code] is None and punch_fits_slot(punch_time, entry_slot):
@@ -239,17 +239,17 @@ def _assign_two_slot_punches(punches, presence_slots):
     return assigned
 
 
-def assign_punches_to_slots(punch_times):
+def assign_punches_to_slots(punch_times, day=None):
     """
     Affecte les pointages du jour aux plages configurées.
     Mode 2 plages : 1er pointage = entrée, dernier = sortie.
     Mode 4 plages : ordre chronologique + fenêtres acceptées.
     """
-    presence_slots = get_presence_slots()
+    presence_slots = get_presence_slots(day)
     punches = sorted(_coerce_time(t) for t in (punch_times or []) if t is not None)
 
-    if _is_two_slot_mode() and len(presence_slots) == 2:
-        return _assign_two_slot_punches(punches, presence_slots)
+    if _is_two_slot_mode(day) and len(presence_slots) == 2:
+        return _assign_two_slot_punches(punches, presence_slots, day=day)
 
     assigned = {slot['code']: None for slot in presence_slots}
     used_indices = set()
@@ -389,12 +389,12 @@ def _build_slot_row(slot, punch_time, slot_status, delay_minutes, status_note, n
 
 
 def evaluate_day_slots(day, punch_times):
-    total_slots = get_total_slots()
-    work_end = get_work_end()
-    lunch_min, lunch_max = get_lunch_break_limits()
-    presence_slots = get_presence_slots()
-    entry_code = first_slot_code()
-    two_slot_mode = _is_two_slot_mode()
+    total_slots = get_total_slots(day)
+    work_end = get_work_end(day)
+    lunch_min, lunch_max = get_lunch_break_limits(day)
+    presence_slots = get_presence_slots(day)
+    entry_code = first_slot_code(day)
+    two_slot_mode = _is_two_slot_mode(day)
 
     if day.weekday() >= 5:
         return {
@@ -410,7 +410,7 @@ def evaluate_day_slots(day, punch_times):
             'missing_slots': [],
         }
 
-    assigned = assign_punches_to_slots(punch_times)
+    assigned = assign_punches_to_slots(punch_times, day=day)
     slots = []
     now = timezone.localtime()
 
@@ -510,7 +510,7 @@ def evaluate_day_slots(day, punch_times):
         if slot.get('status_note'):
             notes.append(str(slot['status_note']))
 
-    if has_lunch_slots() and lunch_out.get('punch_time') and lunch_in.get('punch_time'):
+    if has_lunch_slots(day) and lunch_out.get('punch_time') and lunch_in.get('punch_time'):
         break_minutes = _minutes_between(day, lunch_out['punch_time'], lunch_in['punch_time'])
         if break_minutes < lunch_min or break_minutes > lunch_max:
             notes.append(

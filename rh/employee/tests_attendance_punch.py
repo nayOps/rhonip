@@ -32,7 +32,7 @@ TWO_SLOT_PRESET = [
 
 class AttendancePunchRulesTests(SimpleTestCase):
     def setUp(self):
-        self.day = date(2026, 7, 3)
+        self.day = date(2026, 7, 21)  # apres SCHEDULE_RULES_EFFECTIVE_FROM
         patcher = patch(
             'employee.utils.attendance_slots.get_presence_slots',
             return_value=TWO_SLOT_PRESET,
@@ -182,3 +182,40 @@ class AttendancePunchRulesTests(SimpleTestCase):
         evening = result['slots']['EVENING_OUT']
         self.assertEqual(evening['punch_time'], time(17, 15))
         self.assertEqual(evening['status'], 'ok')
+
+
+from employee.utils.attendance_schedule_config import preset_slots
+
+
+def _two_slot_schedule(*, legacy=False):
+    return {
+        'slot_preset': '2_slots',
+        'slots': preset_slots('2_slots', legacy=legacy),
+        'work_start': time(8, 0),
+        'work_end': time(16, 30) if legacy else time(16, 0),
+        'lunch_break_min_minutes': 50,
+        'lunch_break_max_minutes': 70,
+    }
+
+
+class LegacyScheduleCutoffTests(SimpleTestCase):
+    """Avant le 20/07/2026 : anciennes plages (sortie des 15h acceptee)."""
+
+    def test_legacy_exit_at_1530_is_ok(self):
+        with patch(
+            'employee.utils.attendance_schedule_config.get_attendance_schedule',
+            return_value=_two_slot_schedule(),
+        ):
+            result = evaluate_day_slots(date(2026, 7, 14), [time(8, 0), time(15, 31)])
+        evening = result['slots']['EVENING_OUT']
+        self.assertEqual(evening['punch_time'], time(15, 31))
+        self.assertEqual(evening['status'], 'ok')
+
+    def test_new_rules_reject_exit_before_16h(self):
+        with patch(
+            'employee.utils.attendance_schedule_config.get_attendance_schedule',
+            return_value=_two_slot_schedule(),
+        ):
+            result = evaluate_day_slots(date(2026, 7, 21), [time(8, 0), time(15, 31)])
+        evening = result['slots']['EVENING_OUT']
+        self.assertEqual(evening['status'], 'early_exit')

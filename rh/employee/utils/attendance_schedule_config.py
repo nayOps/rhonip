@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import date, datetime, time
 from functools import lru_cache
 
 from django.utils.translation import gettext as _
@@ -12,6 +12,9 @@ DEFAULT_WORK_START = time(8, 0)
 DEFAULT_WORK_END = time(16, 0)
 DEFAULT_LUNCH_BREAK_MIN = 50
 DEFAULT_LUNCH_BREAK_MAX = 70
+
+# Nouvelles plages actives à partir de ce lundi (20/07/2026).
+SCHEDULE_RULES_EFFECTIVE_FROM = date(2026, 7, 20)
 
 PRESET_4_SLOTS_CONFIG = [
     {
@@ -75,6 +78,74 @@ PRESET_CONFIGS = {
     '2_slots': PRESET_2_SLOTS_CONFIG,
 }
 
+# Plages en vigueur avant SCHEDULE_RULES_EFFECTIVE_FROM (réinterprétation historique).
+LEGACY_PRESET_4_SLOTS_CONFIG = [
+    {
+        'code': 'MORNING_IN',
+        'label': _t('Entrée matin'),
+        'target': '08:00',
+        'accept_from': '05:00',
+        'accept_until': '10:00',
+        'reference': '08:00',
+        'ui_header': _t('Matin : Entrée 1'),
+    },
+    {
+        'code': 'LUNCH_OUT',
+        'label': _t('Sortie pause'),
+        'target': '12:00',
+        'accept_from': '10:01',
+        'accept_until': '12:30',
+        'ui_header': _t('Matin : Sortie 1'),
+    },
+    {
+        'code': 'LUNCH_IN',
+        'label': _t('Entrée pause'),
+        'target': '13:00',
+        'accept_from': '12:00',
+        'accept_until': '14:00',
+        'ui_header': _t('Après-midi : Entrée 2'),
+    },
+    {
+        'code': 'EVENING_OUT',
+        'label': _t('Sortie soir'),
+        'target': '16:00',
+        'accept_from': '14:00',
+        'accept_until': '16:00',
+        'reference': '16:00',
+        'ui_header': _t('Après-midi : Sortie 2'),
+    },
+]
+
+LEGACY_PRESET_2_SLOTS_CONFIG = [
+    {
+        'code': 'MORNING_IN',
+        'label': _t('Entrée'),
+        'target': '08:30',
+        'accept_from': '06:00',
+        'accept_until': '10:00',
+        'reference': '08:30',
+        'ui_header': _t('Entrée'),
+    },
+    {
+        'code': 'EVENING_OUT',
+        'label': _t('Sortie'),
+        'target': '16:00',
+        'accept_from': '15:00',
+        'accept_until': '16:30',
+        'ui_header': _t('Sortie'),
+    },
+]
+
+LEGACY_PRESET_CONFIGS = {
+    '4_slots': LEGACY_PRESET_4_SLOTS_CONFIG,
+    '2_slots': LEGACY_PRESET_2_SLOTS_CONFIG,
+}
+
+LEGACY_WORK_END = {
+    '4_slots': time(16, 0),
+    '2_slots': time(16, 30),
+}
+
 
 def _parse_time_value(value):
     if value is None:
@@ -136,8 +207,34 @@ def deserialize_slot(slot):
     return parsed
 
 
-def preset_slots(preset_key):
-    return [deserialize_slot(item) for item in PRESET_CONFIGS[preset_key]]
+def preset_slots(preset_key, *, legacy=False):
+    source = LEGACY_PRESET_CONFIGS if legacy else PRESET_CONFIGS
+    return [deserialize_slot(item) for item in source[preset_key]]
+
+
+def uses_legacy_schedule(day):
+    """True si la journée doit être évaluée avec les anciennes plages."""
+    if day is None:
+        return False
+    if isinstance(day, datetime):
+        day = day.date()
+    return day < SCHEDULE_RULES_EFFECTIVE_FROM
+
+
+def get_schedule_for_day(day=None):
+    """Planning courant (UI) ou historique selon la date."""
+    schedule = get_attendance_schedule()
+    if not uses_legacy_schedule(day):
+        return schedule
+    preset = schedule['slot_preset']
+    if preset not in LEGACY_PRESET_CONFIGS:
+        preset = '2_slots'
+    return {
+        **schedule,
+        'slots': preset_slots(preset, legacy=True),
+        'work_end': LEGACY_WORK_END.get(preset, schedule['work_end']),
+        'legacy_rules': True,
+    }
 
 
 def default_schedule_row():
@@ -182,44 +279,44 @@ def clear_attendance_schedule_cache():
     get_attendance_schedule.cache_clear()
 
 
-def get_presence_slots():
-    return get_attendance_schedule()['slots']
+def get_presence_slots(day=None):
+    return get_schedule_for_day(day)['slots']
 
 
-def get_slot_by_code():
-    return {slot['code']: slot for slot in get_presence_slots()}
+def get_slot_by_code(day=None):
+    return {slot['code']: slot for slot in get_presence_slots(day)}
 
 
-def get_slot_codes():
-    return tuple(slot['code'] for slot in get_presence_slots())
+def get_slot_codes(day=None):
+    return tuple(slot['code'] for slot in get_presence_slots(day))
 
 
-def get_slot_ui_headers():
-    return tuple(slot.get('ui_header', slot['label']) for slot in get_presence_slots())
+def get_slot_ui_headers(day=None):
+    return tuple(slot.get('ui_header', slot['label']) for slot in get_presence_slots(day))
 
 
-def get_total_slots():
-    return len(get_presence_slots())
+def get_total_slots(day=None):
+    return len(get_presence_slots(day))
 
 
-def get_work_start():
-    return get_attendance_schedule()['work_start']
+def get_work_start(day=None):
+    return get_schedule_for_day(day)['work_start']
 
 
-def get_work_end():
-    return get_attendance_schedule()['work_end']
+def get_work_end(day=None):
+    return get_schedule_for_day(day)['work_end']
 
 
-def get_lunch_break_limits():
-    schedule = get_attendance_schedule()
+def get_lunch_break_limits(day=None):
+    schedule = get_schedule_for_day(day)
     return schedule['lunch_break_min_minutes'], schedule['lunch_break_max_minutes']
 
 
-def has_lunch_slots():
-    codes = set(get_slot_codes())
+def has_lunch_slots(day=None):
+    codes = set(get_slot_codes(day))
     return 'LUNCH_OUT' in codes and 'LUNCH_IN' in codes
 
 
-def first_slot_code():
-    codes = get_slot_codes()
+def first_slot_code(day=None):
+    codes = get_slot_codes(day)
     return codes[0] if codes else 'MORNING_IN'
