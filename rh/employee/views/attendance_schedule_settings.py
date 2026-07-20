@@ -118,7 +118,7 @@ class AttendanceScheduleSettings(LoginRequiredMixin, UserPassesTestMixin, View):
         schedule.slot_preset = preset
         schedule.slots_config = slots_config
         schedule.work_start = datetime.strptime(request.POST.get('work_start', '08:00'), '%H:%M').time()
-        default_work_end = '16:30' if preset == AttendanceSchedule.PRESET_2_SLOTS else '16:00'
+        default_work_end = '16:00'
         schedule.work_end = datetime.strptime(request.POST.get('work_end', default_work_end), '%H:%M').time()
         schedule.lunch_break_min_minutes = int(request.POST.get('lunch_break_min_minutes', 50) or 50)
         schedule.lunch_break_max_minutes = int(request.POST.get('lunch_break_max_minutes', 70) or 70)

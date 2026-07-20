@@ -51,7 +51,7 @@ def slot_display_cell(slot_data, slot_code):
             punch_label,
             _('ENTRÉE RATÉE'),
             'missed',
-            status_note or _('Hors plage (à partir de 10h01)'),
+            status_note or _('Hors plage matin (après 10h)'),
         )
 
     if status == 'early_exit':
@@ -59,7 +59,7 @@ def slot_display_cell(slot_data, slot_code):
             punch_label,
             _('SORTIE EN AVANCE'),
             'missed',
-            status_note or _('Avant 15h00'),
+            status_note or _('Avant 16h00'),
         )
 
     if status == 'outside_slot':
@@ -67,7 +67,7 @@ def slot_display_cell(slot_data, slot_code):
             punch_label,
             _('HORS PLAGE'),
             'warning',
-            status_note or _('Après 16h30'),
+            status_note or _('Hors plage de sortie'),
         )
 
     if status == 'late':
@@ -137,12 +137,13 @@ def _in_blocked_interval(punch_time, blocked):
 def validate_punch_allowed(punch_date, punch_time, existing_punch_times):
     """
     Règles mode 2 plages :
-    - Entrée : première pointe dans la plage matin (ex. 06h–10h), référence officielle 08h30.
-    - Zone bloquée (ex. 10h01–14h59) : refus seulement si une entrée est déjà
+    - Entrée : à partir de 08h00, plage normale jusqu'à 10h00 (référence 08h00).
+    - Zone bloquée (10h01–15h59) : refus seulement si une entrée est déjà
       enregistrée (matin ou unique entrée de secours dans cette zone).
-    - Sans entrée matin : une seule pointe autorisée entre 10h et 15h.
-    - Sortie : plage après-midi (ex. 15h+) ; autorisée même sans entrée matin.
+    - Sans entrée matin : une seule pointe autorisée entre 10h et 16h (1er pointage).
+    - Sortie : à partir de 16h00 (17h, 18h… autorisés) ; même sans entrée matin.
     - Une seconde pointe le matin ne compte pas.
+    - Avant 08h00 : entrée refusée.
     """
     if not _is_two_slot_mode():
         return None
@@ -311,7 +312,7 @@ def _entry_slot_status(day, punch_time, reference, slot):
         return (
             'missed_entry',
             delay_minutes,
-            _('Entrée ratée — pointage à %(time)s (hors plage, à partir de 10h01)')
+            _('Entrée hors plage matin — pointage à %(time)s (après 10h00)')
             % {'time': punch_time.strftime('%H:%M')},
         )
 
@@ -341,15 +342,21 @@ def _exit_slot_status(day, punch_time, slot, now=None):
     if punch_time < accept_from:
         return (
             'early_exit',
-            _('Sortie en avance à %(time)s (avant 15h00) — sortie manquée dans la plage')
-            % {'time': punch_time.strftime('%H:%M')},
+            _('Sortie en avance à %(time)s (avant %(from)s) — sortie manquée dans la plage')
+            % {
+                'time': punch_time.strftime('%H:%M'),
+                'from': accept_from.strftime('%H:%M'),
+            },
         )
 
     if punch_time > accept_until:
         return (
             'outside_slot',
-            _('Sortie à %(time)s (hors plage, après 16h30)')
-            % {'time': punch_time.strftime('%H:%M')},
+            _('Sortie à %(time)s (hors plage, après %(until)s)')
+            % {
+                'time': punch_time.strftime('%H:%M'),
+                'until': accept_until.strftime('%H:%M'),
+            },
         )
 
     return 'ok', ''

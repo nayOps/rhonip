@@ -25,6 +25,24 @@ COMPOSE="docker compose -f docker-compose.yml -f compose/prod.yml -f compose/pro
 $COMPOSE --profile rh cp /tmp/attendance_device.py rh_server:/app/backend/api/views/attendance_device.py
 $COMPOSE --profile rh restart rh_server
 sleep 8
+$COMPOSE --profile rh exec -T rh_server python manage.py shell -c "
+from employee.models import AttendanceSchedule
+from employee.utils.attendance_schedule_config import (
+    clear_attendance_schedule_cache,
+    preset_slots,
+    serialize_slot,
+)
+row = AttendanceSchedule.objects.first()
+if row and row.slot_preset == AttendanceSchedule.PRESET_2_SLOTS:
+    row.slots_config = [serialize_slot(slot) for slot in preset_slots('2_slots')]
+    row.work_start = __import__('datetime').time(8, 0)
+    row.work_end = __import__('datetime').time(16, 0)
+    row.save()
+    clear_attendance_schedule_cache()
+    print('schedule_synced_2_slots')
+else:
+    print('schedule_skip', getattr(row, 'slot_preset', None))
+"
 $COMPOSE --profile rh exec -T rh_server python manage.py test employee.tests_attendance_punch -v 1
 echo DEPLOY_OK
 REMOTE

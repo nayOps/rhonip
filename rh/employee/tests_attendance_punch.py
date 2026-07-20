@@ -13,18 +13,18 @@ TWO_SLOT_PRESET = [
     {
         'code': 'MORNING_IN',
         'label': 'Entrée',
-        'target': time(8, 30),
-        'accept_from': time(6, 0),
+        'target': time(8, 0),
+        'accept_from': time(8, 0),
         'accept_until': time(10, 0),
-        'reference': time(8, 30),
+        'reference': time(8, 0),
         'ui_header': 'Entrée',
     },
     {
         'code': 'EVENING_OUT',
         'label': 'Sortie',
         'target': time(16, 0),
-        'accept_from': time(15, 0),
-        'accept_until': time(16, 30),
+        'accept_from': time(16, 0),
+        'accept_until': time(23, 59),
         'ui_header': 'Sortie',
     },
 ]
@@ -53,7 +53,7 @@ class AttendancePunchRulesTests(SimpleTestCase):
         patcher3.start()
         patcher4 = patch(
             'employee.utils.attendance_slots.get_work_end',
-            return_value=time(16, 30),
+            return_value=time(16, 0),
         )
         self.addCleanup(patcher4.stop)
         patcher4.start()
@@ -70,18 +70,23 @@ class AttendancePunchRulesTests(SimpleTestCase):
         self.addCleanup(patcher6.stop)
         patcher6.start()
 
-    def test_early_morning_entry_from_6h(self):
-        self.assertIsNone(validate_punch_allowed(self.day, time(6, 30), []))
+    def test_before_8h_entry_rejected(self):
+        msg = validate_punch_allowed(self.day, time(7, 30), [])
+        self.assertIn('à partir de', msg.lower())
+        self.assertIn('08:00', msg)
+
+    def test_morning_entry_from_8h_allowed(self):
+        self.assertIsNone(validate_punch_allowed(self.day, time(8, 0), []))
 
     def test_morning_entry_allowed(self):
         self.assertIsNone(validate_punch_allowed(self.day, time(9, 0), []))
 
     def test_second_morning_punch_rejected(self):
-        msg = validate_punch_allowed(self.day, time(9, 30), [time(7, 0)])
+        msg = validate_punch_allowed(self.day, time(9, 30), [time(8, 15)])
         self.assertIn('entrée déjà enregistrée', msg.lower())
 
     def test_midday_blocked_after_morning_entry(self):
-        msg = validate_punch_allowed(self.day, time(11, 0), [time(7, 0)])
+        msg = validate_punch_allowed(self.day, time(11, 0), [time(8, 15)])
         self.assertIn('aucun pointage', msg.lower())
 
     def test_midday_first_punch_allowed_without_morning(self):
@@ -91,20 +96,29 @@ class AttendancePunchRulesTests(SimpleTestCase):
         msg = validate_punch_allowed(self.day, time(12, 45), [time(11, 30)])
         self.assertIn('aucun pointage', msg.lower())
 
-    def test_afternoon_exit_allowed(self):
-        self.assertIsNone(validate_punch_allowed(self.day, time(15, 30), [time(7, 0)]))
+    def test_exit_before_16h_rejected(self):
+        msg = validate_punch_allowed(self.day, time(15, 30), [time(8, 15)])
+        self.assertIn('sortie à partir de', msg.lower())
+        self.assertIn('16:00', msg)
+
+    def test_exit_from_16h_allowed(self):
+        self.assertIsNone(validate_punch_allowed(self.day, time(16, 0), [time(8, 15)]))
+
+    def test_exit_late_evening_allowed(self):
+        self.assertIsNone(validate_punch_allowed(self.day, time(17, 30), [time(8, 15)]))
+        self.assertIsNone(validate_punch_allowed(self.day, time(18, 45), [time(8, 15)]))
 
     def test_exit_without_entry_allowed(self):
         self.assertIsNone(validate_punch_allowed(self.day, time(16, 0), []))
 
     def test_exit_only_assigns_evening_slot(self):
-        assigned = assign_punches_to_slots([time(15, 30)])
+        assigned = assign_punches_to_slots([time(16, 30)])
         self.assertIsNone(assigned['MORNING_IN'])
-        self.assertEqual(assigned['EVENING_OUT'], time(15, 30))
+        self.assertEqual(assigned['EVENING_OUT'], time(16, 30))
 
-    def test_assign_ignores_midday_punch(self):
-        assigned = assign_punches_to_slots([time(7, 0), time(11, 30), time(16, 0)])
-        self.assertEqual(assigned['MORNING_IN'], time(7, 0))
+    def test_assign_ignores_midday_punch_when_morning_exists(self):
+        assigned = assign_punches_to_slots([time(8, 15), time(11, 30), time(16, 0)])
+        self.assertEqual(assigned['MORNING_IN'], time(8, 15))
         self.assertEqual(assigned['EVENING_OUT'], time(16, 0))
 
     def test_assign_late_first_entry_in_blocked_zone(self):
@@ -114,10 +128,10 @@ class AttendancePunchRulesTests(SimpleTestCase):
 
     def test_exit_after_late_first_entry_allowed(self):
         self.assertIsNone(
-            validate_punch_allowed(self.day, time(15, 30), [time(11, 30)])
+            validate_punch_allowed(self.day, time(16, 30), [time(11, 30)])
         )
 
-    def test_on_time_before_official_830(self):
+    def test_on_time_at_official_8h(self):
         with patch('employee.utils.attendance_slots.timezone') as mock_tz:
             from datetime import datetime
             from django.utils import timezone as dj_tz
@@ -125,12 +139,12 @@ class AttendancePunchRulesTests(SimpleTestCase):
             mock_tz.localtime.return_value = dj_tz.make_aware(
                 datetime.combine(self.day, time(12, 0))
             )
-            result = evaluate_day_slots(self.day, [time(7, 15)])
+            result = evaluate_day_slots(self.day, [time(8, 0)])
         entry = result['slots']['MORNING_IN']
         self.assertEqual(entry['status'], 'ok')
         self.assertEqual(entry['delay_minutes'], 0)
 
-    def test_late_after_official_830(self):
+    def test_late_after_official_8h(self):
         with patch('employee.utils.attendance_slots.timezone') as mock_tz:
             from datetime import datetime
             from django.utils import timezone as dj_tz
@@ -141,7 +155,7 @@ class AttendancePunchRulesTests(SimpleTestCase):
             result = evaluate_day_slots(self.day, [time(8, 45)])
         entry = result['slots']['MORNING_IN']
         self.assertEqual(entry['status'], 'late')
-        self.assertEqual(entry['delay_minutes'], 15)
+        self.assertEqual(entry['delay_minutes'], 45)
 
     def test_exit_only_day_is_partial(self):
         with patch('employee.utils.attendance_slots.timezone') as mock_tz:
@@ -151,7 +165,20 @@ class AttendancePunchRulesTests(SimpleTestCase):
             mock_tz.localtime.return_value = dj_tz.make_aware(
                 datetime.combine(self.day, time(17, 0))
             )
-            result = evaluate_day_slots(self.day, [time(15, 30)])
+            result = evaluate_day_slots(self.day, [time(16, 30)])
         self.assertEqual(result['status'], 'partial')
         self.assertIsNone(result['slots']['MORNING_IN']['punch_time'])
-        self.assertEqual(result['slots']['EVENING_OUT']['punch_time'], time(15, 30))
+        self.assertEqual(result['slots']['EVENING_OUT']['punch_time'], time(16, 30))
+
+    def test_evening_punch_17h_is_ok(self):
+        with patch('employee.utils.attendance_slots.timezone') as mock_tz:
+            from datetime import datetime
+            from django.utils import timezone as dj_tz
+
+            mock_tz.localtime.return_value = dj_tz.make_aware(
+                datetime.combine(self.day, time(18, 0))
+            )
+            result = evaluate_day_slots(self.day, [time(8, 10), time(17, 15)])
+        evening = result['slots']['EVENING_OUT']
+        self.assertEqual(evening['punch_time'], time(17, 15))
+        self.assertEqual(evening['status'], 'ok')
