@@ -16,7 +16,7 @@ TWO_SLOT_PRESET = [
         'target': time(8, 0),
         'accept_from': time(8, 0),
         'accept_until': time(10, 0),
-        'reference': time(8, 0),
+        'reference': time(8, 30),
         'ui_header': 'Entrée',
     },
     {
@@ -131,7 +131,7 @@ class AttendancePunchRulesTests(SimpleTestCase):
             validate_punch_allowed(self.day, time(16, 30), [time(11, 30)])
         )
 
-    def test_on_time_at_official_8h(self):
+    def test_on_time_until_830(self):
         with patch('employee.utils.attendance_slots.timezone') as mock_tz:
             from datetime import datetime
             from django.utils import timezone as dj_tz
@@ -139,12 +139,13 @@ class AttendancePunchRulesTests(SimpleTestCase):
             mock_tz.localtime.return_value = dj_tz.make_aware(
                 datetime.combine(self.day, time(12, 0))
             )
-            result = evaluate_day_slots(self.day, [time(8, 0)])
-        entry = result['slots']['MORNING_IN']
-        self.assertEqual(entry['status'], 'ok')
-        self.assertEqual(entry['delay_minutes'], 0)
+            for punch in (time(8, 0), time(8, 15), time(8, 30)):
+                result = evaluate_day_slots(self.day, [punch])
+                entry = result['slots']['MORNING_IN']
+                self.assertEqual(entry['status'], 'ok', punch)
+                self.assertEqual(entry['delay_minutes'], 0, punch)
 
-    def test_late_after_official_8h(self):
+    def test_late_after_830(self):
         with patch('employee.utils.attendance_slots.timezone') as mock_tz:
             from datetime import datetime
             from django.utils import timezone as dj_tz
@@ -155,7 +156,7 @@ class AttendancePunchRulesTests(SimpleTestCase):
             result = evaluate_day_slots(self.day, [time(8, 45)])
         entry = result['slots']['MORNING_IN']
         self.assertEqual(entry['status'], 'late')
-        self.assertEqual(entry['delay_minutes'], 45)
+        self.assertEqual(entry['delay_minutes'], 15)
 
     def test_exit_only_day_is_partial(self):
         with patch('employee.utils.attendance_slots.timezone') as mock_tz:

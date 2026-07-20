@@ -137,7 +137,7 @@ def _in_blocked_interval(punch_time, blocked):
 def validate_punch_allowed(punch_date, punch_time, existing_punch_times):
     """
     Règles mode 2 plages :
-    - Entrée : à partir de 08h00, plage normale jusqu'à 10h00 (référence 08h00).
+    - Entrée : à partir de 08h00, plage normale jusqu'à 10h00 (à l'heure jusqu'à 08h30).
     - Zone bloquée (10h01–15h59) : refus seulement si une entrée est déjà
       enregistrée (matin ou unique entrée de secours dans cette zone).
     - Sans entrée matin : une seule pointe autorisée entre 10h et 16h (1er pointage).

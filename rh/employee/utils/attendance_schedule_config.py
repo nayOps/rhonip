@@ -23,7 +23,7 @@ PRESET_4_SLOTS_CONFIG = [
         'target': '08:00',
         'accept_from': '08:00',
         'accept_until': '10:00',
-        'reference': '08:00',
+        'reference': '08:30',
         'ui_header': _t('Matin : Entrée 1'),
     },
     {
@@ -60,7 +60,7 @@ PRESET_2_SLOTS_CONFIG = [
         'target': '08:00',
         'accept_from': '08:00',
         'accept_until': '10:00',
-        'reference': '08:00',
+        'reference': '08:30',
         'ui_header': _t('Entrée'),
     },
     {
