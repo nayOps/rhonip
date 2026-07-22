@@ -56,9 +56,10 @@ def _has_marked_presence_on_day(attendance_by_date, day):
 
 
 def _has_marked_presence_in_range(attendance_by_date, start, end):
+    """True si au moins un pointage brut existe dans la plage (sans evaluate_day_slots)."""
     current = start
     while current <= end:
-        if _has_marked_presence_on_day(attendance_by_date, current):
+        if attendance_by_date.get(current):
             return True
         current += timedelta(days=1)
     return False
@@ -252,7 +253,7 @@ def _employee_row_link(employee, year, month):
     return reverse('employee:change', kwargs={'pk': employee.pk}) + f'?year={year}&month={month}'
 
 
-def build_company_registry(request, employees, year, month, week_start):
+def build_company_registry(request, employees, year, month, week_start, month_bulk=None):
     period_view, display_mode, focus_day = _parse_registry_params(request)[3:6]
     base = {
         'direction': request.GET.get('direction', ''),
@@ -267,215 +268,218 @@ def build_company_registry(request, employees, year, month, week_start):
     month_start = date(year, month, 1)
     month_end = date(year, month, days_in_month)
 
-    daily_bulk = _bulk_attendance(employee_ids, focus_day, focus_day)
-    week_bulk = _bulk_attendance(employee_ids, week_start, week_end)
-    month_bulk = _bulk_attendance(employee_ids, month_start, month_end)
-
     daily_list_rows = []
-    present_morning = 0
-    for employee in employees:
-        emp_bulk = daily_bulk.get(employee.pk, {})
-        punch_times = emp_bulk.get(focus_day, [])
-        detail = _day_detail(emp_bulk, focus_day)
-        if detail.get('validated_slots', 0) <= 0 and not punch_times:
-            continue
-        slots = detail.get('slots', {})
-        morning_punch = _morning_punch_on_day(daily_bulk.get(employee.pk, {}), focus_day)
-        if morning_punch:
-            present_morning += 1
-        daily_list_rows.append(
-            {
-                'employee': employee,
-                'initials': _employee_initials(employee),
-                'direction': str(employee.direction) if employee.direction else '—',
-                'registration_number': employee.registration_number or '—',
-                'search_text': _employee_search_text(employee),
-                'morning_punch_time': morning_punch,
-                'status': detail['status'],
-                'status_label': STATUS_DISPLAY.get(detail['status'], detail['status']),
-                'validated_slots': detail.get('validated_slots', 0),
-                'total_slots': detail.get('total_slots', get_total_slots()),
-                'schedule': detail.get('schedule', ''),
-                'note': detail.get('note', ''),
-                'detail_url': _employee_row_link(employee, year, month),
-                'slots': slots_display_row(slots),
-            }
-        )
-
-    daily_list_rows.sort(key=_arrival_sort_key)
-
-    daily_counts = _aggregate_day_counts(employees, daily_bulk, focus_day)
-    daily_attended = (
-        daily_counts.get('present', 0)
-        + daily_counts.get('late', 0)
-        + daily_counts.get('partial', 0)
-    )
-    daily_aggregate = {
-        'present': daily_counts.get('present', 0),
-        'late': daily_counts.get('late', 0),
-        'partial': daily_counts.get('partial', 0),
-        'absent': daily_counts.get('absent', 0),
-        'attended': daily_attended,
-        'total': len(employees),
-        'present_morning': present_morning,
-        'present_morning_pct': round(present_morning * 1000 / len(employees)) / 10 if employees else 0,
-        'rate': round(daily_attended * 1000 / len(employees)) / 10 if employees else 0,
-        'status': _aggregate_status(daily_counts, len(employees), focus_day),
-    }
-
     weekly_list_rows = []
-    for employee in employees:
-        week_attendance = week_bulk.get(employee.pk, {})
-        if not _has_marked_presence_in_range(week_attendance, week_start, week_end):
-            continue
-        days = []
-        for offset in range(7):
-            day = week_start + timedelta(days=offset)
-            detail = _day_detail(week_bulk.get(employee.pk, {}), day)
-            days.append(
-                {
-                    'date': day,
-                    'weekday_short': WEEKDAY_SHORT[day.weekday()],
-                    'status': detail['status'],
-                    'validated_slots': detail.get('validated_slots', 0),
-                'total_slots': detail.get('total_slots', get_total_slots()),
-                    'schedule': detail.get('schedule', ''),
-                    'is_weekend': day.weekday() >= 5,
-                }
-            )
-        weekly_list_rows.append(
-            {
-                'employee': employee,
-                'initials': _employee_initials(employee),
-                'direction': str(employee.direction) if employee.direction else '—',
-                'registration_number': employee.registration_number or '—',
-                'search_text': _employee_search_text(employee),
-                'morning_punch_time': _morning_punch_on_day(week_attendance, focus_day),
-                'days': days,
-                'detail_url': _employee_row_link(employee, year, month),
-            }
-        )
-
-    weekly_list_rows.sort(key=_arrival_sort_key)
-
-    weekly_calendar_days = []
-    for offset in range(7):
-        day = week_start + timedelta(days=offset)
-        counts = _aggregate_day_counts(employees, week_bulk, day)
-        attended = counts.get('present', 0) + counts.get('late', 0) + counts.get('partial', 0)
-        weekly_calendar_days.append(
-            {
-                'date': day,
-                'weekday_short': WEEKDAY_SHORT[day.weekday()],
-                'day_number': day.day,
-                'status': _aggregate_status(counts, len(employees), day),
-                'present_count': attended,
-                'total': len(employees),
-                'is_weekend': day.weekday() >= 5,
-                'is_selected': day == focus_day,
-                'day_url': _registry_query(
-                    request,
-                    **{
-                        **base,
-                        'day': day.isoformat(),
-                        'year': day.year,
-                        'month': day.month,
-                        'week': week_start.isoformat(),
-                    },
-                ),
-            }
-        )
-
     monthly_list_rows = []
-    for employee in employees:
-        month_attendance = month_bulk.get(employee.pk, {})
-        if not _has_marked_presence_in_range(month_attendance, month_start, month_end):
-            continue
-        summary = _summarize_employee(employee, year, month, month_attendance)
-        monthly_list_rows.append(
-            {
-                'employee': employee,
-                'initials': _employee_initials(employee),
-                'direction': str(employee.direction) if employee.direction else '—',
-                'registration_number': employee.registration_number or '—',
-                'search_text': _employee_search_text(employee),
-                'morning_punch_time': _morning_punch_on_day(month_attendance, focus_day),
-                'presence_rate': summary['presence_rate'],
-                'present_days': summary['present_days'],
-                'late_count': summary['late_count'],
-                'absence_count': summary['absence_count'],
-                'detail_url': _employee_row_link(employee, year, month),
-            }
-        )
-
-    monthly_list_rows.sort(key=_arrival_sort_key)
-
-    month_cells = []
-    leading_blanks = month_start.weekday()
-    for _blank in range(leading_blanks):
-        month_cells.append({'is_padding': True})
-
-    for day_num in range(1, days_in_month + 1):
-        day = date(year, month, day_num)
-        counts = _aggregate_day_counts(employees, month_bulk, day)
-        attended = counts.get('present', 0) + counts.get('late', 0) + counts.get('partial', 0)
-        status = _aggregate_status(counts, len(employees), day)
-        month_cells.append(
-            {
-                'is_padding': False,
-                'date': day,
-                'day_number': day_num,
-                'weekday_short': WEEKDAY_SHORT[day.weekday()],
-                'status': status,
-                'status_label': STATUS_DISPLAY.get(status, ''),
-                'present_count': attended,
-                'total': len(employees),
-                'is_weekend': day.weekday() >= 5,
-                'is_selected': day == focus_day,
-                'day_url': _registry_query(
-                    request,
-                    **{
-                        **base,
-                        'day': day.isoformat(),
-                        'year': year,
-                        'month': month,
-                        'week': week_start.isoformat(),
-                    },
-                ),
-            }
-        )
-
-    trailing = (7 - (len(month_cells) % 7)) % 7
-    month_cells.extend({'is_padding': True} for _blank in range(trailing))
-    month_weeks = [month_cells[index : index + 7] for index in range(0, len(month_cells), 7)]
-
-    prev_day = focus_day - timedelta(days=1)
-    next_day = focus_day + timedelta(days=1)
-    prev_week = week_start - timedelta(days=7)
-    next_week = week_start + timedelta(days=7)
-    prev_month = _shift_month(year, month, -1)
-    next_month = _shift_month(year, month, 1)
-
+    weekly_calendar_days = []
+    month_weeks = []
+    daily_aggregate = {
+        'present': 0,
+        'late': 0,
+        'partial': 0,
+        'absent': 0,
+        'attended': 0,
+        'total': len(employees),
+        'present_morning': 0,
+        'present_morning_pct': 0,
+        'rate': 0,
+        'status': 'absent',
+    }
+    present_morning = 0
     week_late = 0
     week_absent = 0
     week_present_morning = 0
-    for employee in employees:
+    month_late = 0
+    month_absent = 0
+    month_present_morning = 0
+    empty_pagination = _paginate_rows([], request)
+
+    if period_view == 'daily':
+        daily_bulk = _bulk_attendance(employee_ids, focus_day, focus_day)
+        for employee in employees:
+            emp_bulk = daily_bulk.get(employee.pk, {})
+            punch_times = emp_bulk.get(focus_day, [])
+            detail = _day_detail(emp_bulk, focus_day)
+            if detail.get('validated_slots', 0) <= 0 and not punch_times:
+                continue
+            slots = detail.get('slots', {})
+            morning_punch = _morning_punch_on_day(emp_bulk, focus_day)
+            if morning_punch:
+                present_morning += 1
+            daily_list_rows.append(
+                {
+                    'employee': employee,
+                    'initials': _employee_initials(employee),
+                    'direction': str(employee.direction) if employee.direction else '—',
+                    'registration_number': employee.registration_number or '—',
+                    'search_text': _employee_search_text(employee),
+                    'morning_punch_time': morning_punch,
+                    'status': detail['status'],
+                    'status_label': STATUS_DISPLAY.get(detail['status'], detail['status']),
+                    'validated_slots': detail.get('validated_slots', 0),
+                    'total_slots': detail.get('total_slots', get_total_slots()),
+                    'schedule': detail.get('schedule', ''),
+                    'note': detail.get('note', ''),
+                    'detail_url': _employee_row_link(employee, year, month),
+                    'slots': slots_display_row(slots),
+                }
+            )
+        daily_list_rows.sort(key=_arrival_sort_key)
+        daily_counts = _aggregate_day_counts(employees, daily_bulk, focus_day)
+        daily_attended = (
+            daily_counts.get('present', 0)
+            + daily_counts.get('late', 0)
+            + daily_counts.get('partial', 0)
+        )
+        daily_aggregate = {
+            'present': daily_counts.get('present', 0),
+            'late': daily_counts.get('late', 0),
+            'partial': daily_counts.get('partial', 0),
+            'absent': daily_counts.get('absent', 0),
+            'attended': daily_attended,
+            'total': len(employees),
+            'present_morning': present_morning,
+            'present_morning_pct': round(present_morning * 1000 / len(employees)) / 10 if employees else 0,
+            'rate': round(daily_attended * 1000 / len(employees)) / 10 if employees else 0,
+            'status': _aggregate_status(daily_counts, len(employees), focus_day),
+        }
+
+    elif period_view == 'weekly':
+        week_bulk = _bulk_attendance(employee_ids, week_start, week_end)
+        for employee in employees:
+            week_attendance = week_bulk.get(employee.pk, {})
+            if not _has_marked_presence_in_range(week_attendance, week_start, week_end):
+                continue
+            days = []
+            for offset in range(7):
+                day = week_start + timedelta(days=offset)
+                detail = _day_detail(week_attendance, day)
+                days.append(
+                    {
+                        'date': day,
+                        'weekday_short': WEEKDAY_SHORT[day.weekday()],
+                        'status': detail['status'],
+                        'validated_slots': detail.get('validated_slots', 0),
+                        'total_slots': detail.get('total_slots', get_total_slots()),
+                        'schedule': detail.get('schedule', ''),
+                        'is_weekend': day.weekday() >= 5,
+                    }
+                )
+            weekly_list_rows.append(
+                {
+                    'employee': employee,
+                    'initials': _employee_initials(employee),
+                    'direction': str(employee.direction) if employee.direction else '—',
+                    'registration_number': employee.registration_number or '—',
+                    'search_text': _employee_search_text(employee),
+                    'morning_punch_time': _morning_punch_on_day(week_attendance, focus_day),
+                    'days': days,
+                    'detail_url': _employee_row_link(employee, year, month),
+                }
+            )
+        weekly_list_rows.sort(key=_arrival_sort_key)
         for offset in range(7):
             day = week_start + timedelta(days=offset)
-            if day.weekday() >= 5:
-                continue
-            detail = _day_detail(week_bulk.get(employee.pk, {}), day)
-            slots = detail.get('slots', {})
-            if slots.get('MORNING_IN', {}).get('punch_time'):
-                week_present_morning += 1
-            if detail['status'] == 'late':
-                week_late += 1
-            elif detail['status'] == 'absent':
-                week_absent += 1
+            counts = _aggregate_day_counts(employees, week_bulk, day)
+            attended = counts.get('present', 0) + counts.get('late', 0) + counts.get('partial', 0)
+            weekly_calendar_days.append(
+                {
+                    'date': day,
+                    'weekday_short': WEEKDAY_SHORT[day.weekday()],
+                    'day_number': day.day,
+                    'status': _aggregate_status(counts, len(employees), day),
+                    'present_count': attended,
+                    'total': len(employees),
+                    'is_weekend': day.weekday() >= 5,
+                    'is_selected': day == focus_day,
+                    'day_url': _registry_query(
+                        request,
+                        **{
+                            **base,
+                            'day': day.isoformat(),
+                            'year': day.year,
+                            'month': day.month,
+                            'week': week_start.isoformat(),
+                        },
+                    ),
+                }
+            )
+        for employee in employees:
+            emp_week = week_bulk.get(employee.pk, {})
+            for offset in range(7):
+                day = week_start + timedelta(days=offset)
+                if day.weekday() >= 5:
+                    continue
+                detail = _day_detail(emp_week, day)
+                if detail.get('slots', {}).get('MORNING_IN', {}).get('punch_time'):
+                    week_present_morning += 1
+                if detail['status'] == 'late':
+                    week_late += 1
+                elif detail['status'] == 'absent':
+                    week_absent += 1
 
-    month_late = sum(row['late_count'] for row in monthly_list_rows)
-    month_absent = sum(row['absence_count'] for row in monthly_list_rows)
-    month_present_morning = sum(row['present_days'] for row in monthly_list_rows)
+    else:  # monthly
+        if month_bulk is None:
+            month_bulk = _bulk_attendance(employee_ids, month_start, month_end)
+        for employee in employees:
+            month_attendance = month_bulk.get(employee.pk, {})
+            if not _has_marked_presence_in_range(month_attendance, month_start, month_end):
+                continue
+            summary = _summarize_employee(employee, year, month, month_attendance)
+            monthly_list_rows.append(
+                {
+                    'employee': employee,
+                    'initials': _employee_initials(employee),
+                    'direction': str(employee.direction) if employee.direction else '—',
+                    'registration_number': employee.registration_number or '—',
+                    'search_text': _employee_search_text(employee),
+                    'morning_punch_time': _morning_punch_on_day(month_attendance, focus_day),
+                    'presence_rate': summary['presence_rate'],
+                    'present_days': summary['present_days'],
+                    'late_count': summary['late_count'],
+                    'absence_count': summary['absence_count'],
+                    'detail_url': _employee_row_link(employee, year, month),
+                }
+            )
+        monthly_list_rows.sort(key=_arrival_sort_key)
+        month_cells = []
+        for _blank in range(month_start.weekday()):
+            month_cells.append({'is_padding': True})
+        for day_num in range(1, days_in_month + 1):
+            day = date(year, month, day_num)
+            counts = _aggregate_day_counts(employees, month_bulk, day)
+            attended = counts.get('present', 0) + counts.get('late', 0) + counts.get('partial', 0)
+            status = _aggregate_status(counts, len(employees), day)
+            month_cells.append(
+                {
+                    'is_padding': False,
+                    'date': day,
+                    'day_number': day_num,
+                    'weekday_short': WEEKDAY_SHORT[day.weekday()],
+                    'status': status,
+                    'status_label': STATUS_DISPLAY.get(status, ''),
+                    'present_count': attended,
+                    'total': len(employees),
+                    'is_weekend': day.weekday() >= 5,
+                    'is_selected': day == focus_day,
+                    'day_url': _registry_query(
+                        request,
+                        **{
+                            **base,
+                            'day': day.isoformat(),
+                            'year': year,
+                            'month': month,
+                            'week': week_start.isoformat(),
+                        },
+                    ),
+                }
+            )
+        trailing = (7 - (len(month_cells) % 7)) % 7
+        month_cells.extend({'is_padding': True} for _blank in range(trailing))
+        month_weeks = [month_cells[index : index + 7] for index in range(0, len(month_cells), 7)]
+        month_late = sum(row['late_count'] for row in monthly_list_rows)
+        month_absent = sum(row['absence_count'] for row in monthly_list_rows)
+        month_present_morning = sum(row['present_days'] for row in monthly_list_rows)
 
     sheet_kpis = {
         'daily': {
@@ -501,9 +505,9 @@ def build_company_registry(request, employees, year, month, week_start):
         },
     }
 
-    daily_pagination = _paginate_rows(daily_list_rows, request)
-    weekly_pagination = _paginate_rows(weekly_list_rows, request)
-    monthly_pagination = _paginate_rows(monthly_list_rows, request)
+    daily_pagination = _paginate_rows(daily_list_rows, request) if period_view == 'daily' else empty_pagination
+    weekly_pagination = _paginate_rows(weekly_list_rows, request) if period_view == 'weekly' else empty_pagination
+    monthly_pagination = _paginate_rows(monthly_list_rows, request) if period_view == 'monthly' else empty_pagination
 
     today = date.today()
     week_end = week_start + timedelta(days=6)
@@ -522,6 +526,12 @@ def build_company_registry(request, employees, year, month, week_start):
         period_nav_label = f'{MONTH_NAMES[month - 1]} {year}'
 
     today_week = today - timedelta(days=today.weekday())
+    prev_day = focus_day - timedelta(days=1)
+    next_day = focus_day + timedelta(days=1)
+    prev_week = week_start - timedelta(days=7)
+    next_week = week_start + timedelta(days=7)
+    prev_month = _shift_month(year, month, -1)
+    next_month = _shift_month(year, month, 1)
 
     return {
         'period_view': period_view,
@@ -615,6 +625,7 @@ def _summarize_employee(employee, year, month, attendance_by_date):
     present_days = 0
     late_count = 0
     absence_count = 0
+    on_time_days = 0
     total_late_minutes = 0
 
     for day in working_days:
@@ -626,6 +637,8 @@ def _summarize_employee(employee, year, month, attendance_by_date):
             if detail['status'] == 'late':
                 late_count += 1
                 total_late_minutes += detail['delay_minutes']
+            elif detail['status'] == 'present':
+                on_time_days += 1
 
     total_working = len(working_days) or 1
     presence_rate = round(present_days * 1000 / total_working) / 10
@@ -636,11 +649,7 @@ def _summarize_employee(employee, year, month, attendance_by_date):
         'late_count': late_count,
         'absence_count': absence_count,
         'present_days': present_days,
-        'on_time_days': sum(
-            1
-            for day in working_days
-            if _day_detail(attendance_by_date, day)['status'] == 'present'
-        ),
+        'on_time_days': on_time_days,
         'total_late_minutes': total_late_minutes,
         'working_days_count': len(working_days),
     }
@@ -835,6 +844,8 @@ def build_company_attendance_dashboard(request):
         'red_zone': red_zone,
         'prev': _shift_month(year, month, -1),
         'next': _shift_month(year, month, 1),
-        'registry': build_company_registry(request, employees, year, month, week_start),
+        'registry': build_company_registry(
+            request, employees, year, month, week_start, month_bulk=month_bulk
+        ),
         'total_slots': get_total_slots(),
     }

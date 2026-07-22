@@ -14,7 +14,7 @@ from django.utils.translation import gettext as _
 
 from employee.models import Direction, Employee
 from employee.utils.attendance_slots import evaluate_day_slots
-from employee.utils.attendance_stats import MONTH_NAMES, bulk_punches_by_employee
+from employee.utils.attendance_stats import MONTH_NAMES, bulk_attendance_details
 from employee.utils.report_pdf_common import build_pdf_filename, logo_data_uri
 from employee.utils.roster import apply_roster_filter
 
@@ -251,6 +251,7 @@ def _compute_agent_row(
     total_raw_punches = 0
     late_days = 0
     partial_days = 0
+    days_morning_no_evening = 0
 
     for day in working_days:
         punch_times = attendance_by_date.get(day, [])
@@ -273,6 +274,8 @@ def _compute_agent_row(
         if has_morning and has_evening:
             both_days += 1
             two_slot_days += 1
+        elif has_morning and not has_evening:
+            days_morning_no_evening += 1
         if detail['status'] == 'late':
             late_days += 1
         elif detail['status'] == 'partial':
@@ -282,12 +285,6 @@ def _compute_agent_row(
     both_rate = round(both_days * 1000 / working_count) / 10
     morning_only_rate = 0.0
     evening_on_present_rate = 0.0
-    days_morning_no_evening = 0
-    for day in working_days:
-        detail = evaluate_day_slots(day, attendance_by_date.get(day, []))
-        slots = detail.get('slots', {})
-        if _slot_punched(slots, MORNING_SLOT) and not _slot_punched(slots, EVENING_SLOT):
-            days_morning_no_evening += 1
 
     if present_days:
         morning_only_rate = round(days_morning_no_evening * 1000 / present_days) / 10
@@ -551,14 +548,12 @@ def build_agent_rows(
     registration_numbers = [employee.registration_number for employee in employees if employee.registration_number]
 
     working_days = _weekdays_between(filters['month_start'], filters['period_end'])
-    bulk_attendance = bulk_punches_by_employee(
+    bulk_attendance, source_map, last_punch_map = bulk_attendance_details(
         employee_ids,
         filters['month_start'],
         filters['period_end'],
     )
     enrollment_map = _bulk_enrollment_counts(registration_numbers)
-    source_map = _bulk_punch_sources(employee_ids, filters['month_start'], filters['period_end'])
-    last_punch_map = _bulk_last_punch(employee_ids, filters['month_start'], filters['period_end'])
 
     rows = []
     for employee in employees:
@@ -650,6 +645,7 @@ def build_presence_statistics(
         'projection': _build_projection(all_rows_for_charts, working_days, filters['month_end']),
         'real_threshold': REAL_AGENT_THRESHOLD,
         'rows': pagination['rows'],
+        'filtered_rows': filtered_rows,
         'pagination': pagination,
         'query_string': query_string,
         'generated_at_label': date.today().strftime('%d/%m/%Y'),
@@ -675,19 +671,14 @@ def build_presence_statistics(
 
 
 def build_presence_statistics_pdf_context(**kwargs) -> dict:
-    """Contexte PDF : tous les agents filtrés (sans pagination)."""
+    """Contexte PDF : tous les agents filtrés (sans pagination, 1 seul calcul)."""
     report = build_presence_statistics(**{**kwargs, 'page': 1})
-    rows, _meta = build_agent_rows(
-        year=report['year'],
-        month=report['month'],
-        direction_id=report['selected_direction_id'],
-    )
-    filtered = _filter_rows(rows, report['segment'], report['search_query'])
+    filtered = list(report.get('filtered_rows') or [])
     for index, row in enumerate(filtered, start=1):
         row['numero_display'] = f'{index:03d}'
     report['rows'] = filtered
     report['pdf_rows_count'] = len(filtered)
-    report['logo_uri'] = logo_data_uri()
+    report['logo_uri'] = report.get('logo_uri') or logo_data_uri()
     return report
 
 

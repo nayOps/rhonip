@@ -12,7 +12,6 @@ from employee.utils.presence_statistics import (
     build_agent_rows,
     build_presence_statistics,
     build_presence_statistics_pdf_context,
-    render_presence_statistics_pdf,
 )
 from employee.utils.report_pdf_common import default_reports_output_dir, save_report_pdf
 
@@ -101,7 +100,11 @@ class PresenceStatisticsPdfExport(StaffStatisticsMixin, View):
     def get(self, request):
         kwargs = _stats_kwargs(request)
         report = build_presence_statistics_pdf_context(**kwargs)
-        pdf_bytes = render_presence_statistics_pdf(**kwargs)
+        from employee.utils.html_pdf_renderer import render_html_to_pdf
+        from django.template.loader import render_to_string
+
+        html = render_to_string('employee/presence_statistics_pdf.html', report)
+        pdf_bytes = render_html_to_pdf(html)
         filename = report.get('pdf_filename') or 'rapport-rh-onip-statistiques-presence.pdf'
         save_report_pdf(pdf_bytes, filename)
         response = HttpResponse(pdf_bytes, content_type='application/pdf')

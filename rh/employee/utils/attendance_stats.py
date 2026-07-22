@@ -86,16 +86,48 @@ def bulk_punches_by_employee(employee_ids, start, end):
     if not employee_ids:
         return {}
 
-    records = Attendance.objects.filter(
-        employee_id__in=employee_ids,
-        date__gte=start,
-        date__lte=end,
-    ).order_by('employee_id', 'date', 'time')
+    rows = (
+        Attendance.objects.filter(
+            employee_id__in=employee_ids,
+            date__gte=start,
+            date__lte=end,
+        )
+        .order_by('employee_id', 'date', 'time')
+        .values_list('employee_id', 'date', 'time')
+    )
 
     grouped = defaultdict(lambda: defaultdict(list))
-    for record in records:
-        grouped[record.employee_id][record.date].append(record.time)
+    for employee_id, punch_date, punch_time in rows:
+        grouped[employee_id][punch_date].append(punch_time)
     return grouped
+
+
+def bulk_attendance_details(employee_ids, start, end):
+    """Un seul scan Attendance : pointages + sources + dernier pointage."""
+    from employee.models import Attendance
+    from collections import Counter
+
+    if not employee_ids:
+        return {}, {}, {}
+
+    rows = (
+        Attendance.objects.filter(
+            employee_id__in=employee_ids,
+            date__gte=start,
+            date__lte=end,
+        )
+        .order_by('employee_id', 'date', 'time')
+        .values_list('employee_id', 'date', 'time', 'source')
+    )
+
+    punches = defaultdict(lambda: defaultdict(list))
+    sources = defaultdict(Counter)
+    last_punch = {}
+    for employee_id, punch_date, punch_time, source in rows:
+        punches[employee_id][punch_date].append(punch_time)
+        sources[employee_id][source or 'manual'] += 1
+        last_punch[employee_id] = (punch_date, punch_time)
+    return punches, sources, last_punch
 
 
 def _attendance_by_date(employee, start, end):
