@@ -489,6 +489,12 @@
     opacity: 0.72;
 }
 
+.attendance-day-card.is-holiday {
+    background: #fffbeb;
+    border-color: #fcd34d;
+    opacity: 1;
+}
+
 .attendance-day-card.is-selected {
     border-color: var(--ed-primary);
     box-shadow: inset 0 0 0 1px var(--ed-primary);
@@ -636,6 +642,10 @@
 
 .attendance-status-dot.weekend {
     background: #cbd5e1;
+}
+
+.attendance-status-dot.holiday {
+    background: #f59e0b;
 }
 
 .attendance-section-title {
@@ -846,6 +856,11 @@
 .attendance-month-cell.is-empty,
 .attendance-month-cell.is-weekend {
     background: #f8fafc;
+}
+
+.attendance-month-cell.is-holiday {
+    background: #fef3c7;
+    color: #92400e;
 }
 
 .attendance-month-cell.is-present {

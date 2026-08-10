@@ -22,10 +22,21 @@ from employee.utils.attendance_stats import (
     bulk_punches_by_employee,
     parse_attendance_period,
 )
+from employee.utils.holidays import is_public_holiday
 
 
 def _bulk_attendance(employee_ids, start, end):
     return bulk_punches_by_employee(employee_ids, start, end)
+
+
+def _day_flags(day):
+    weekend = day.weekday() >= 5
+    holiday = (not weekend) and is_public_holiday(day)
+    return {
+        'is_weekend': weekend,
+        'is_holiday': holiday,
+        'is_non_working': weekend or holiday,
+    }
 
 
 STATUS_DISPLAY = {
@@ -34,6 +45,7 @@ STATUS_DISPLAY = {
     'partial': _('Partiel'),
     'absent': _('Absent'),
     'weekend': _('Week-end'),
+    'holiday': _('Férié'),
 }
 
 
@@ -235,6 +247,8 @@ def _aggregate_day_counts(employees, bulk, day):
 def _aggregate_status(counts, employees_count, day):
     if day.weekday() >= 5:
         return 'weekend'
+    if is_public_holiday(day):
+        return 'holiday'
     if employees_count == 0:
         return 'absent'
     attended = counts.get('present', 0) + counts.get('late', 0) + counts.get('partial', 0)
@@ -362,7 +376,7 @@ def build_company_registry(request, employees, year, month, week_start, month_bu
                         'validated_slots': detail.get('validated_slots', 0),
                         'total_slots': detail.get('total_slots', get_total_slots()),
                         'schedule': detail.get('schedule', ''),
-                        'is_weekend': day.weekday() >= 5,
+                        **_day_flags(day),
                     }
                 )
             weekly_list_rows.append(
@@ -390,7 +404,7 @@ def build_company_registry(request, employees, year, month, week_start, month_bu
                     'status': _aggregate_status(counts, len(employees), day),
                     'present_count': attended,
                     'total': len(employees),
-                    'is_weekend': day.weekday() >= 5,
+                    **_day_flags(day),
                     'is_selected': day == focus_day,
                     'day_url': _registry_query(
                         request,
@@ -460,7 +474,7 @@ def build_company_registry(request, employees, year, month, week_start, month_bu
                     'status_label': STATUS_DISPLAY.get(status, ''),
                     'present_count': attended,
                     'total': len(employees),
-                    'is_weekend': day.weekday() >= 5,
+                    **_day_flags(day),
                     'is_selected': day == focus_day,
                     'day_url': _registry_query(
                         request,

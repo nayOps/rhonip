@@ -21,6 +21,7 @@ from employee.utils.attendance_stats import (
     bulk_punches_by_employee,
 )
 from employee.utils.company_attendance import _morning_punch_on_day
+from employee.utils.holidays import holiday_name_for_day, is_public_holiday
 from employee.utils.report_pdf_common import build_pdf_filename, logo_data_uri
 from employee.utils.roster import apply_roster_filter
 
@@ -28,6 +29,7 @@ STATUS_BADGE_CLASS = {
     'present': 'present',
     'partial': 'partial',
     'absent': 'absent',
+    'holiday': 'weekend',
 }
 
 REPORT_SLOT_CODES = ('MORNING_IN', 'EVENING_OUT')
@@ -36,6 +38,7 @@ REPORT_STATUS_LABELS = {
     'present': _('PRÉSENT'),
     'partial': _('PARTIEL'),
     'absent': _('ABSENT'),
+    'holiday': _('FÉRIÉ'),
 }
 
 
@@ -238,6 +241,9 @@ def build_daily_attendance_report(
         'report_day_label': target_date.strftime('%d/%m/%Y'),
         'weekday_label': weekday_label,
         'is_weekend': target_date.weekday() >= 5,
+        'is_holiday': is_public_holiday(target_date),
+        'holiday_name': holiday_name_for_day(target_date),
+        'is_non_working': target_date.weekday() >= 5 or is_public_holiday(target_date),
         'direction_id': direction_id,
         'direction_label': direction_label,
         'query_string': build_daily_attendance_query_string(target_date, direction_id),

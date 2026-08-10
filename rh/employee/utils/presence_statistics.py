@@ -147,12 +147,15 @@ def build_query_string(**filters) -> str:
 
 
 def _weekdays_between(start: date, end: date) -> list[date]:
+    from employee.utils.holidays import holiday_dates_in_range
+
     if end < start:
         return []
+    holidays = holiday_dates_in_range(start, end)
     days = []
     current = start
     while current <= end:
-        if current.weekday() < 5:
+        if current.weekday() < 5 and current not in holidays:
             days.append(current)
         current += timedelta(days=1)
     return days
@@ -257,7 +260,7 @@ def _compute_agent_row(
         punch_times = attendance_by_date.get(day, [])
         total_raw_punches += len(punch_times)
         detail = evaluate_day_slots(day, punch_times)
-        if detail['status'] == 'weekend':
+        if detail['status'] in ('weekend', 'holiday'):
             continue
 
         slots = detail.get('slots', {})

@@ -59,6 +59,8 @@ STATUS_LABELS = {
     'partial': _('PARTIEL'),
     'absent': _('ABSENT'),
     'early_leave': _('DÉPART ANTICIPÉ'),
+    'holiday': _('FÉRIÉ'),
+    'weekend': _('WEEK-END'),
 }
 
 
@@ -143,11 +145,17 @@ def _day_detail(attendance_by_date, day):
 
 
 def _weekdays_in_month(year, month):
+    from employee.utils.holidays import holiday_dates_in_range
+
     days_in_month = monthrange(year, month)[1]
+    month_start = date(year, month, 1)
+    month_end = date(year, month, days_in_month)
+    holidays = holiday_dates_in_range(month_start, month_end)
     return [
         date(year, month, day)
         for day in range(1, days_in_month + 1)
         if date(year, month, day).weekday() < 5
+        and date(year, month, day) not in holidays
     ]
 
 
@@ -256,7 +264,7 @@ def build_week_view(employee, week_start):
                 'is_selected': offset == 0,
             }
         )
-        if detail['status'] != 'weekend':
+        if detail['status'] not in ('weekend', 'holiday'):
             slots = detail.get('slots', {})
             rows.append(
                 {

@@ -548,6 +548,26 @@
     opacity: 0.55;
 }
 
+.ca-date-chip.holiday,
+.ca-date-chip.status-holiday {
+    opacity: 1;
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fcd34d;
+}
+
+.ca-date-chip.holiday small,
+.ca-month-cell.holiday small {
+    color: #92400e;
+    font-weight: 700;
+}
+
+.ca-month-cell.holiday,
+.ca-month-cell.status-holiday {
+    background: #fef3c7;
+    color: #92400e;
+}
+
 .ca-month-calendar {
     padding: 0.85rem 1rem 0.25rem;
     border-bottom: 1px solid var(--ca-border);

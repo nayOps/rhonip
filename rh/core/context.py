@@ -202,6 +202,10 @@ def base(request):
             'href': reverse_lazy('employee:attendance_schedule_settings'),
             'permission': 'employee.view_employee',
         }, {
+            'title': _('Jours fériés'),
+            'href': reverse_lazy('core:list', kwargs={'app': 'leave', 'model': 'holiday'}),
+            'permission': 'employee.view_employee',
+        }, {
             'title': _('Organisation'),
             'href': reverse_lazy('core:list', kwargs={'app': 'core', 'model': 'organization'}),
             'permission': 'core.view_organization'

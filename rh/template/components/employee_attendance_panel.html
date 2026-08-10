@@ -36,7 +36,7 @@
 <div id="attendance-weekly-panel">
     <div class="attendance-week-strip">
         {% for day in attendance_week.days %}
-        <div class="attendance-day-card{% if day.status == 'weekend' %} is-weekend{% endif %}{% if forloop.first %} is-selected{% endif %}">
+        <div class="attendance-day-card{% if day.status == 'weekend' %} is-weekend{% endif %}{% if day.status == 'holiday' %} is-holiday{% endif %}{% if forloop.first %} is-selected{% endif %}">
             <div class="attendance-day-weekday">{{ day.weekday_short }}</div>
             <div class="attendance-day-number">{{ day.day_number|stringformat:"02d" }}</div>
             <span class="attendance-status-dot {{ day.status }}"></span>
@@ -131,7 +131,7 @@
         {% for week in attendance_month.weeks %}
         <div class="attendance-month-row">
             {% for cell in week %}
-            <div class="attendance-month-cell{% if cell.is_padding %} is-empty{% elif cell.status == 'weekend' %} is-weekend{% elif cell.status == 'present' %} is-present{% elif cell.status == 'late' %} is-late{% elif cell.status == 'partial' %} is-partial{% elif cell.status == 'early_leave' %} is-early-leave{% elif cell.status == 'absent' %} is-absent{% endif %}">
+            <div class="attendance-month-cell{% if cell.is_padding %} is-empty{% elif cell.status == 'weekend' %} is-weekend{% elif cell.status == 'holiday' %} is-holiday{% elif cell.status == 'present' %} is-present{% elif cell.status == 'late' %} is-late{% elif cell.status == 'partial' %} is-partial{% elif cell.status == 'early_leave' %} is-early-leave{% elif cell.status == 'absent' %} is-absent{% endif %}">
                 {% if not cell.is_padding %}
                 <div class="attendance-month-cell-top">
                     <span class="attendance-month-cell-day">{{ cell.day_number }}</span>

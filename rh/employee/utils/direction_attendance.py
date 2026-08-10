@@ -5,6 +5,7 @@ from datetime import date, timedelta
 from django.utils.translation import gettext as gettext_lazy
 
 from employee.models import Direction, Employee
+from employee.utils.holidays import is_public_holiday
 from employee.utils.roster import apply_roster_filter
 from employee.utils.attendance_stats import (
     MONTH_NAMES,
@@ -119,7 +120,7 @@ def build_direction_report(direction, year, month):
     day_delays = defaultdict(int)
     for day_num in range(1, days_in_month + 1):
         day = date(year, month, day_num)
-        if day.weekday() >= 5:
+        if day.weekday() >= 5 or is_public_holiday(day):
             continue
         max_delay = 0
         for employee in employees:
@@ -133,13 +134,14 @@ def build_direction_report(direction, year, month):
 
     for day_num in range(1, days_in_month + 1):
         day = date(year, month, day_num)
-        if day.weekday() >= 5:
+        if day.weekday() >= 5 or is_public_holiday(day):
             cells.append(
                 {
                     'day_number': day_num,
                     'level': 0,
                     'is_padding': False,
-                    'is_weekend': True,
+                    'is_weekend': day.weekday() >= 5,
+                    'is_holiday': is_public_holiday(day),
                 }
             )
         else:
@@ -150,6 +152,7 @@ def build_direction_report(direction, year, month):
                     'level': _heatmap_level(delay),
                     'is_padding': False,
                     'is_weekend': False,
+                    'is_holiday': False,
                 }
             )
 

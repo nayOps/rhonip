@@ -179,7 +179,7 @@
 <h4 class="font-label-bold text-primary uppercase mb-3 tracking-widest text-[10px]">Synthèse</h4>
 <p class="text-[10px] leading-snug text-on-surface-variant">
 Présents : {{ present_count_display }} · Partiels : {{ partial_count_display }} · Absents : {{ absent_count_display }} · Pointages : {{ registered_count_display }} / effectif {{ total_count_display }}.
-{% if is_weekend %}Journée non ouvrée (week-end).{% endif %}
+{% if is_holiday %}Journée fériée{% if holiday_name %} — {{ holiday_name }}{% endif %}.{% elif is_weekend %}Journée non ouvrée (week-end).{% endif %}
 </p>
 <p class="text-[9px] text-on-surface-variant mt-2">Généré le {{ generated_at_label }}</p>
 </div>

@@ -6,10 +6,12 @@
     {% if registry.period_view == 'weekly' %}
     <div class="ca-date-strip" role="navigation" aria-label="{% trans 'Jours de la semaine' %}">
         {% for day in registry.weekly.calendar_days %}
-        <a href="?{{ day.day_url }}" class="ca-date-chip{% if day.is_selected %} active{% endif %}{% if day.is_weekend %} weekend{% endif %} status-{{ day.status }}">
+        <a href="?{{ day.day_url }}" class="ca-date-chip{% if day.is_selected %} active{% endif %}{% if day.is_non_working %} weekend{% endif %}{% if day.is_holiday %} holiday{% endif %} status-{{ day.status }}">
             <span class="ca-date-chip-day">{{ day.weekday_short }}</span>
             <strong class="ca-date-chip-num">{{ day.day_number }}</strong>
-            {% if not day.is_weekend %}
+            {% if day.is_holiday %}
+            <small>{% trans 'Férié' %}</small>
+            {% elif not day.is_weekend %}
             <small>{{ day.present_count }}/{{ day.total }}</small>
             {% endif %}
         </a>
@@ -28,9 +30,11 @@
             {% if cell.is_padding %}
             <span class="ca-month-cell padding"></span>
             {% else %}
-            <a href="?{{ cell.day_url }}" class="ca-month-cell{% if cell.is_selected %} active{% endif %}{% if cell.is_weekend %} weekend{% endif %} status-{{ cell.status }}">
+            <a href="?{{ cell.day_url }}" class="ca-month-cell{% if cell.is_selected %} active{% endif %}{% if cell.is_non_working %} weekend{% endif %}{% if cell.is_holiday %} holiday{% endif %} status-{{ cell.status }}">
                 <strong>{{ cell.day_number }}</strong>
-                {% if not cell.is_weekend %}
+                {% if cell.is_holiday %}
+                <small>{% trans 'Férié' %}</small>
+                {% elif not cell.is_weekend %}
                 <small>{{ cell.present_count }}</small>
                 {% endif %}
             </a>
@@ -136,8 +140,8 @@
                         </td>
                         {% for day in row.days %}
                         <td class="text-center">
-                            {% if day.is_weekend %}
-                            <span class="text-muted">—</span>
+                            {% if day.is_non_working %}
+                            <span class="text-muted">{% if day.is_holiday %}{% trans 'Férié' %}{% else %}—{% endif %}</span>
                             {% else %}
                             <span class="ca-slot-badge {% if day.status == 'present' %}ok{% elif day.status == 'late' %}late{% elif day.status == 'absent' %}absent{% else %}partial{% endif %}">
                                 {{ day.validated_slots }}/{{ dashboard.total_slots }}

@@ -12,6 +12,7 @@ from employee.utils.attendance_schedule_config import (
     has_lunch_slots,
     first_slot_code,
 )
+from employee.utils.holidays import holiday_name_for_day, is_public_holiday
 
 VALIDATED_SLOT_STATUSES = frozenset(
     {'ok', 'late', 'missed_entry', 'early_exit', 'outside_slot'}
@@ -408,6 +409,27 @@ def evaluate_day_slots(day, punch_times):
             'validated_slots': 0,
             'total_slots': total_slots,
             'missing_slots': [],
+        }
+
+    if is_public_holiday(day):
+        holiday_name = holiday_name_for_day(day)
+        label = _('FÉRIÉ')
+        note = _('Jour férié')
+        if holiday_name:
+            label = _('FÉRIÉ — %(name)s') % {'name': holiday_name}
+            note = _('Jour férié : %(name)s') % {'name': holiday_name}
+        return {
+            'status': 'holiday',
+            'status_label': label,
+            'schedule': '',
+            'note': note,
+            'delay_minutes': 0,
+            'worked_minutes': 0,
+            'slots': {},
+            'validated_slots': 0,
+            'total_slots': total_slots,
+            'missing_slots': [],
+            'holiday_name': holiday_name,
         }
 
     assigned = assign_punches_to_slots(punch_times, day=day)
