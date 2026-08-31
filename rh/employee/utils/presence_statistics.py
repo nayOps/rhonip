@@ -34,6 +34,8 @@ SEGMENT_LABELS = {
     'enrolled_never': _('Enrôlé, jamais pointé'),
     'nominal': _('De nom (non enrôlé)'),
     'chronic_absent': _('Absence chronique'),
+    'morning_only': _('Matin seulement'),
+    'evening_only': _('Sortie seulement'),
     'weak': _('Faible (5–10 %)'),
     'moderate': _('Modéré (11–20 %)'),
     'irregular': _('Irrégulier (21–59 %)'),
@@ -46,6 +48,8 @@ SEGMENT_FILTER_CHOICES = (
     ('enrolled_never', _('Enrôlé, jamais pointé')),
     ('nominal', _('De nom (non enrôlé)')),
     ('chronic_absent', _('Absence chronique')),
+    ('morning_only', _('Matin seulement')),
+    ('evening_only', _('Sortie seulement')),
     ('regular', _('Présence régulière (≥ 60 %)')),
     ('irregular_presence', _('Présence irrégulière')),
 )
@@ -289,6 +293,7 @@ def _compute_agent_row(
     late_days = 0
     partial_days = 0
     days_morning_no_evening = 0
+    days_evening_no_morning = 0
 
     for day in working_days:
         punch_times = attendance_by_date.get(day, [])
@@ -313,6 +318,8 @@ def _compute_agent_row(
             two_slot_days += 1
         elif has_morning and not has_evening:
             days_morning_no_evening += 1
+        elif has_evening and not has_morning:
+            days_evening_no_morning += 1
         if detail['status'] == 'late':
             late_days += 1
         elif detail['status'] == 'partial':
@@ -355,6 +362,8 @@ def _compute_agent_row(
         'two_slot_days': two_slot_days,
         'presence_rate': presence_rate,
         'both_rate': both_rate,
+        'morning_only_days': days_morning_no_evening,
+        'evening_only_days': days_evening_no_morning,
         'morning_only_rate': morning_only_rate,
         'evening_on_present_rate': evening_on_present_rate,
         'avg_punches': avg_punches,
@@ -386,6 +395,24 @@ def _is_chronic_absent(row: dict) -> bool:
     return False
 
 
+def _is_morning_only(row: dict) -> bool:
+    """Présence matin uniquement : au moins 1 matin, 0 sortie, taux > 4 %."""
+    return (
+        row['morning_days'] >= 1
+        and row['evening_days'] == 0
+        and row['presence_rate'] > 4
+    )
+
+
+def _is_evening_only(row: dict) -> bool:
+    """Présence sortie uniquement : au moins 1 soir, 0 matin, taux > 4 %."""
+    return (
+        row['evening_days'] >= 1
+        and row['morning_days'] == 0
+        and row['presence_rate'] > 4
+    )
+
+
 def classify_segment(row: dict) -> str:
     if row['total_punches'] == 0:
         if row['enrolled_count'] >= 1:
@@ -394,6 +421,11 @@ def classify_segment(row: dict) -> str:
 
     if _is_chronic_absent(row):
         return 'chronic_absent'
+
+    if _is_morning_only(row):
+        return 'morning_only'
+    if _is_evening_only(row):
+        return 'evening_only'
 
     rate = row['presence_rate']
     if rate >= REGULAR_PRESENCE_THRESHOLD:
@@ -436,6 +468,8 @@ def _build_kpis(rows: list[dict]) -> dict:
     )
     enrolled_never = sum(1 for row in rows if row['segment'] == 'enrolled_never')
     chronic_absent = sum(1 for row in rows if row['segment'] == 'chronic_absent')
+    morning_only = sum(1 for row in rows if row['segment'] == 'morning_only')
+    evening_only = sum(1 for row in rows if row['segment'] == 'evening_only')
 
     return {
         'total_active': total,
@@ -448,6 +482,8 @@ def _build_kpis(rows: list[dict]) -> dict:
         'irregular_presence': irregular_presence,
         'enrolled_never': enrolled_never,
         'chronic_absent': chronic_absent,
+        'morning_only': morning_only,
+        'evening_only': evening_only,
     }
 
 
@@ -468,6 +504,8 @@ def _build_segment_donut(rows: list[dict]) -> list[dict]:
         'enrolled_never': '#94a3b8',
         'nominal': '#64748b',
         'chronic_absent': '#ef4444',
+        'morning_only': '#fcd34d',
+        'evening_only': '#fb923c',
         'weak': '#fde68a',
         'moderate': '#fbbf24',
         'irregular': '#f59e0b',
@@ -477,6 +515,8 @@ def _build_segment_donut(rows: list[dict]) -> list[dict]:
         'enrolled_never',
         'nominal',
         'chronic_absent',
+        'morning_only',
+        'evening_only',
         'weak',
         'moderate',
         'irregular',
@@ -517,6 +557,8 @@ def _build_direction_breakdown(rows: list[dict]) -> list[dict]:
                     1 for row in items if row['segment'] in ('weak', 'moderate', 'irregular')
                 ),
                 'chronic_absent': sum(1 for row in items if row['segment'] == 'chronic_absent'),
+                'morning_only': sum(1 for row in items if row['segment'] == 'morning_only'),
+                'evening_only': sum(1 for row in items if row['segment'] == 'evening_only'),
                 'avg_presence': round(
                     sum(row['presence_rate'] for row in items) * 10 / total
                 ) / 10 if total else 0,

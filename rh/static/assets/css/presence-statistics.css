@@ -159,7 +159,11 @@
 .ps-segment-badge--weak,
 .ps-segment-badge--moderate,
 .ps-segment-badge--irregular { background: #fef3c7; color: #92400e; }
+.ps-segment-badge--morning_only { background: #fef9c3; color: #854d0e; }
+.ps-segment-badge--evening_only { background: #ffedd5; color: #9a3412; }
 .ps-segment-badge--chronic_absent { background: #fecaca; color: #7f1d1d; }
+.ps-row--morning-only { background: rgba(250, 204, 21, 0.06); }
+.ps-row--evening-only { background: rgba(251, 146, 60, 0.06); }
 
 .ps-month-nav {
     display: flex;

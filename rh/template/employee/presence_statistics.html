@@ -5,7 +5,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'assets/css/company-attendance.css' %}">
-<link rel="stylesheet" href="{% static 'assets/css/presence-statistics.css' %}?v=20260831">
+<link rel="stylesheet" href="{% static 'assets/css/presence-statistics.css' %}?v=20260831b">
 
 <div class="company-attendance-page ps-page">
     <header class="ca-page-header">
@@ -103,6 +103,14 @@
             <span class="ps-kpi-label">{% trans 'Absence chronique' %}</span>
             <strong class="ps-kpi-value">{{ report.kpis.chronic_absent }}</strong>
         </article>
+        <article class="ps-kpi-card ps-kpi-card--warn">
+            <span class="ps-kpi-label">{% trans 'Matin seulement' %}</span>
+            <strong class="ps-kpi-value">{{ report.kpis.morning_only }}</strong>
+        </article>
+        <article class="ps-kpi-card ps-kpi-card--warn">
+            <span class="ps-kpi-label">{% trans 'Sortie seulement' %}</span>
+            <strong class="ps-kpi-value">{{ report.kpis.evening_only }}</strong>
+        </article>
         <article class="ps-kpi-card ps-kpi-card--info">
             <span class="ps-kpi-label">{% trans 'Taux moyen' %}</span>
             <strong class="ps-kpi-value">{{ report.projection.avg_presence_rate }} %</strong>
@@ -135,6 +143,8 @@
                         <th>{% trans 'Enrôlé, jamais ptg' %}</th>
                         <th>{% trans 'De nom' %}</th>
                         <th>{% trans 'Irrégulier' %}</th>
+                        <th>{% trans 'Matin seul.' %}</th>
+                        <th>{% trans 'Sortie seul.' %}</th>
                         <th>{% trans 'Abs. chronique' %}</th>
                         <th>{% trans 'Taux moyen' %}</th>
                     </tr>
@@ -148,11 +158,13 @@
                         <td>{{ row.enrolled_never }}</td>
                         <td>{{ row.nominal }}</td>
                         <td>{{ row.irregular_presence }}</td>
+                        <td>{{ row.morning_only }}</td>
+                        <td>{{ row.evening_only }}</td>
                         <td>{{ row.chronic_absent }}</td>
                         <td>{{ row.avg_presence }} %</td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="8" class="text-muted">{% trans 'Aucune donnée' %}</td></tr>
+                    <tr><td colspan="10" class="text-muted">{% trans 'Aucune donnée' %}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -182,7 +194,7 @@
                 </thead>
                 <tbody>
                     {% for row in report.rows %}
-                    <tr class="{% if row.is_real_agent %}ps-row--real{% elif row.segment == 'enrolled_never' %}ps-row--enrolled-never{% elif row.segment == 'nominal' %}ps-row--nominal{% endif %}">
+                    <tr class="{% if row.is_real_agent %}ps-row--real{% elif row.segment == 'enrolled_never' %}ps-row--enrolled-never{% elif row.segment == 'nominal' %}ps-row--nominal{% elif row.segment == 'morning_only' %}ps-row--morning-only{% elif row.segment == 'evening_only' %}ps-row--evening-only{% endif %}">
                         <td><code>{{ row.matricule }}</code></td>
                         <td>
                             <a href="{% url 'employee:change' row.employee.pk %}">{{ row.full_name }}</a>
