@@ -19,8 +19,49 @@ from employee.utils.report_pdf_common import build_pdf_filename, logo_data_uri
 from employee.utils.roster import apply_roster_filter
 
 REAL_AGENT_THRESHOLD = 60
+REGULAR_PRESENCE_THRESHOLD = 60
+WEAK_RATE_MIN = 5.0
+WEAK_RATE_MAX = 10.0
+MODERATE_RATE_MIN = 11.0
+MODERATE_RATE_MAX = 20.0
+IRREGULAR_RATE_MIN = 21.0
+IRREGULAR_RATE_MAX = 59.0
 MORNING_SLOT = 'MORNING_IN'
 EVENING_SLOT = 'EVENING_OUT'
+
+# Segments exclusifs (classification agent)
+SEGMENT_LABELS = {
+    'enrolled_never': _('Enrôlé, jamais pointé'),
+    'nominal': _('De nom (non enrôlé)'),
+    'chronic_absent': _('Absence chronique'),
+    'weak': _('Faible (5–10 %)'),
+    'moderate': _('Modéré (11–20 %)'),
+    'irregular': _('Irrégulier (21–59 %)'),
+    'regular': _('Présence régulière (≥ 60 %)'),
+}
+
+# Filtre principal (select)
+SEGMENT_FILTER_CHOICES = (
+    ('all', _('Tous les segments')),
+    ('enrolled_never', _('Enrôlé, jamais pointé')),
+    ('nominal', _('De nom (non enrôlé)')),
+    ('chronic_absent', _('Absence chronique')),
+    ('regular', _('Présence régulière (≥ 60 %)')),
+    ('irregular_presence', _('Présence irrégulière')),
+)
+
+# Sous-filtre visible quand segment = irregular_presence
+IRREGULAR_TIER_CHOICES = (
+    ('all', _('Tous (5–59 %)')),
+    ('weak', _('Faible (5–10 %)')),
+    ('moderate', _('Modéré (11–20 %)')),
+    ('irregular', _('Irrégulier (21–59 %)')),
+)
+
+# Rétrocompatibilité exports / anciens liens
+SEGMENT_CHOICES = SEGMENT_FILTER_CHOICES
+
+THRESHOLD_CURVE = (10, 20, 60, 80, 90)
 
 
 def _employee_display_name(employee) -> str:
@@ -60,30 +101,13 @@ def _format_punch_label(last_punch) -> str:
         return '—'
     return f'{date_label} {time_label}'.strip()
 
-SEGMENT_CHOICES = (
-    ('all', _('Tous les segments')),
-    ('ghost', _('Fantômes (enrôlé, jamais pointé)')),
-    ('nominal', _('De nom (sans empreinte, jamais pointé)')),
-    ('never_punched', _('Jamais pointé (période)')),
-    ('morning_only', _('Matin seulement')),
-    ('rare_evening', _('Sortie soir rare')),
-    ('regular_complete', _('Complet régulier (entrée + sortie)')),
-    ('daily', _('Quotidien (≥ 95 %)')),
-    ('irregular', _('Irrégulier (10–50 %)')),
-    ('chronic_absent', _('Absent chronique (< 10 %)')),
-    ('real_agent', _('Agent réel (≥ 60 %)')),
-    ('two_slots_daily', _('≥ 2 pointages/jour (matin + soir)')),
-)
-
-THRESHOLD_CURVE = (40, 50, 60, 70, 80, 90)
-
-
 def parse_presence_statistics_filters(
     *,
     year=None,
     month=None,
     direction_id=None,
     segment='all',
+    irregular_tier='all',
     search_query='',
     page=1,
     today=None,
@@ -101,9 +125,16 @@ def parse_presence_statistics_filters(
             direction_pk = None
 
     segment = (segment or 'all').strip()
-    valid_segments = {code for code, _ in SEGMENT_CHOICES}
+    valid_segments = {code for code, _ in SEGMENT_FILTER_CHOICES}
     if segment not in valid_segments:
         segment = 'all'
+
+    irregular_tier = (irregular_tier or 'all').strip()
+    valid_tiers = {code for code, _ in IRREGULAR_TIER_CHOICES}
+    if irregular_tier not in valid_tiers:
+        irregular_tier = 'all'
+    if segment != 'irregular_presence':
+        irregular_tier = 'all'
 
     search_query = (search_query or '').strip()
     try:
@@ -124,6 +155,7 @@ def parse_presence_statistics_filters(
         'period_end': period_end,
         'direction_id': direction_pk,
         'segment': segment,
+        'irregular_tier': irregular_tier,
         'search_query': search_query,
         'page': page,
     }
@@ -139,6 +171,8 @@ def build_query_string(**filters) -> str:
         params['direction'] = filters['direction_id']
     if filters.get('segment') and filters['segment'] != 'all':
         params['segment'] = filters['segment']
+    if filters.get('irregular_tier') and filters['irregular_tier'] != 'all':
+        params['irregular_tier'] = filters['irregular_tier']
     if filters.get('search_query'):
         params['q'] = filters['search_query']
     if filters.get('page') and int(filters['page']) > 1:
@@ -333,54 +367,61 @@ def _compute_agent_row(
         'is_real_agent': presence_rate >= REAL_AGENT_THRESHOLD,
     }
     row['segment'] = classify_segment(row)
-    row['segment_label'] = dict(SEGMENT_CHOICES).get(row['segment'], row['segment'])
+    row['segment_label'] = str(SEGMENT_LABELS.get(row['segment'], row['segment']))
     return row
+
+
+def _is_chronic_absent(row: dict) -> bool:
+    """Absence chronique : pointage minimal (1 total, 1 jour ≤2 ptg, ou ≤2 jours et ≤5 %)."""
+    if row['total_punches'] == 0:
+        return False
+    if row['total_punches'] == 1:
+        return True
+    if row['present_days'] == 0:
+        return True
+    if row['present_days'] == 1 and row['total_punches'] <= 2:
+        return True
+    if row['present_days'] <= 2 and row['presence_rate'] <= 5:
+        return True
+    return False
 
 
 def classify_segment(row: dict) -> str:
     if row['total_punches'] == 0:
         if row['enrolled_count'] >= 1:
-            return 'ghost'
+            return 'enrolled_never'
         return 'nominal'
 
-    rate = row['presence_rate']
-    if rate < 10:
+    if _is_chronic_absent(row):
         return 'chronic_absent'
-    if row['present_days'] >= 3 and row['morning_only_rate'] >= 70:
-        return 'morning_only'
-    if row['present_days'] >= 3 and row['evening_on_present_rate'] < 30:
-        return 'rare_evening'
-    if rate >= 95:
-        return 'daily'
-    if row['both_rate'] >= 80:
-        return 'regular_complete'
-    if row['two_slot_days'] >= row['present_days'] * 0.8 and row['present_days'] >= 3:
-        return 'two_slots_daily'
-    if 10 <= rate < 50:
+
+    rate = row['presence_rate']
+    if rate >= REGULAR_PRESENCE_THRESHOLD:
+        return 'regular'
+    if rate >= IRREGULAR_RATE_MIN:
         return 'irregular'
-    if rate >= REAL_AGENT_THRESHOLD:
-        return 'real_agent'
-    return 'irregular'
+    if rate >= MODERATE_RATE_MIN:
+        return 'moderate'
+    if rate > 4:
+        return 'weak'
+    return 'chronic_absent'
 
 
 def _exclusive_segment(row: dict) -> str:
     """Classification exclusive pour le graphique donut."""
-    order = (
-        'ghost',
-        'nominal',
-        'chronic_absent',
-        'morning_only',
-        'rare_evening',
-        'irregular',
-        'daily',
-        'regular_complete',
-        'two_slots_daily',
-        'real_agent',
-    )
-    segment = row['segment']
-    if segment in order:
-        return segment
-    return 'irregular'
+    return row['segment']
+
+
+def _filter_segment_label(segment: str, irregular_tier: str = 'all') -> str:
+    if segment == 'all':
+        return str(_('Tous les segments'))
+    if segment == 'irregular_presence':
+        base = dict(SEGMENT_FILTER_CHOICES).get(segment, segment)
+        if irregular_tier and irregular_tier != 'all':
+            tier = dict(IRREGULAR_TIER_CHOICES).get(irregular_tier, irregular_tier)
+            return f'{base} — {tier}'
+        return str(base)
+    return str(dict(SEGMENT_FILTER_CHOICES).get(segment, segment))
 
 
 def _build_kpis(rows: list[dict]) -> dict:
@@ -389,8 +430,12 @@ def _build_kpis(rows: list[dict]) -> dict:
     enrolled_partial = sum(1 for row in rows if 1 <= row['enrolled_count'] < 10)
     no_fingerprint = sum(1 for row in rows if row['enrolled_count'] == 0)
     punched_once = sum(1 for row in rows if row['total_punches'] > 0)
-    never_punched = sum(1 for row in rows if row['total_punches'] == 0)
-    real_agents = sum(1 for row in rows if row['is_real_agent'])
+    regular_presence = sum(1 for row in rows if row['segment'] == 'regular')
+    irregular_presence = sum(
+        1 for row in rows if row['segment'] in ('weak', 'moderate', 'irregular')
+    )
+    enrolled_never = sum(1 for row in rows if row['segment'] == 'enrolled_never')
+    chronic_absent = sum(1 for row in rows if row['segment'] == 'chronic_absent')
 
     return {
         'total_active': total,
@@ -398,9 +443,11 @@ def _build_kpis(rows: list[dict]) -> dict:
         'enrolled_partial': enrolled_partial,
         'no_fingerprint': no_fingerprint,
         'punched_at_least_once': punched_once,
-        'never_punched': never_punched,
-        'real_agents': real_agents,
-        'real_agents_rate': round(real_agents * 1000 / total) / 10 if total else 0,
+        'regular_presence': regular_presence,
+        'regular_presence_rate': round(regular_presence * 1000 / total) / 10 if total else 0,
+        'irregular_presence': irregular_presence,
+        'enrolled_never': enrolled_never,
+        'chronic_absent': chronic_absent,
     }
 
 
@@ -416,21 +463,28 @@ def _build_threshold_curve(rows: list[dict]) -> list[dict]:
 
 def _build_segment_donut(rows: list[dict]) -> list[dict]:
     counts = Counter(_exclusive_segment(row) for row in rows)
-    labels = dict(SEGMENT_CHOICES)
+    labels = SEGMENT_LABELS
     palette = {
-        'ghost': '#94a3b8',
+        'enrolled_never': '#94a3b8',
         'nominal': '#64748b',
         'chronic_absent': '#ef4444',
-        'morning_only': '#f59e0b',
-        'rare_evening': '#fb923c',
-        'irregular': '#eab308',
-        'daily': '#22c55e',
-        'regular_complete': '#16a34a',
-        'two_slots_daily': '#059669',
-        'real_agent': '#0ea5e9',
+        'weak': '#fde68a',
+        'moderate': '#fbbf24',
+        'irregular': '#f59e0b',
+        'regular': '#16a34a',
     }
+    order = (
+        'enrolled_never',
+        'nominal',
+        'chronic_absent',
+        'weak',
+        'moderate',
+        'irregular',
+        'regular',
+    )
     segments = []
-    for code, count in counts.most_common():
+    for code in order:
+        count = counts.get(code, 0)
         if count <= 0:
             continue
         segments.append(
@@ -456,10 +510,13 @@ def _build_direction_breakdown(rows: list[dict]) -> list[dict]:
             {
                 'direction': direction,
                 'total': total,
-                'real_agents': sum(1 for row in items if row['is_real_agent']),
-                'ghosts': sum(1 for row in items if row['segment'] == 'ghost'),
+                'regular_presence': sum(1 for row in items if row['segment'] == 'regular'),
+                'enrolled_never': sum(1 for row in items if row['segment'] == 'enrolled_never'),
                 'nominal': sum(1 for row in items if row['segment'] == 'nominal'),
-                'never_punched': sum(1 for row in items if row['total_punches'] == 0),
+                'irregular_presence': sum(
+                    1 for row in items if row['segment'] in ('weak', 'moderate', 'irregular')
+                ),
+                'chronic_absent': sum(1 for row in items if row['segment'] == 'chronic_absent'),
                 'avg_presence': round(
                     sum(row['presence_rate'] for row in items) * 10 / total
                 ) / 10 if total else 0,
@@ -476,21 +533,31 @@ def _build_projection(rows: list[dict], working_days: list[date], month_end: dat
         if rows
         else 0
     )
-    real_now = sum(1 for row in rows if row['is_real_agent'])
+    regular_now = sum(1 for row in rows if row['segment'] == 'regular')
     return {
         'elapsed_working_days': elapsed,
         'remaining_working_days': remaining_days,
         'avg_presence_rate': avg_rate,
-        'real_agents_now': real_now,
-        'real_threshold': REAL_AGENT_THRESHOLD,
+        'regular_presence_now': regular_now,
+        'regular_threshold': REGULAR_PRESENCE_THRESHOLD,
     }
 
 
-def _filter_rows(rows: list[dict], segment: str, search_query: str) -> list[dict]:
+def _filter_rows(
+    rows: list[dict],
+    segment: str,
+    search_query: str,
+    irregular_tier: str = 'all',
+) -> list[dict]:
     filtered = rows
     if segment and segment != 'all':
-        if segment == 'never_punched':
-            filtered = [row for row in filtered if row['total_punches'] == 0]
+        if segment == 'irregular_presence':
+            filtered = [
+                row for row in filtered
+                if row['segment'] in ('weak', 'moderate', 'irregular')
+            ]
+            if irregular_tier and irregular_tier != 'all':
+                filtered = [row for row in filtered if row['segment'] == irregular_tier]
         else:
             filtered = [row for row in filtered if row['segment'] == segment]
 
@@ -583,6 +650,7 @@ def build_presence_statistics(
     month=None,
     direction_id=None,
     segment='all',
+    irregular_tier='all',
     search_query='',
     page=1,
     today=None,
@@ -592,6 +660,7 @@ def build_presence_statistics(
         month=month,
         direction_id=direction_id,
         segment=segment,
+        irregular_tier=irregular_tier,
         search_query=search_query,
         page=page,
         today=today,
@@ -607,7 +676,12 @@ def build_presence_statistics(
 
     kpis = _build_kpis(rows)
     all_rows_for_charts = list(rows)
-    filtered_rows = _filter_rows(rows, filters['segment'], filters['search_query'])
+    filtered_rows = _filter_rows(
+        rows,
+        filters['segment'],
+        filters['search_query'],
+        filters['irregular_tier'],
+    )
     pagination = paginate_rows(filtered_rows, filters['page'])
     pagination['previous_page'] = pagination['page'] - 1
     pagination['next_page'] = pagination['page'] + 1
@@ -621,6 +695,7 @@ def build_presence_statistics(
         month=filters['month'],
         direction_id=filters['direction_id'],
         segment=filters['segment'],
+        irregular_tier=filters['irregular_tier'],
         search_query=filters['search_query'],
     )
 
@@ -636,8 +711,10 @@ def build_presence_statistics(
         'working_days_count': len(working_days),
         'selected_direction_id': filters['direction_id'],
         'segment': filters['segment'],
+        'irregular_tier': filters['irregular_tier'],
         'search_query': filters['search_query'],
-        'segment_choices': SEGMENT_CHOICES,
+        'segment_choices': SEGMENT_FILTER_CHOICES,
+        'irregular_tier_choices': IRREGULAR_TIER_CHOICES,
         'directions': directions,
         'kpis': kpis,
         'threshold_curve': threshold_curve,
@@ -646,7 +723,7 @@ def build_presence_statistics(
         'segment_donut_json': json.dumps(segment_donut),
         'direction_breakdown': _build_direction_breakdown(all_rows_for_charts),
         'projection': _build_projection(all_rows_for_charts, working_days, filters['month_end']),
-        'real_threshold': REAL_AGENT_THRESHOLD,
+        'real_threshold': REGULAR_PRESENCE_THRESHOLD,
         'rows': pagination['rows'],
         'filtered_rows': filtered_rows,
         'pagination': pagination,
@@ -657,7 +734,7 @@ def build_presence_statistics(
             year=filters['year'],
             month=filters['month'],
         ),
-        'segment_label': dict(SEGMENT_CHOICES).get(filters['segment'], filters['segment']),
+        'segment_label': _filter_segment_label(filters['segment'], filters['irregular_tier']),
         'direction_label': (
             next(
                 (str(d.name) for d in directions if d.pk == filters['direction_id']),

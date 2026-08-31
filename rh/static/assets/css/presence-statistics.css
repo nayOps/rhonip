@@ -6,6 +6,30 @@
     flex-wrap: wrap;
 }
 
+.ps-page .ps-page-actions .btn {
+    font-size: 0.84rem;
+    font-weight: 600;
+    border-radius: 0.55rem;
+    padding: 0.5rem 0.95rem;
+}
+
+.ps-page .ps-page-actions .btn-primary {
+    background: var(--ca-primary, #0f2744);
+    border-color: var(--ca-primary, #0f2744);
+}
+
+.ps-page .reports-hub-link-btn {
+    background: rgba(15, 39, 68, 0.06);
+    border: 1px solid rgba(15, 39, 68, 0.18);
+    color: var(--ca-primary, #0f2744);
+}
+
+.ps-page .reports-hub-link-btn:hover {
+    background: var(--ca-primary, #0f2744);
+    border-color: var(--ca-primary, #0f2744);
+    color: #fff;
+}
+
 .ps-kpi-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
@@ -108,7 +132,8 @@
 }
 
 .ps-row--real { background: rgba(34, 197, 94, 0.04); }
-.ps-row--ghost { background: rgba(239, 68, 68, 0.04); }
+.ps-row--enrolled-never { background: rgba(239, 68, 68, 0.04); }
+.ps-row--nominal { background: rgba(148, 163, 184, 0.08); }
 
 .ps-rate {
     font-weight: 700;
@@ -128,13 +153,12 @@
     white-space: nowrap;
 }
 
-.ps-segment-badge--ghost,
-.ps-segment-badge--nominal { background: #fee2e2; color: #991b1b; }
-.ps-segment-badge--real_agent,
-.ps-segment-badge--daily,
-.ps-segment-badge--regular_complete { background: #dcfce7; color: #166534; }
-.ps-segment-badge--morning_only,
-.ps-segment-badge--rare_evening { background: #fef3c7; color: #92400e; }
+.ps-segment-badge--enrolled_never { background: #fee2e2; color: #991b1b; }
+.ps-segment-badge--nominal { background: #e2e8f0; color: #475569; }
+.ps-segment-badge--regular { background: #dcfce7; color: #166534; }
+.ps-segment-badge--weak,
+.ps-segment-badge--moderate,
+.ps-segment-badge--irregular { background: #fef3c7; color: #92400e; }
 .ps-segment-badge--chronic_absent { background: #fecaca; color: #7f1d1d; }
 
 .ps-month-nav {

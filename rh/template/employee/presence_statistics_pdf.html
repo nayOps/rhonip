@@ -91,7 +91,7 @@
 {{ report_title_line1 }}<br>{{ report_title_line2 }}
 </h1>
 <p class="mt-4 font-body-md text-on-primary-container/90">
-{{ direction_label }} · {{ working_days_count }} jours ouvrés · Seuil réel {{ real_threshold }} %
+{{ direction_label }} · {{ working_days_count }} jours ouvrés · Seuil régulier {{ real_threshold }} %
 {% if segment and segment != 'all' %} · Segment : {{ segment_label }}{% endif %}
 </p>
 </section>
@@ -102,28 +102,28 @@
 <p class="font-headline-md text-primary text-[16px]">{{ kpis.total_active }}</p>
 </div>
 <div class="p-3 border-r border-outline-variant">
-<p class="font-label-sm text-on-surface-variant mb-1">Agents réels</p>
-<p class="font-headline-md text-primary text-[16px]">{{ kpis.real_agents }}</p>
+<p class="font-label-sm text-on-surface-variant mb-1">Présence régulière</p>
+<p class="font-headline-md text-primary text-[16px]">{{ kpis.regular_presence }}</p>
 </div>
 <div class="p-3 border-r border-outline-variant bg-surface">
+<p class="font-label-sm text-on-surface-variant mb-1">Irrégulier</p>
+<p class="font-headline-md text-primary text-[16px]">{{ kpis.irregular_presence }}</p>
+</div>
+<div class="p-3 border-r border-outline-variant">
+<p class="font-label-sm text-on-surface-variant mb-1">Enrôlé, jamais ptg</p>
+<p class="font-headline-md text-primary text-[16px]">{{ kpis.enrolled_never }}</p>
+</div>
+<div class="p-3 border-r border-outline-variant bg-surface">
+<p class="font-label-sm text-on-surface-variant mb-1">Abs. chronique</p>
+<p class="font-headline-md text-primary text-[16px]">{{ kpis.chronic_absent }}</p>
+</div>
+<div class="p-3 border-r border-outline-variant">
 <p class="font-label-sm text-on-surface-variant mb-1">10/10</p>
 <p class="font-headline-md text-primary text-[16px]">{{ kpis.enrolled_complete }}</p>
 </div>
-<div class="p-3 border-r border-outline-variant">
+<div class="p-3 border-r border-outline-variant bg-surface">
 <p class="font-label-sm text-on-surface-variant mb-1">Partiel</p>
 <p class="font-headline-md text-primary text-[16px]">{{ kpis.enrolled_partial }}</p>
-</div>
-<div class="p-3 border-r border-outline-variant bg-surface">
-<p class="font-label-sm text-on-surface-variant mb-1">Sans emp.</p>
-<p class="font-headline-md text-primary text-[16px]">{{ kpis.no_fingerprint }}</p>
-</div>
-<div class="p-3 border-r border-outline-variant">
-<p class="font-label-sm text-on-surface-variant mb-1">≥ 1 ptg</p>
-<p class="font-headline-md text-primary text-[16px]">{{ kpis.punched_at_least_once }}</p>
-</div>
-<div class="p-3 border-r border-outline-variant bg-surface">
-<p class="font-label-sm text-on-surface-variant mb-1">Jamais ptg</p>
-<p class="font-headline-md text-primary text-[16px]">{{ kpis.never_punched }}</p>
 </div>
 <div class="p-3">
 <p class="font-label-sm text-on-surface-variant mb-1">Taux moyen</p>
@@ -189,8 +189,8 @@ Détail agents
 <div>
 <h4 class="font-label-bold text-primary uppercase mb-3 tracking-widest text-[10px]">Synthèse</h4>
 <p class="text-[10px] leading-snug text-on-surface-variant">
-Effectif actif : {{ kpis.total_active }} · Agents réels (≥ {{ real_threshold }} %) : {{ kpis.real_agents }}
-({{ kpis.real_agents_rate }} %) · Jamais pointé : {{ kpis.never_punched }} · Taux moyen : {{ projection.avg_presence_rate }} %.
+Effectif actif : {{ kpis.total_active }} · Présence régulière (≥ {{ real_threshold }} %) : {{ kpis.regular_presence }}
+({{ kpis.regular_presence_rate }} %) · Irrégulier (5–59 %) : {{ kpis.irregular_presence }} · Enrôlé jamais pointé : {{ kpis.enrolled_never }} · Absence chronique : {{ kpis.chronic_absent }} · Taux moyen : {{ projection.avg_presence_rate }} %.
 </p>
 <p class="text-[9px] text-on-surface-variant mt-2">Généré le {{ generated_at_label }}</p>
 </div>

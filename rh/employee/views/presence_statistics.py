@@ -29,6 +29,7 @@ def _stats_kwargs(request):
         'month': source.get('month'),
         'direction_id': source.get('direction'),
         'segment': source.get('segment', 'all'),
+        'irregular_tier': source.get('irregular_tier', 'all'),
         'search_query': source.get('q', ''),
         'page': source.get('page', 1),
     }
@@ -50,7 +51,12 @@ class PresenceStatisticsExport(StaffStatisticsMixin, View):
             month=kwargs.get('month'),
             direction_id=kwargs.get('direction_id'),
         )
-        rows = _filter_rows(rows, kwargs.get('segment', 'all'), kwargs.get('search_query', ''))
+        rows = _filter_rows(
+            rows,
+            kwargs.get('segment', 'all'),
+            kwargs.get('search_query', ''),
+            kwargs.get('irregular_tier', 'all'),
+        )
 
         response = HttpResponse(content_type='text/csv; charset=utf-8')
         filename = f'statistiques-presence-{meta["year"]}-{meta["month"]:02d}.csv'
