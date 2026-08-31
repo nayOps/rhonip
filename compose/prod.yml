@@ -24,7 +24,8 @@ x-rh-prod-env: &rh-prod-env
   GUNICORN_THREADS: ${GUNICORN_THREADS:-2}
   GUNICORN_TIMEOUT: ${GUNICORN_TIMEOUT:-90}
   GUNICORN_WORKER_CLASS: ${GUNICORN_WORKER_CLASS:-gthread}
-  WHITENOISE_USE_FINDERS: "0"
+  # rh/static monté en prod : servir le bind mount si staticfiles est en retard
+  WHITENOISE_USE_FINDERS: "1"
 
 services:
   onip_postgres:
@@ -47,6 +48,7 @@ services:
       - ./rh/core:/app/backend/core:ro
       - ./agents:/app/agents:ro
       - ./datas:/app/datas:ro
+      - ./deploy/vps/reports:/app/deploy/vps/reports
 
   rh_worker:
     container_name: onip_rh_worker
