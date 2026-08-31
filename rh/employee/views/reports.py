@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse
@@ -26,6 +28,10 @@ from employee.utils.daily_attendance_report import (
 )
 from employee.utils.reports_registry import REPORT_CATALOG
 from employee.utils.report_pdf_common import list_generated_report_files
+from employee.utils.presence_statistics import (
+    build_presence_segment_report_index,
+    generate_presence_segment_reports,
+)
 
 
 class StaffReportsMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -124,6 +130,11 @@ class ReportsHub(StaffReportsMixin, View):
     template_name = 'employee/reports_hub.html'
 
     def get(self, request):
+        today = date.today()
+        year = int(request.GET.get('year') or today.year)
+        month = int(request.GET.get('month') or today.month)
+        month = max(1, min(12, month))
+
         reports = []
         for item in REPORT_CATALOG:
             preview_url = reverse(item['preview_name'])
@@ -142,12 +153,32 @@ class ReportsHub(StaffReportsMixin, View):
                     'export_url': export_url,
                 }
             )
+
+        segment_reports = build_presence_segment_report_index(year=year, month=month)
+        for item in segment_reports:
+            item['preview_url'] = (
+                f"{reverse('employee:presence_statistics')}?{item['query_string']}"
+            )
+            item['export_url'] = (
+                f"{reverse('employee:presence_statistics_pdf')}?{item['query_string']}"
+            )
+            if item['exists']:
+                item['download_url'] = reverse(
+                    'employee:generated_report_download',
+                    args=[item['filename']],
+                )
+            else:
+                item['download_url'] = ''
+
         return render(
             request,
             self.template_name,
             {
                 'reports': reports,
                 'generated_reports': list_generated_report_files(),
+                'presence_segment_reports': segment_reports,
+                'presence_report_year': year,
+                'presence_report_month': month,
                 'main_report_url': reverse('employee:biometric_enrollment_report'),
                 'statistics_url': reverse('employee:presence_statistics'),
             },
@@ -354,3 +385,33 @@ class DailyAttendanceReportExport(StaffReportsMixin, View):
         response = HttpResponse(pdf_bytes, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response
+
+
+class GeneratePresenceSegmentReports(StaffReportsMixin, View):
+    """Génère tous les PDF statistiques par segment pour une période."""
+
+    def post(self, request):
+        today = date.today()
+        try:
+            year = int(request.POST.get('year') or today.year)
+            month = int(request.POST.get('month') or today.month)
+        except (TypeError, ValueError):
+            messages.error(request, _('Période invalide.'))
+            return redirect(reverse('employee:reports_hub'))
+
+        month = max(1, min(12, month))
+        results = generate_presence_segment_reports(year=year, month=month, today=today)
+        total_agents = sum(r.get('row_count', 0) for r in results)
+        messages.success(
+            request,
+            _('%(files)s rapports PDF générés pour %(month)02d/%(year)s (%(agents)s lignes agents au total).')
+            % {
+                'files': len(results),
+                'month': month,
+                'year': year,
+                'agents': total_agents,
+            },
+        )
+        return redirect(
+            f"{reverse('employee:reports_hub')}?year={year}&month={month}"
+        )

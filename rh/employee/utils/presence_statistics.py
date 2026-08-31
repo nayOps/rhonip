@@ -771,10 +771,11 @@ def build_presence_statistics(
         'pagination': pagination,
         'query_string': query_string,
         'generated_at_label': date.today().strftime('%d/%m/%Y'),
-        'pdf_filename': build_pdf_filename(
-            'statistiques-presence',
-            year=filters['year'],
-            month=filters['month'],
+        'pdf_filename': build_presence_segment_pdf_filename(
+            filters['year'],
+            filters['month'],
+            filters['segment'],
+            filters['irregular_tier'],
         ),
         'segment_label': _filter_segment_label(filters['segment'], filters['irregular_tier']),
         'direction_label': (
@@ -816,3 +817,128 @@ def render_presence_statistics_pdf(**kwargs) -> bytes:
 
     html = render_presence_statistics_html(**kwargs)
     return render_html_to_pdf(html)
+
+
+# --- Rapports PDF par segment (hub rapports) ---
+
+PRESENCE_SEGMENT_REPORT_SPECS = (
+    ('all', 'all', 'tous', _('Tous les segments')),
+    ('enrolled_never', 'all', 'enrolle-jamais-pointe', _('Enrôlé, jamais pointé')),
+    ('nominal', 'all', 'de-nom', _('De nom (non enrôlé)')),
+    ('chronic_absent', 'all', 'absence-chronique', _('Absence chronique')),
+    ('morning_only', 'all', 'matin-seulement', _('Matin seulement')),
+    ('evening_only', 'all', 'sortie-seulement', _('Sortie seulement')),
+    ('regular', 'all', 'presence-reguliere', _('Présence régulière (≥ 60 %)')),
+    ('irregular_presence', 'all', 'irregulier-5-59', _('Présence irrégulière (5–59 %)')),
+    ('irregular_presence', 'weak', 'irregulier-faible', _('Irrégulier — Faible (5–10 %)')),
+    ('irregular_presence', 'moderate', 'irregulier-modere', _('Irrégulier — Modéré (11–20 %)')),
+    ('irregular_presence', 'irregular', 'irregulier-21-59', _('Irrégulier (21–59 %)')),
+)
+
+
+def _presence_segment_spec_map() -> dict[tuple[str, str], dict]:
+    return {
+        (segment, irregular_tier): {
+            'segment': segment,
+            'irregular_tier': irregular_tier,
+            'slug': slug,
+            'label': str(label),
+        }
+        for segment, irregular_tier, slug, label in PRESENCE_SEGMENT_REPORT_SPECS
+    }
+
+
+def build_presence_segment_pdf_filename(
+    year: int,
+    month: int,
+    segment: str = 'all',
+    irregular_tier: str = 'all',
+) -> str:
+    spec = _presence_segment_spec_map().get((segment, irregular_tier))
+    slug = spec['slug'] if spec else segment.replace('_', '-')
+    return build_pdf_filename(
+        'statistiques-presence',
+        year=year,
+        month=month,
+        segment_slug=slug,
+    )
+
+
+def build_presence_segment_report_index(*, year=None, month=None, today=None) -> list[dict]:
+    """Liste des rapports segment pour le hub (fichier généré + liens export)."""
+    from employee.utils.report_pdf_common import default_reports_output_dir
+
+    today = today or date.today()
+    year = int(year or today.year)
+    month = int(month or today.month)
+    output_dir = default_reports_output_dir()
+
+    items = []
+    for segment, irregular_tier, slug, label in PRESENCE_SEGMENT_REPORT_SPECS:
+        filename = build_pdf_filename(
+            'statistiques-presence',
+            year=year,
+            month=month,
+            segment_slug=slug,
+        )
+        path = output_dir / filename
+        query = build_query_string(
+            year=year,
+            month=month,
+            segment=segment,
+            irregular_tier=irregular_tier,
+        )
+        stat = path.stat() if path.is_file() else None
+        items.append(
+            {
+                'segment': segment,
+                'irregular_tier': irregular_tier,
+                'slug': slug,
+                'label': str(label),
+                'filename': filename,
+                'exists': path.is_file(),
+                'size_kb': max(1, round(stat.st_size / 1024)) if stat else None,
+                'modified_label': date.fromtimestamp(stat.st_mtime).strftime('%d/%m/%Y %H:%M') if stat else None,
+                'query_string': query,
+            }
+        )
+    return items
+
+
+def generate_presence_segment_reports(*, year=None, month=None, today=None) -> list[dict]:
+    """Génère et enregistre un PDF pour chaque segment de présence."""
+    from employee.utils.report_pdf_common import save_report_pdf
+
+    today = today or date.today()
+    year = int(year or today.year)
+    month = int(month or today.month)
+    results = []
+
+    for segment, irregular_tier, slug, label in PRESENCE_SEGMENT_REPORT_SPECS:
+        kwargs = {
+            'year': year,
+            'month': month,
+            'segment': segment,
+            'irregular_tier': irregular_tier,
+            'today': today,
+        }
+        pdf_bytes = render_presence_statistics_pdf(**kwargs)
+        filename = build_pdf_filename(
+            'statistiques-presence',
+            year=year,
+            month=month,
+            segment_slug=slug,
+        )
+        path = save_report_pdf(pdf_bytes, filename)
+        ctx = build_presence_statistics_pdf_context(**kwargs)
+        results.append(
+            {
+                'filename': filename,
+                'path': str(path),
+                'label': str(label),
+                'row_count': ctx.get('pdf_rows_count', 0),
+                'segment': segment,
+                'irregular_tier': irregular_tier,
+            }
+        )
+    return results

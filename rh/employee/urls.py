@@ -17,6 +17,7 @@ urlpatterns = [
     path('statistics/export.pdf', PresenceStatisticsPdfExport.as_view(), name='presence_statistics_pdf'),
     path('reports/generated/<str:filename>', GeneratedReportDownload.as_view(), name='generated_report_download'),
     path('reports/', ReportsHub.as_view(), name='reports_hub'),
+    path('reports/generate-presence-segments/', GeneratePresenceSegmentReports.as_view(), name='generate_presence_segment_reports'),
     path('reports/biometric-enrollment/', BiometricEnrollmentReport.as_view(), name='biometric_enrollment_report'),
     path('reports/biometric-enrollment.pdf', BiometricEnrollmentReportExport.as_view(), name='biometric_enrollment_report_export'),
     path('reports/biometric-enrollment/schedule/', BiometricEnrollmentReportSchedule.as_view(), name='biometric_enrollment_report_schedule'),

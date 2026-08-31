@@ -124,6 +124,78 @@
         </div>
     </section>
 
+    <section class="rh-reports-section mt-4" aria-labelledby="rh-presence-segments-title">
+        <div class="bio-table-card__header px-0 pt-0 border-0 bg-transparent d-flex flex-wrap justify-content-between align-items-end gap-3">
+            <div>
+                <h2 id="rh-presence-segments-title" class="rh-reports-section__title">{% trans 'Statistiques de présence par segment' %}</h2>
+                <p class="rh-reports-section__subtitle">{% trans 'Un PDF par segment pour la période sélectionnée' %}</p>
+            </div>
+            <form method="post" action="{% url 'employee:generate_presence_segment_reports' %}" class="d-flex flex-wrap align-items-end gap-2">
+                {% csrf_token %}
+                <label class="small text-muted mb-0">
+                    {% trans 'Mois' %}
+                    <input type="number" name="month" value="{{ presence_report_month }}" min="1" max="12" class="form-control form-control-sm" style="width:4.5rem">
+                </label>
+                <label class="small text-muted mb-0">
+                    {% trans 'Année' %}
+                    <input type="number" name="year" value="{{ presence_report_year }}" min="2020" max="2100" class="form-control form-control-sm" style="width:5.5rem">
+                </label>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-file-earmark-pdf"></i> {% trans 'Générer tous les PDF' %}
+                </button>
+            </form>
+        </div>
+        <div class="table-responsive">
+            <table class="table ps-table">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Segment' %}</th>
+                        <th>{% trans 'Fichier PDF' %}</th>
+                        <th>{% trans 'Statut' %}</th>
+                        <th>{% trans 'Taille' %}</th>
+                        <th>{% trans 'Généré le' %}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for seg in presence_segment_reports %}
+                    <tr>
+                        <td>{{ seg.label }}</td>
+                        <td><code class="small">{{ seg.filename }}</code></td>
+                        <td>
+                            {% if seg.exists %}
+                            <span class="badge bg-success">{% trans 'Disponible' %}</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{% trans 'Non généré' %}</span>
+                            {% endif %}
+                        </td>
+                        <td>{% if seg.size_kb %}{{ seg.size_kb }} Ko{% else %}—{% endif %}</td>
+                        <td>{{ seg.modified_label|default:"—" }}</td>
+                        <td class="text-end text-nowrap">
+                            <a href="{{ seg.preview_url }}" class="btn btn-sm btn-outline-secondary" title="{% trans 'Visualiser' %}">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% if seg.exists %}
+                            <a href="{{ seg.download_url }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-download"></i> {% trans 'Télécharger' %}
+                            </a>
+                            {% else %}
+                            <a href="{{ seg.export_url }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-download"></i> {% trans 'Générer' %}
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-muted">{% trans 'Aucun segment configuré.' %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     <section class="rh-reports-section mt-4" aria-labelledby="rh-generated-reports-title">
         <div class="bio-table-card__header px-0 pt-0 border-0 bg-transparent">
             <div>

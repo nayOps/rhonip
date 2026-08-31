@@ -25,4 +25,5 @@ from .reports import (
     EnrollmentDayReportSchedule,
     DailyAttendanceReport,
     DailyAttendanceReportExport,
+    GeneratePresenceSegmentReports,
 )

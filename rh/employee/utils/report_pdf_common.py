@@ -65,8 +65,9 @@ def build_pdf_filename(
     date_to: date | None = None,
     year: int | None = None,
     month: int | None = None,
+    segment_slug: str | None = None,
 ) -> str:
-    """Convention : rapport-rh-onip-{code}-{dates}.pdf"""
+    """Convention : rapport-rh-onip-{code}-{dates}[-{segment}].pdf"""
     parts = ['rapport-rh-onip', report_code]
     if year and month:
         parts.append(f'{int(year):04d}-{int(month):02d}')
@@ -77,6 +78,8 @@ def build_pdf_filename(
         parts.append(date_to.strftime('%Y-%m-%d'))
     elif date_from:
         parts.append(date_from.strftime('%Y-%m-%d'))
+    if segment_slug:
+        parts.append(segment_slug)
     return '-'.join(parts) + '.pdf'
 
 

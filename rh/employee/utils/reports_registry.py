@@ -51,8 +51,8 @@ REPORT_CATALOG = (
         'code': 'statistiques-presence',
         'title': _('Statistiques de présence'),
         'description': _(
-            'Analyse mensuelle des agents actifs : agents réels, fantômes, '
-            'matin seulement, segments et seuil de présence.'
+            'Analyse mensuelle des agents actifs : segments exclusifs, présence régulière, '
+            'matin seulement, sortie seulement et tranches de taux.'
         ),
         'icon': 'bi-graph-up-arrow',
         'badge': _('Mensuel'),
