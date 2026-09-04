@@ -30,6 +30,7 @@ def _stats_kwargs(request):
         'direction_id': source.get('direction'),
         'segment': source.get('segment', 'all'),
         'irregular_tier': source.get('irregular_tier', 'all'),
+        'regular_tier': source.get('regular_tier', 'all'),
         'search_query': source.get('q', ''),
         'page': source.get('page', 1),
     }
@@ -56,6 +57,7 @@ class PresenceStatisticsExport(StaffStatisticsMixin, View):
             kwargs.get('segment', 'all'),
             kwargs.get('search_query', ''),
             kwargs.get('irregular_tier', 'all'),
+            kwargs.get('regular_tier', 'all'),
         )
 
         response = HttpResponse(content_type='text/csv; charset=utf-8')

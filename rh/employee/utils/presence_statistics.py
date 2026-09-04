@@ -62,10 +62,49 @@ IRREGULAR_TIER_CHOICES = (
     ('irregular', _('Irrégulier (21–59 %)')),
 )
 
+# Sous-filtre visible quand segment = regular (jours présents / mois)
+REGULAR_HIGH_DAYS_MIN = 15
+REGULAR_TIER_CODES = ('all', 'high', 'complete')
+
 # Rétrocompatibilité exports / anciens liens
 SEGMENT_CHOICES = SEGMENT_FILTER_CHOICES
 
 THRESHOLD_CURVE = (10, 20, 60, 80, 90)
+
+
+def build_regular_tier_choices(working_days_count: int) -> tuple[tuple[str, str], ...]:
+    """Sous-niveaux dynamiques selon le nombre de jours ouvrés du mois."""
+    max_days = max(1, int(working_days_count or 1))
+    high_max = max_days - 1
+    choices = [('all', _('Tous (≥ 60 %)'))]
+    if high_max >= REGULAR_HIGH_DAYS_MIN:
+        choices.append(
+            (
+                'high',
+                _('15–%(max)s jours') % {'max': high_max},
+            )
+        )
+    choices.append(
+        (
+            'complete',
+            _('Présence complète (%(n)s/%(n)s)') % {'n': max_days},
+        )
+    )
+    return tuple(choices)
+
+
+def _matches_regular_tier(row: dict, regular_tier: str) -> bool:
+    if row.get('segment') != 'regular':
+        return False
+    if not regular_tier or regular_tier == 'all':
+        return True
+    present = int(row.get('present_days') or 0)
+    working = max(1, int(row.get('working_days') or 1))
+    if regular_tier == 'complete':
+        return present >= working
+    if regular_tier == 'high':
+        return REGULAR_HIGH_DAYS_MIN <= present < working
+    return False
 
 
 def _employee_display_name(employee) -> str:
@@ -112,6 +151,7 @@ def parse_presence_statistics_filters(
     direction_id=None,
     segment='all',
     irregular_tier='all',
+    regular_tier='all',
     search_query='',
     page=1,
     today=None,
@@ -140,6 +180,12 @@ def parse_presence_statistics_filters(
     if segment != 'irregular_presence':
         irregular_tier = 'all'
 
+    regular_tier = (regular_tier or 'all').strip()
+    if regular_tier not in REGULAR_TIER_CODES:
+        regular_tier = 'all'
+    if segment != 'regular':
+        regular_tier = 'all'
+
     search_query = (search_query or '').strip()
     try:
         page = max(1, int(page or 1))
@@ -160,6 +206,7 @@ def parse_presence_statistics_filters(
         'direction_id': direction_pk,
         'segment': segment,
         'irregular_tier': irregular_tier,
+        'regular_tier': regular_tier,
         'search_query': search_query,
         'page': page,
     }
@@ -177,6 +224,8 @@ def build_query_string(**filters) -> str:
         params['segment'] = filters['segment']
     if filters.get('irregular_tier') and filters['irregular_tier'] != 'all':
         params['irregular_tier'] = filters['irregular_tier']
+    if filters.get('regular_tier') and filters['regular_tier'] != 'all':
+        params['regular_tier'] = filters['regular_tier']
     if filters.get('search_query'):
         params['q'] = filters['search_query']
     if filters.get('page') and int(filters['page']) > 1:
@@ -444,13 +493,26 @@ def _exclusive_segment(row: dict) -> str:
     return row['segment']
 
 
-def _filter_segment_label(segment: str, irregular_tier: str = 'all') -> str:
+def _filter_segment_label(
+    segment: str,
+    irregular_tier: str = 'all',
+    regular_tier: str = 'all',
+    working_days_count: int = 20,
+) -> str:
     if segment == 'all':
         return str(_('Tous les segments'))
     if segment == 'irregular_presence':
         base = dict(SEGMENT_FILTER_CHOICES).get(segment, segment)
         if irregular_tier and irregular_tier != 'all':
             tier = dict(IRREGULAR_TIER_CHOICES).get(irregular_tier, irregular_tier)
+            return f'{base} — {tier}'
+        return str(base)
+    if segment == 'regular':
+        base = dict(SEGMENT_FILTER_CHOICES).get(segment, segment)
+        if regular_tier and regular_tier != 'all':
+            tier = dict(build_regular_tier_choices(working_days_count)).get(
+                regular_tier, regular_tier
+            )
             return f'{base} — {tier}'
         return str(base)
     return str(dict(SEGMENT_FILTER_CHOICES).get(segment, segment))
@@ -470,6 +532,8 @@ def _build_kpis(rows: list[dict]) -> dict:
     chronic_absent = sum(1 for row in rows if row['segment'] == 'chronic_absent')
     morning_only = sum(1 for row in rows if row['segment'] == 'morning_only')
     evening_only = sum(1 for row in rows if row['segment'] == 'evening_only')
+    regular_high = sum(1 for row in rows if _matches_regular_tier(row, 'high'))
+    regular_complete = sum(1 for row in rows if _matches_regular_tier(row, 'complete'))
 
     return {
         'total_active': total,
@@ -479,6 +543,8 @@ def _build_kpis(rows: list[dict]) -> dict:
         'punched_at_least_once': punched_once,
         'regular_presence': regular_presence,
         'regular_presence_rate': round(regular_presence * 1000 / total) / 10 if total else 0,
+        'regular_high': regular_high,
+        'regular_complete': regular_complete,
         'irregular_presence': irregular_presence,
         'enrolled_never': enrolled_never,
         'chronic_absent': chronic_absent,
@@ -590,6 +656,7 @@ def _filter_rows(
     segment: str,
     search_query: str,
     irregular_tier: str = 'all',
+    regular_tier: str = 'all',
 ) -> list[dict]:
     filtered = rows
     if segment and segment != 'all':
@@ -600,6 +667,12 @@ def _filter_rows(
             ]
             if irregular_tier and irregular_tier != 'all':
                 filtered = [row for row in filtered if row['segment'] == irregular_tier]
+        elif segment == 'regular':
+            filtered = [row for row in filtered if row['segment'] == 'regular']
+            if regular_tier and regular_tier != 'all':
+                filtered = [
+                    row for row in filtered if _matches_regular_tier(row, regular_tier)
+                ]
         else:
             filtered = [row for row in filtered if row['segment'] == segment]
 
@@ -693,6 +766,7 @@ def build_presence_statistics(
     direction_id=None,
     segment='all',
     irregular_tier='all',
+    regular_tier='all',
     search_query='',
     page=1,
     today=None,
@@ -703,6 +777,7 @@ def build_presence_statistics(
         direction_id=direction_id,
         segment=segment,
         irregular_tier=irregular_tier,
+        regular_tier=regular_tier,
         search_query=search_query,
         page=page,
         today=today,
@@ -715,6 +790,7 @@ def build_presence_statistics(
         today=today,
     )
     working_days = meta['working_days']
+    working_days_count = len(working_days)
 
     kpis = _build_kpis(rows)
     all_rows_for_charts = list(rows)
@@ -723,6 +799,7 @@ def build_presence_statistics(
         filters['segment'],
         filters['search_query'],
         filters['irregular_tier'],
+        filters['regular_tier'],
     )
     pagination = paginate_rows(filtered_rows, filters['page'])
     pagination['previous_page'] = pagination['page'] - 1
@@ -738,6 +815,7 @@ def build_presence_statistics(
         direction_id=filters['direction_id'],
         segment=filters['segment'],
         irregular_tier=filters['irregular_tier'],
+        regular_tier=filters['regular_tier'],
         search_query=filters['search_query'],
     )
 
@@ -750,13 +828,15 @@ def build_presence_statistics(
         'month': filters['month'],
         'month_start': filters['month_start'],
         'period_end': filters['period_end'],
-        'working_days_count': len(working_days),
+        'working_days_count': working_days_count,
         'selected_direction_id': filters['direction_id'],
         'segment': filters['segment'],
         'irregular_tier': filters['irregular_tier'],
+        'regular_tier': filters['regular_tier'],
         'search_query': filters['search_query'],
         'segment_choices': SEGMENT_FILTER_CHOICES,
         'irregular_tier_choices': IRREGULAR_TIER_CHOICES,
+        'regular_tier_choices': build_regular_tier_choices(working_days_count),
         'directions': directions,
         'kpis': kpis,
         'threshold_curve': threshold_curve,
@@ -776,8 +856,14 @@ def build_presence_statistics(
             filters['month'],
             filters['segment'],
             filters['irregular_tier'],
+            filters['regular_tier'],
         ),
-        'segment_label': _filter_segment_label(filters['segment'], filters['irregular_tier']),
+        'segment_label': _filter_segment_label(
+            filters['segment'],
+            filters['irregular_tier'],
+            filters['regular_tier'],
+            working_days_count,
+        ),
         'direction_label': (
             next(
                 (str(d.name) for d in directions if d.pk == filters['direction_id']),
@@ -820,31 +906,35 @@ def render_presence_statistics_pdf(**kwargs) -> bytes:
 
 
 # --- Rapports PDF par segment (hub rapports) ---
+# Tuple: segment, irregular_tier, regular_tier, slug, label
 
 PRESENCE_SEGMENT_REPORT_SPECS = (
-    ('all', 'all', 'tous', _('Tous les segments')),
-    ('enrolled_never', 'all', 'enrolle-jamais-pointe', _('Enrôlé, jamais pointé')),
-    ('nominal', 'all', 'de-nom', _('De nom (non enrôlé)')),
-    ('chronic_absent', 'all', 'absence-chronique', _('Absence chronique')),
-    ('morning_only', 'all', 'matin-seulement', _('Matin seulement')),
-    ('evening_only', 'all', 'sortie-seulement', _('Sortie seulement')),
-    ('regular', 'all', 'presence-reguliere', _('Présence régulière (≥ 60 %)')),
-    ('irregular_presence', 'all', 'irregulier-5-59', _('Présence irrégulière (5–59 %)')),
-    ('irregular_presence', 'weak', 'irregulier-faible', _('Irrégulier — Faible (5–10 %)')),
-    ('irregular_presence', 'moderate', 'irregulier-modere', _('Irrégulier — Modéré (11–20 %)')),
-    ('irregular_presence', 'irregular', 'irregulier-21-59', _('Irrégulier (21–59 %)')),
+    ('all', 'all', 'all', 'tous', _('Tous les segments')),
+    ('enrolled_never', 'all', 'all', 'enrolle-jamais-pointe', _('Enrôlé, jamais pointé')),
+    ('nominal', 'all', 'all', 'de-nom', _('De nom (non enrôlé)')),
+    ('chronic_absent', 'all', 'all', 'absence-chronique', _('Absence chronique')),
+    ('morning_only', 'all', 'all', 'matin-seulement', _('Matin seulement')),
+    ('evening_only', 'all', 'all', 'sortie-seulement', _('Sortie seulement')),
+    ('regular', 'all', 'all', 'presence-reguliere', _('Présence régulière (≥ 60 %)')),
+    ('regular', 'all', 'high', 'presence-reguliere-15-19', _('Présence régulière — 15 jours jusqu’à N−1')),
+    ('regular', 'all', 'complete', 'presence-reguliere-complete', _('Présence régulière — Complète (N/N)')),
+    ('irregular_presence', 'all', 'all', 'irregulier-5-59', _('Présence irrégulière (5–59 %)')),
+    ('irregular_presence', 'weak', 'all', 'irregulier-faible', _('Irrégulier — Faible (5–10 %)')),
+    ('irregular_presence', 'moderate', 'all', 'irregulier-modere', _('Irrégulier — Modéré (11–20 %)')),
+    ('irregular_presence', 'irregular', 'all', 'irregulier-21-59', _('Irrégulier (21–59 %)')),
 )
 
 
-def _presence_segment_spec_map() -> dict[tuple[str, str], dict]:
+def _presence_segment_spec_map() -> dict[tuple[str, str, str], dict]:
     return {
-        (segment, irregular_tier): {
+        (segment, irregular_tier, regular_tier): {
             'segment': segment,
             'irregular_tier': irregular_tier,
+            'regular_tier': regular_tier,
             'slug': slug,
             'label': str(label),
         }
-        for segment, irregular_tier, slug, label in PRESENCE_SEGMENT_REPORT_SPECS
+        for segment, irregular_tier, regular_tier, slug, label in PRESENCE_SEGMENT_REPORT_SPECS
     }
 
 
@@ -853,8 +943,9 @@ def build_presence_segment_pdf_filename(
     month: int,
     segment: str = 'all',
     irregular_tier: str = 'all',
+    regular_tier: str = 'all',
 ) -> str:
-    spec = _presence_segment_spec_map().get((segment, irregular_tier))
+    spec = _presence_segment_spec_map().get((segment, irregular_tier, regular_tier))
     slug = spec['slug'] if spec else segment.replace('_', '-')
     return build_pdf_filename(
         'statistiques-presence',
@@ -874,7 +965,7 @@ def build_presence_segment_report_index(*, year=None, month=None, today=None) ->
     output_dir = default_reports_output_dir()
 
     items = []
-    for segment, irregular_tier, slug, label in PRESENCE_SEGMENT_REPORT_SPECS:
+    for segment, irregular_tier, regular_tier, slug, label in PRESENCE_SEGMENT_REPORT_SPECS:
         filename = build_pdf_filename(
             'statistiques-presence',
             year=year,
@@ -887,12 +978,14 @@ def build_presence_segment_report_index(*, year=None, month=None, today=None) ->
             month=month,
             segment=segment,
             irregular_tier=irregular_tier,
+            regular_tier=regular_tier,
         )
         stat = path.stat() if path.is_file() else None
         items.append(
             {
                 'segment': segment,
                 'irregular_tier': irregular_tier,
+                'regular_tier': regular_tier,
                 'slug': slug,
                 'label': str(label),
                 'filename': filename,
@@ -914,12 +1007,13 @@ def generate_presence_segment_reports(*, year=None, month=None, today=None) -> l
     month = int(month or today.month)
     results = []
 
-    for segment, irregular_tier, slug, label in PRESENCE_SEGMENT_REPORT_SPECS:
+    for segment, irregular_tier, regular_tier, slug, label in PRESENCE_SEGMENT_REPORT_SPECS:
         kwargs = {
             'year': year,
             'month': month,
             'segment': segment,
             'irregular_tier': irregular_tier,
+            'regular_tier': regular_tier,
             'today': today,
         }
         pdf_bytes = render_presence_statistics_pdf(**kwargs)
@@ -939,6 +1033,7 @@ def generate_presence_segment_reports(*, year=None, month=None, today=None) -> l
                 'row_count': ctx.get('pdf_rows_count', 0),
                 'segment': segment,
                 'irregular_tier': irregular_tier,
+                'regular_tier': regular_tier,
             }
         )
     return results
